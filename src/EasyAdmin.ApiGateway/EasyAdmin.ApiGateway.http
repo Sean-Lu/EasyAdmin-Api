@@ -1,0 +1,6 @@
+@EasyAdmin.ApiGateway_HostAddress = http://localhost:5262
+
+GET {{EasyAdmin.ApiGateway_HostAddress}}/api/Test/GetWeatherForecast
+Accept: application/json
+
+###

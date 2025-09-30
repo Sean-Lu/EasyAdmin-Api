@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EasyAdmin.GrpcService": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

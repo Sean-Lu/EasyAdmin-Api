@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EasyAdmin.ConsumerService": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

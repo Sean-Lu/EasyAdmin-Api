@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EasyAdmin.JobService": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

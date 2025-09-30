@@ -1,0 +1,46 @@
+﻿@model EasyAdmin.Web.Models.ViewModels.UnknownExceptionViewModel
+@{
+    Layout = null;// 不使用布局页
+    ViewBag.Title = "您访问的页面出错了";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>@ViewBag.Title</title>
+    <link href="~/css/errorpage.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="errorpage-tip">
+        <p><span>ERROR</span></p>
+        <p>出错啦(´･ω･`)</p>
+    </div>
+
+    <div class="errorpage-operator">
+        <a class="btn-common" href="javascript:void(0);" onclick="history.back()">返回上一页面</a>
+        <a class="btn-common btn-green" href="/">返回网站首页</a>
+    </div>
+
+    <div class="errorpage-exception" style="@(Model.ShowException ? string.Empty : "display: none")">
+        @{
+            if (Model != null)
+            {
+                var ex = Model.Exception;
+                @*while (ex != null)
+                    {
+                        var exception = $"<div><b>Message: </b>{ex.Message}{Environment.NewLine}<br /><b>Source: </b>{ex.Source}{Environment.NewLine}<br /><b>StackTrace: </b>{(Model.ShowException ? ex.StackTrace?.Replace(Environment.NewLine, "<br />") : ex.StackTrace)}{Environment.NewLine}</div>";
+                        @Html.Raw(exception)
+                        ex = ex.InnerException;
+                    }*@
+                if (ex != null)
+                {
+                    <div>
+                        <b>@ex.ToString()</b>
+                    </div>
+                }
+            }
+        }
+    </div>
+</body>
+</html>
