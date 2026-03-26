@@ -11,6 +11,8 @@ namespace EasyAdmin.Domain.Entities;
 /// </summary>
 //[Table("User")]
 [CodeFirst]
+[LeftJoin(typeof(DepartmentEntity), nameof(DepartmentId), nameof(DepartmentEntity.Id), "dept")]
+[LeftJoin(typeof(PositionEntity), nameof(PositionId), nameof(PositionEntity.Id), "post")]
 public class UserEntity : TenantEntityBase
 {
     /// <summary>
@@ -47,6 +49,26 @@ public class UserEntity : TenantEntityBase
     /// 最后登录时间
     /// </summary>
     public virtual DateTime? LastLoginTime { get; set; }
+    /// <summary>
+    /// 所属部门ID
+    /// </summary>
+    public virtual long? DepartmentId { get; set; }
+    /// <summary>
+    /// 所属部门名称
+    /// </summary>
+    [NotMapped]
+    [LeftJoinField("dept", nameof(DepartmentEntity.Name))]
+    public virtual string? DepartmentName { get; set; }
+    /// <summary>
+    /// 所属岗位ID
+    /// </summary>
+    public virtual long? PositionId { get; set; }
+    /// <summary>
+    /// 所属岗位名称
+    /// </summary>
+    [NotMapped]
+    [LeftJoinField("post", nameof(PositionEntity.Name))]
+    public virtual string? PositionName { get; set; }
     /// <summary>
     /// 状态（0-禁用，1-启用）
     /// </summary>

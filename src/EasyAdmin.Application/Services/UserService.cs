@@ -99,7 +99,7 @@ public class UserService(
 
     public async Task<List<UserEntity>> GetAllUserAsync()
     {
-        return (await userRepository.QueryAsync(WhereExpressionUtil.Create<UserEntity>(entity => entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete))).ToList();
+        return (await userRepository.QueryAsync(WhereExpressionUtil.Create<UserEntity>(entity => entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete && entity.State == CommonState.Enable))).ToList();
     }
 
     public async Task<UserEntity> GetByIdAsync(long id)

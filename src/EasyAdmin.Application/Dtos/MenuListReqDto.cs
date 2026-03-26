@@ -5,11 +5,11 @@ public class MenuListReqDto
     /// <summary>
     /// 是否查询所有菜单（包含被禁用的）
     /// </summary>
-    public bool All { get; set; } = false;
+    public bool All { get; set; }
     /// <summary>
     /// 是否包含顶级菜单
     /// </summary>
-    public bool IncludeTopMenu { get; set; } = false;
+    public bool IncludeTopMenu { get; set; }
 
     /// <summary>
     /// 菜单名称

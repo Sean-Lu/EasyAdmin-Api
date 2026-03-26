@@ -32,6 +32,22 @@ public class UserDto : TenantDtoBase
     /// </summary>
     public virtual DateTime? LastLoginTime { get; set; }
     /// <summary>
+    /// 所属部门ID
+    /// </summary>
+    public virtual long? DepartmentId { get; set; }
+    /// <summary>
+    /// 所属部门名称
+    /// </summary>
+    public virtual string? DepartmentName { get; set; }
+    /// <summary>
+    /// 所属岗位ID
+    /// </summary>
+    public virtual long? PositionId { get; set; }
+    /// <summary>
+    /// 所属岗位名称
+    /// </summary>
+    public virtual string? PositionName { get; set; }
+    /// <summary>
     /// 状态（0-禁用，1-启用）
     /// </summary>
     public virtual CommonState State { get; set; }

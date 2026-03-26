@@ -5,6 +5,7 @@ using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Domain.Extensions;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Helper;
 using Microsoft.Extensions.Logging;
 using Sean.Core.DbRepository.Extensions;
 using Sean.Core.DbRepository.Util;
@@ -17,6 +18,7 @@ public class MenuService(
     IMenuRepository menuRepository
     ) : IMenuService
 {
+    private const long TopMenuId = 0;
     private const string TopMenuName = "顶级菜单";
 
     public async Task<bool> AddAsync(MenuDto dto)
@@ -46,10 +48,22 @@ public class MenuService(
 
     public async Task<List<MenuEntity>?> GetMenuTreeAsync(MenuListReqDto request)
     {
-        var menuTree = (await menuRepository.QueryAsync(WhereExpressionUtil.Create<MenuEntity>(entity => !entity.IsDelete)
+        var list = (await menuRepository.QueryAsync(WhereExpressionUtil.Create<MenuEntity>(entity => !entity.IsDelete)
             .AndAlsoIF(!string.IsNullOrWhiteSpace(request.Title), entity => entity.Title.Contains(request.Title))
             .AndAlsoIF(!string.IsNullOrWhiteSpace(request.Path), entity => entity.Path.Contains(request.Path))
-            .AndAlsoIF(!request.All, entity => entity.State == CommonState.Enable)))?.ToList().ToTreeList();
+            .AndAlsoIF(!request.All, entity => entity.State == CommonState.Enable)))?.ToList() ?? new List<MenuEntity>();
+        if (list.Any() && !list.Exists(c => c.PId == TopMenuId))
+        {
+            // 向上查找所有上级菜单
+            await TreeHelper.AddAllParentsAsync(
+                list,
+                async (id) => await menuRepository.GetByIdAsync(id),
+                entity => entity.Id,
+                entity => entity.PId,
+                entity => entity.PId == TopMenuId
+            );
+        }
+        var treeList = list.ToTreeList(TopMenuId);
         if (request.IncludeTopMenu)
         {
             return new List<MenuEntity>
@@ -57,38 +71,38 @@ public class MenuService(
                 new()
                 {
                     Id = 0,
-                    PId = 0,
+                    PId = TopMenuId,
                     Title = TopMenuName,
-                    Children = menuTree
+                    Children = treeList
                 }
             };
         }
-        return menuTree;
+        return treeList;
     }
 
     public async Task<MenuEntity> GetByIdAsync(long id)
     {
-        var menu = await menuRepository.GetByIdAsync(id);
-        if (menu.Id > 0)
+        var entity = await menuRepository.GetByIdAsync(id);
+        if (entity.Id > 0)
         {
-            menu.ParentFullPath = await GetParentMenuFullPathAsync(menu);
+            entity.ParentFullPath = await GetParentFullPathAsync(entity);
         }
-        return menu;
+        return entity;
     }
 
-    private async Task<string> GetParentMenuFullPathAsync(MenuEntity menu)
+    private async Task<string> GetParentFullPathAsync(MenuEntity entity)
     {
-        if (menu.PId == 0)
+        if (entity.PId == 0)
         {
             return TopMenuName;
         }
-        if (menu.PId == menu.Id)
+        if (entity.PId == entity.Id)
         {
-            return menu.Title;
+            return entity.Title;
         }
 
-        var parentMenu = await menuRepository.GetByIdAsync(menu.PId);
-        var parentMenuFullPath = await GetParentMenuFullPathAsync(parentMenu);
-        return $"{parentMenuFullPath} / {parentMenu.Title}";
+        var parent = await menuRepository.GetByIdAsync(entity.PId);
+        var parentFullPath = await GetParentFullPathAsync(parent);
+        return $"{parentFullPath} / {parent.Title}";
     }
 }
