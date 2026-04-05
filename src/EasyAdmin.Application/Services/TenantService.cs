@@ -82,8 +82,7 @@ public class TenantService(
 
     public async Task<bool> UpdateAsync(TenantDto dto)
     {
-        var entity = mapper.Map<TenantEntity>(dto);
-        return await tenantRepository.UpdateAsync(entity) > 0;
+        return await tenantRepository.UpdateByDtoAsync(dto, mapper.Map<TenantEntity>) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {

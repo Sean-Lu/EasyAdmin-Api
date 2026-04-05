@@ -33,8 +33,7 @@ public class CheckInCountService(
 
     public async Task<bool> UpdateAsync(CheckInCountDto dto)
     {
-        var entity = mapper.Map<CheckInCountEntity>(dto);
-        return await checkInCountRepository.UpdateAsync(entity) > 0;
+        return await checkInCountRepository.UpdateByDtoAsync(dto, mapper.Map<CheckInCountEntity>) > 0;
     }
 
     public async Task<bool> IncrAsync(long userId, CheckInType checkInType, DateTime lastCheckInTime, int incrCount, bool firstDay = false)

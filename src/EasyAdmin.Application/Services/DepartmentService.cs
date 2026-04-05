@@ -40,8 +40,7 @@ public class DepartmentService(
 
     public async Task<bool> UpdateAsync(DepartmentDto dto)
     {
-        var entity = mapper.Map<DepartmentEntity>(dto);
-        return await departmentRepository.UpdateAsync(entity) > 0;
+        return await departmentRepository.UpdateByDtoAsync(dto, mapper.Map<DepartmentEntity>) > 0;
     }
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)

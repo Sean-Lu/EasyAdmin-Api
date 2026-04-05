@@ -35,8 +35,7 @@ public class DayWorkReportService(
 
     public async Task<bool> UpdateAsync(DayWorkReportDto dto)
     {
-        var entity = mapper.Map<DayWorkReportEntity>(dto);
-        return await dayWorkReportRepository.UpdateAsync(entity) > 0;
+        return await dayWorkReportRepository.UpdateByDtoAsync(dto, mapper.Map<DayWorkReportEntity>) > 0;
     }
 
     public async Task<PageQueryResult<DayWorkReportEntity>> PageAsync(DayWorkReportPageReqDto request)

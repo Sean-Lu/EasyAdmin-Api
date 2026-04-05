@@ -34,8 +34,7 @@ public class LoginLogService(
 
     public async Task<bool> UpdateAsync(LoginLogDto dto)
     {
-        var entity = mapper.Map<LoginLogEntity>(dto);
-        return await loginLogRepository.UpdateAsync(entity) > 0;
+        return await loginLogRepository.UpdateByDtoAsync(dto, mapper.Map<LoginLogEntity>) > 0;
     }
 
     public async Task<PageQueryResult<LoginLogEntity>> PageAsync(LoginLogPageReqDto request)

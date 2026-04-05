@@ -36,8 +36,7 @@ public class TaskService(
 
     public async Task<bool> UpdateAsync(TaskDto dto)
     {
-        var entity = mapper.Map<TaskEntity>(dto);
-        return await taskRepository.UpdateAsync(entity) > 0;
+        return await taskRepository.UpdateByDtoAsync(dto, mapper.Map<TaskEntity>) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {

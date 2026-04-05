@@ -34,8 +34,7 @@ public class ParamService(
 
     public async Task<bool> UpdateAsync(ParamDto dto)
     {
-        var entity = mapper.Map<ParamEntity>(dto);
-        return await paramRepository.UpdateAsync(entity) > 0;
+        return await paramRepository.UpdateByDtoAsync(dto, mapper.Map<ParamEntity>) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {

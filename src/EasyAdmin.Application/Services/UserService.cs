@@ -75,8 +75,7 @@ public class UserService(
 
     public async Task<bool> UpdateAsync(UserDto dto)
     {
-        var entity = mapper.Map<UserEntity>(dto);
-        return await userRepository.UpdateAsync(entity, FieldExpressionUtil.IgnoreFields<UserEntity>(c => c.Password)) > 0;
+        return await userRepository.UpdateByDtoAsync(dto, mapper.Map<UserEntity>) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {

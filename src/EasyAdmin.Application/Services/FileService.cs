@@ -35,8 +35,7 @@ public class FileService(
 
     public async Task<bool> UpdateAsync(FileDto dto)
     {
-        var entity = mapper.Map<FileEntity>(dto);
-        return await fileRepository.UpdateAsync(entity) > 0;
+        return await fileRepository.UpdateByDtoAsync(dto, mapper.Map<FileEntity>) > 0;
     }
 
     public async Task<PageQueryResult<FileEntity>> PageAsync(FilePageReqDto request)

@@ -38,8 +38,7 @@ public class MenuService(
 
     public async Task<bool> UpdateAsync(MenuDto dto)
     {
-        var entity = mapper.Map<MenuEntity>(dto);
-        return await menuRepository.UpdateAsync(entity) > 0;
+        return await menuRepository.UpdateByDtoAsync(dto, mapper.Map<MenuEntity>) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {

@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="9.4.0" />
-    <PackageReference Include="Sean.Core.DbRepository.Dapper" Version="2.1.19" />
+    <PackageReference Include="Sean.Core.DbRepository.Dapper" Version="2.1.20" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
   </ItemGroup>
 

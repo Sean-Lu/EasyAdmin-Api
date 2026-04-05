@@ -55,8 +55,7 @@ public class PositionService(
             throw new ExplicitException("岗位编码不能为空");
         }
 
-        var entity = mapper.Map<PositionEntity>(dto);
-        return await positionRepository.UpdateAsync(entity) > 0;
+        return await positionRepository.UpdateByDtoAsync(dto, mapper.Map<PositionEntity>) > 0;
     }
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)

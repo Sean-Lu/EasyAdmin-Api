@@ -34,8 +34,7 @@ public class OperateLogService(
 
     public async Task<bool> UpdateAsync(OperateLogDto dto)
     {
-        var entity = mapper.Map<OperateLogEntity>(dto);
-        return await operateLogRepository.UpdateAsync(entity) > 0;
+        return await operateLogRepository.UpdateByDtoAsync(dto, mapper.Map<OperateLogEntity>) > 0;
     }
 
     public async Task<PageQueryResult<OperateLogEntity>> PageAsync(OperateLogPageReqDto request)

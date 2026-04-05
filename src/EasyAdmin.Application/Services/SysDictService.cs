@@ -34,8 +34,7 @@ public class SysDictService(
 
     public async Task<bool> UpdateAsync(SysDictDto dto)
     {
-        var entity = mapper.Map<SysDictEntity>(dto);
-        return await sysDictRepository.UpdateAsync(entity) > 0;
+        return await sysDictRepository.UpdateByDtoAsync(dto, mapper.Map<SysDictEntity>) > 0;
     }
 
     public async Task<PageQueryResult<SysDictEntity>> PageAsync(SysDictPageReqDto request)
