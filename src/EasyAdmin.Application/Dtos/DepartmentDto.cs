@@ -4,6 +4,9 @@ using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
 
+/// <summary>
+/// 部门 DTO
+/// </summary>
 [AutoMap(typeof(DepartmentEntity), ReverseMap = true)]
 public class DepartmentDto : TenantTreeDtoBase<DepartmentDto>
 {

@@ -1,5 +1,8 @@
 ﻿namespace EasyAdmin.Application.Dtos;
 
+/// <summary>
+/// 菜单列表查询条件
+/// </summary>
 public class MenuListReqDto
 {
     /// <summary>

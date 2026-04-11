@@ -5,7 +5,7 @@ using EasyAdmin.Infrastructure.Enums;
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
-/// 文件表
+/// 文件 DTO
 /// </summary>
 [AutoMap(typeof(FileEntity), ReverseMap = true)]
 public class FileDto : TenantDtoBase

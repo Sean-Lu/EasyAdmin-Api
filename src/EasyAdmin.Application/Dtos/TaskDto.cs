@@ -4,6 +4,9 @@ using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
 
+/// <summary>
+/// 任务 DTO
+/// </summary>
 [AutoMap(typeof(TaskEntity), ReverseMap = true)]
 public class TaskDto : TenantDtoBase
 {

@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿namespace EasyAdmin.Application.Dtos;
 
-namespace EasyAdmin.Application.Dtos;
-
+/// <summary>
+/// 用户列表分页查询条件
+/// </summary>
 public class UserPageReqDto : PageRequestBase
 {
     /// <summary>

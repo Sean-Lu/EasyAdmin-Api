@@ -5,7 +5,7 @@ using EasyAdmin.Infrastructure.Enums;
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
-/// 签到日志表
+/// 签到日志 DTO
 /// </summary>
 [AutoMap(typeof(CheckInLogEntity), ReverseMap = true)]
 public class CheckInLogDto : TenantDtoBase

@@ -1,16 +1,17 @@
-﻿namespace EasyAdmin.Application.Dtos;
+namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
-/// 岗位列表分页查询条件
+/// 角色列表分页查询条件
 /// </summary>
-public class PositionPageReqDto : PageRequestBase
+public class RolePageReqDto : PageRequestBase
 {
     /// <summary>
-    /// 岗位名称
+    /// 角色名称
     /// </summary>
     public string? Name { get; set; }
+    
     /// <summary>
-    /// 岗位编码
+    /// 角色编码
     /// </summary>
     public string? Code { get; set; }
 }

@@ -4,7 +4,7 @@ using EasyAdmin.Domain.Entities;
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
-/// 操作日志表
+/// 操作日志 DTO
 /// </summary>
 [AutoMap(typeof(OperateLogEntity), ReverseMap = true)]
 public class OperateLogDto : TenantDtoBase

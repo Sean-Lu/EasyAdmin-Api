@@ -1,5 +1,8 @@
 ﻿namespace EasyAdmin.Application.Dtos;
 
+/// <summary>
+/// 字典列表分页查询条件
+/// </summary>
 public class SysDictPageReqDto : PageRequestBase
 {
     /// <summary>

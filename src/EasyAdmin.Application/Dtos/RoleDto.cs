@@ -1,31 +1,35 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
-/// 参数配置 DTO
+/// 角色 DTO
 /// </summary>
-[AutoMap(typeof(ParamEntity), ReverseMap = true)]
-public class ParamDto : DtoBase
+[AutoMap(typeof(RoleEntity), ReverseMap = true)]
+public class RoleDto : TenantDtoBase
 {
     /// <summary>
-    /// 参数名称
+    /// 角色名称
     /// </summary>
-    public virtual string ParamName { get; set; }
+    public virtual string Name { get; set; }
+    
     /// <summary>
-    /// 参数键名
+    /// 角色编码
     /// </summary>
-    public virtual string ParamKey { get; set; }
+    public virtual string Code { get; set; }
+    
     /// <summary>
-    /// 参数键值
+    /// 角色描述
     /// </summary>
-    public virtual string ParamValue { get; set; }
+    public virtual string? Description { get; set; }
+    
     /// <summary>
-    /// 备注
+    /// 排序
     /// </summary>
-    public virtual string? Remark { get; set; }
+    public virtual int Sort { get; set; }
+    
     /// <summary>
     /// 状态（0-禁用，1-启用）
     /// </summary>

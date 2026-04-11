@@ -48,9 +48,10 @@ public class CheckInCountService(
             LastCheckInTime = lastCheckInTime
         };
 
-        return await checkInCountRepository.ExecuteAutoTransactionAsync(async tran =>
+        // 使用自动事务（自动提交或回滚）
+        return await checkInCountRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
-            if (await checkInCountRepository.UpdateAsync(updateModel, entity => entity.LastCheckInTime, entity => entity.UserId == userId && entity.CheckInType == checkInType, tran) < 1)
+            if (await checkInCountRepository.UpdateAsync(updateModel, entity => entity.LastCheckInTime, entity => entity.UserId == userId && entity.CheckInType == checkInType, transaction) < 1)
             {
                 return false;
             }
@@ -58,14 +59,14 @@ public class CheckInCountService(
             if (firstDay)
             {
                 updateModel.ContinuousCheckInDays = 1;
-                if (await checkInCountRepository.UpdateAsync(updateModel, entity => entity.ContinuousCheckInDays, entity => entity.UserId == userId && entity.CheckInType == checkInType, tran) < 1)
+                if (await checkInCountRepository.UpdateAsync(updateModel, entity => entity.ContinuousCheckInDays, entity => entity.UserId == userId && entity.CheckInType == checkInType, transaction) < 1)
                 {
                     return false;
                 }
             }
             else
             {
-                if (!await checkInCountRepository.IncrementAsync(incrCount, entity => entity.ContinuousCheckInDays, entity => entity.UserId == userId && entity.CheckInType == checkInType, tran))
+                if (!await checkInCountRepository.IncrementAsync(incrCount, entity => entity.ContinuousCheckInDays, entity => entity.UserId == userId && entity.CheckInType == checkInType, transaction))
                 {
                     return false;
                 }

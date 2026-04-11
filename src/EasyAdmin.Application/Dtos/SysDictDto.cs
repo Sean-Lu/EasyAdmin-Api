@@ -5,7 +5,7 @@ using EasyAdmin.Infrastructure.Enums;
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
-/// 字典表
+/// 字典 DTO
 /// </summary>
 [AutoMap(typeof(SysDictEntity), ReverseMap = true)]
 public class SysDictDto : TreeDtoBase<SysDictDto>

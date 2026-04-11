@@ -1,5 +1,8 @@
 ﻿namespace EasyAdmin.Application.Dtos;
 
+/// <summary>
+/// 参数列表分页查询条件
+/// </summary>
 public class ParamPageReqDto : PageRequestBase
 {
     /// <summary>

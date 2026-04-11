@@ -6,7 +6,7 @@ using EasyAdmin.Infrastructure.Attributes;
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
-/// 日报
+/// 日报导出 DTO
 /// </summary>
 [AutoMap(typeof(DayWorkReportEntity))]
 public class DayWorkReportExportDto

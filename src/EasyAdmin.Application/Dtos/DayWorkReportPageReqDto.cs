@@ -1,5 +1,8 @@
 ﻿namespace EasyAdmin.Application.Dtos;
 
+/// <summary>
+/// 日报列表分页查询条件
+/// </summary>
 public class DayWorkReportPageReqDto : PageRequestBase
 {
     /// <summary>
@@ -10,13 +13,4 @@ public class DayWorkReportPageReqDto : PageRequestBase
     /// 结束日期
     /// </summary>
     public DateTime? EndTime { get; set; }
-}
-
-public class DayWorkReportExportReqDto : DayWorkReportPageReqDto
-{
-    /// <summary>
-    /// "excel" or "markdown"
-    /// </summary>
-    public string ExportType { get; set; }
-    public bool ExportAll { get; set; }
 }

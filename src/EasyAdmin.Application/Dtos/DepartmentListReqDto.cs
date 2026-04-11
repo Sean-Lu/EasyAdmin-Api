@@ -1,5 +1,8 @@
 ﻿namespace EasyAdmin.Application.Dtos;
 
+/// <summary>
+/// 部门列表查询条件
+/// </summary>
 public class DepartmentListReqDto
 {
     /// <summary>

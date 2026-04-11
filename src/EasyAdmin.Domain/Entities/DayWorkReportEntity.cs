@@ -5,7 +5,7 @@ using Sean.Core.DbRepository;
 namespace EasyAdmin.Domain.Entities;
 
 /// <summary>
-/// 日报
+/// 日报表
 /// </summary>
 //[Table("DayWorkReport")]
 [CodeFirst]
