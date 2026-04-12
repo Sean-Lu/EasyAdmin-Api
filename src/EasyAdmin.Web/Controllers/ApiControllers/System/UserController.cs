@@ -16,7 +16,8 @@ public class UserController(
     ILogger<UserController> logger,
     IConfiguration configuration,
     IMapper mapper,
-    IUserService userService
+    IUserService userService,
+    IUserRoleService userRoleService
     ) : BaseApiController
 {
     /// <summary>
@@ -156,5 +157,27 @@ public class UserController(
             return Fail<bool>("重置密码失败");
         }
         return Success(true);
+    }
+
+    /// <summary>
+    /// 给用户分配角色
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<bool>> AssignRoles(UserRoleAssignmentDto data)
+    {
+        return Success(await userRoleService.AssignRolesToUserAsync(data));
+    }
+
+    /// <summary>
+    /// 获取用户角色ID列表
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<ApiResult<List<long>>> GetUserRoleIds(long userId)
+    {
+        return Success(await userRoleService.GetUserRoleIdsAsync(userId));
     }
 }
