@@ -1,5 +1,4 @@
-﻿using EasyAdmin.Infrastructure.Enums;
-using EasyAdmin.Infrastructure.Models;
+﻿using EasyAdmin.Infrastructure.Models;
 
 namespace EasyAdmin.Infrastructure.Tenant;
 
@@ -27,10 +26,6 @@ public static class TenantContextHolder
     /// 用户ID
     /// </summary>
     public static long UserId => (UserInfo?.UserId).GetValueOrDefault();
-    /// <summary>
-    /// 用户角色
-    /// </summary>
-    public static UserRole UserRole => (UserInfo?.UserRole).GetValueOrDefault();
 
     /// <summary>
     /// 清理上下文

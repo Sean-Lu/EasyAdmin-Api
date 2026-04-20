@@ -38,8 +38,7 @@ public class UserRoleService(
 
     public async Task<List<long>> GetUserRoleIdsAsync(long userId)
     {
-        var userRoles = await userRoleRepository.QueryAsync(entity => entity.UserId == userId && entity.TenantId == TenantContextHolder.TenantId);
-        return userRoles?.Select(ur => ur.RoleId).ToList() ?? new List<long>();
+        return await userRoleRepository.GetUserRoleIdsAsync(userId);
     }
 
     public async Task<List<RoleEntity>> GetUserRolesAsync(long userId)
@@ -50,7 +49,7 @@ public class UserRoleService(
             return new List<RoleEntity>();
         }
 
-        var roles = await roleRepository.QueryAsync(entity => userRoleIds.Contains(entity.Id) && entity.TenantId == TenantContextHolder.TenantId);
+        var roles = await roleRepository.QueryAsync(entity => userRoleIds.Contains(entity.Id) && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete);
         return roles?.ToList() ?? new List<RoleEntity>();
     }
 }

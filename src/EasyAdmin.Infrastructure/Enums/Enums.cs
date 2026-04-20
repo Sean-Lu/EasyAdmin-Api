@@ -1,29 +1,6 @@
 ﻿namespace EasyAdmin.Infrastructure.Enums;
 
 /// <summary>
-/// 用户角色
-/// </summary>
-public enum UserRole
-{
-    /// <summary>
-    /// 未知
-    /// </summary>
-    Unknown = 0,
-    /// <summary>
-    /// 普通用户
-    /// </summary>
-    User = 1,
-    /// <summary>
-    /// 管理员
-    /// </summary>
-    Administrator = 2,
-    /// <summary>
-    /// 超级管理员
-    /// </summary>
-    SuperAdministrator = 3
-}
-
-/// <summary>
 /// 签到类型
 /// </summary>
 public enum CheckInType

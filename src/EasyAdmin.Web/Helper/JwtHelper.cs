@@ -58,7 +58,6 @@ public static class JwtHelper
         {
             new(nameof(JwtUserModel.TenantId),user.TenantId.ToString()),
             new(nameof(JwtUserModel.UserId),user.UserId.ToString()),
-            new(nameof(JwtUserModel.UserRole),((int)user.UserRole).ToString()),
         };
         return GetJwtToken(claims);
     }
@@ -103,7 +102,6 @@ public static class JwtHelper
         {
             TenantId = Convert.ToInt64(claims.First(t => t.Type == nameof(JwtUserModel.TenantId)).Value),
             UserId = Convert.ToInt64(claims.First(t => t.Type == nameof(JwtUserModel.UserId)).Value),
-            UserRole = Enum.Parse<UserRole>(claims.First(t => t.Type == nameof(JwtUserModel.UserRole)).Value)
         };
     }
 

@@ -42,10 +42,6 @@ public class UserService(
         {
             entity.NickName = entity.UserName;
         }
-        if (entity.Role == UserRole.Unknown)
-        {
-            entity.Role = UserRole.User;// 默认赋予普通用户角色
-        }
         if (string.IsNullOrEmpty(entity.Password))
         {
             var paramEntity = await paramRepository.GetAsync(c => c.ParamKey == ConfigConst.UserInitPassword && c.State == CommonState.Enable);

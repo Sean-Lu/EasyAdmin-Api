@@ -4,6 +4,7 @@ using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Domain.Extensions;
+using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Helper;
 using EasyAdmin.Infrastructure.Tenant;
@@ -19,9 +20,6 @@ public class DepartmentService(
     IDepartmentRepository departmentRepository
     ) : IDepartmentService
 {
-    private const long TopDepartmentId = 0;
-    private const string TopDepartmentName = "顶级部门";
-
     public async Task<bool> AddAsync(DepartmentDto dto)
     {
         var entity = mapper.Map<DepartmentEntity>(dto);
@@ -53,7 +51,7 @@ public class DepartmentService(
         var list = (await departmentRepository.QueryAsync(WhereExpressionUtil.Create<DepartmentEntity>(entity => entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
             .AndAlsoIF(!string.IsNullOrWhiteSpace(request.Name), entity => entity.Name.Contains(request.Name))
             .AndAlsoIF(!request.All, entity => entity.State == CommonState.Enable)))?.ToList() ?? new List<DepartmentEntity>();
-        if (list.Any() && !list.Exists(c => c.PId == TopDepartmentId))
+        if (list.Any() && !list.Exists(c => c.PId == SysConst.TopDepartmentId))
         {
             // 向上查找所有上级部门
             await TreeHelper.AddAllParentsAsync(
@@ -61,10 +59,10 @@ public class DepartmentService(
                 async (id) => await departmentRepository.GetByIdAsync(id),
                 entity => entity.Id,
                 entity => entity.PId,
-                entity => entity.PId == TopDepartmentId
+                entity => entity.PId == SysConst.TopDepartmentId
             );
         }
-        var treeList = list.ToTreeList(TopDepartmentId);
+        var treeList = list.ToTreeList(SysConst.TopDepartmentId);
         if (request.IncludeTopDepartment)
         {
             return new List<DepartmentEntity>
@@ -72,8 +70,8 @@ public class DepartmentService(
                 new()
                 {
                     Id = 0,
-                    PId = TopDepartmentId,
-                    Name = TopDepartmentName,
+                    PId = SysConst.TopDepartmentId,
+                    Name = SysConst.TopDepartmentName,
                     Children = treeList
                 }
             };
@@ -95,7 +93,7 @@ public class DepartmentService(
     {
         if (entity.PId == 0)
         {
-            return TopDepartmentName;
+            return SysConst.TopDepartmentName;
         }
         if (entity.PId == entity.Id)
         {

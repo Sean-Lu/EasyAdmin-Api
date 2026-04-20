@@ -80,11 +80,10 @@ public class MenuController(
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ApiResult<List<MenuDto>?>> ListTree([FromQuery] MenuListReqDto request)
+    public async Task<ApiResult<List<MenuDto>>> ListTree([FromQuery] MenuListReqDto request)
     {
-        // todo:菜单权限控制：不同用户看到的菜单列表不一样
-
-        return Success(mapper.Map<List<MenuDto>>(await menuService.GetMenuTreeAsync(request)));
+        // 根据当前登录用户的权限返回菜单数据
+        return Success(mapper.Map<List<MenuDto>>(await menuService.GetMenuTreeAsync(UserId, request)));
     }
 
     /// <summary>

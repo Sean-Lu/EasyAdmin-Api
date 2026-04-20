@@ -1,5 +1,6 @@
 ﻿using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
+using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Domain.SeedData;
@@ -55,7 +56,7 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             //new MenuEntity{ Id = 8000003, PId = 8000000, Sort = 8, Icon = "AppstoreOutlined", Title = "菜单3", Path = "/menu/menu3", State = CommonState.Disable },
 
             new MenuEntity{ Id = 8000000, PId = 0, Sort = 9, Icon = "SettingOutlined", Title = "系统管理", Path = "/system", State = CommonState.Enable },
-            new MenuEntity{ Id = 8000001, PId = 8000000, Sort = 1, Icon = "ShopOutlined", Title = "租户管理", Path = "/system/tenant", State = CommonState.Enable },
+            new MenuEntity{ Id = SysConst.TenantMenuId, PId = 8000000, Sort = 1, Icon = "ShopOutlined", Title = "租户管理", Path = "/system/tenant", State = CommonState.Enable },
             new MenuEntity{ Id = 8000002, PId = 8000000, Sort = 2, Icon = "UserOutlined", Title = "用户管理", Path = "/system/user", State = CommonState.Enable },
             new MenuEntity{ Id = 8000003, PId = 8000000, Sort = 3, Icon = "SolutionOutlined", Title = "角色管理", Path = "/system/role", State = CommonState.Enable },
             new MenuEntity{ Id = 8000004, PId = 8000000, Sort = 4, Icon = "AppstoreOutlined", Title = "部门管理", Path = "/system/department", State = CommonState.Enable },

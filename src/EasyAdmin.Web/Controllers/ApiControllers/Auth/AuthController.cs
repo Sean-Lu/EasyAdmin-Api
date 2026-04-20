@@ -53,8 +53,7 @@ public class AuthController(
         var token = JwtHelper.GetJwtToken(new JwtUserModel
         {
             TenantId = user.TenantId,
-            UserId = user.Id,
-            UserRole = user.Role
+            UserId = user.Id
         });
         return Success(new LoginResponse
         {
@@ -86,17 +85,9 @@ public class AuthController(
     [HttpGet]
     public ApiResult<object> Buttons()
     {
-        return UserRole switch
+        return Success<object>(new
         {
-            UserRole.SuperAdministrator or UserRole.Administrator => Success<object>(new
-            {
-                useHooks = new Dictionary<string, bool> { { "add", true }, { "edit", true }, { "delete", true }, }
-            }),
-            UserRole.User => Success<object>(new
-            {
-                useHooks = new Dictionary<string, bool> { { "add", true }, { "edit", true }, }
-            }),
-            _ => Fail<object>()
-        };
+            useHooks = new Dictionary<string, bool> { { "add", true }, { "edit", true }, { "delete", true }, }
+        });
     }
 }

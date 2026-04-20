@@ -42,10 +42,6 @@ public class UserEntity : TenantEntityBase
     [MaxLength(50)]
     public virtual string Email { get; set; }
     /// <summary>
-    /// 用户角色
-    /// </summary>
-    public virtual UserRole Role { get; set; }
-    /// <summary>
     /// 最后登录时间
     /// </summary>
     public virtual DateTime? LastLoginTime { get; set; }

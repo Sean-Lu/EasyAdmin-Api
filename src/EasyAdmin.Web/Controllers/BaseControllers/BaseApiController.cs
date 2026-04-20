@@ -28,10 +28,6 @@ public abstract class BaseApiController : ControllerBase
     /// 当前用户ID
     /// </summary>
     protected long UserId => TenantContextHolder.UserId;//UserInfo?.UserId ?? 0;
-    /// <summary>
-    /// 当前用户角色
-    /// </summary>
-    protected UserRole UserRole => TenantContextHolder.UserRole;//UserInfo?.UserRole ?? UserRole.Unknown;
 
     #region ApiResult
     protected ApiResult Success()
