@@ -55,6 +55,7 @@ public class AuthController(
             TenantId = user.TenantId,
             UserId = user.Id
         });
+        
         return Success(new LoginResponse
         {
             AccessToken = token
@@ -70,7 +71,7 @@ public class AuthController(
     public ApiResult<object> CheckToken()
     {
         var tokenExpiredTime = JwtHelper.GetTokenExpiredTime(this.Request);
-        var isTokenExpired = tokenExpiredTime.HasValue && DateTime.UtcNow > tokenExpiredTime;// 如果当前时间已经超过过期时间，则Token过期
+        var isTokenExpired = tokenExpiredTime.HasValue && DateTime.UtcNow > tokenExpiredTime.Value.ToUniversalTime();
         return Success<object>(new
         {
             ValidTo = tokenExpiredTime,

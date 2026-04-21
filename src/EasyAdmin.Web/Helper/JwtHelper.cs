@@ -74,9 +74,46 @@ public static class JwtHelper
         {
             return null;
         }
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var jwtToken = tokenHandler.ReadJwtToken(token);
-        return jwtToken.ValidTo;
+        
+        try
+        {
+            // 手动解析 token 以获取 exp（因为 JwtSecurityTokenHandler 在某些情况下无法正确读取 exp）
+            var parts = token.Split('.');
+            if (parts.Length >= 2)
+            {
+                var payloadBase64 = parts[1];
+                // 补全 base64 可能缺失的 =
+                while (payloadBase64.Length % 4 != 0)
+                    payloadBase64 += '=';
+                
+                var payloadBytes = Convert.FromBase64String(payloadBase64);
+                var payloadJson = System.Text.Encoding.UTF8.GetString(payloadBytes);
+                
+                // 解析 exp
+                var jsonDoc = System.Text.Json.JsonDocument.Parse(payloadJson);
+                if (jsonDoc.RootElement.TryGetProperty("exp", out var expElement) && 
+                    expElement.TryGetInt64(out var expUnixTime))
+                {
+                    return DateTimeOffset.FromUnixTimeSeconds(expUnixTime).UtcDateTime;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // 如果手动解析失败，尝试使用标准方法
+        }
+        
+        // 备用：使用标准方法
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            return jwtToken.ValidTo;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -132,6 +169,18 @@ public static class JwtHelper
     /// <returns></returns>
     private static string? GetToken(HttpRequest request)
     {
-        return request.Headers.TryGetValue(WebConst.RequestHeaderTokenKey, out var token) ? token.ToString().Replace("Bearer ", "") : null;
+        // 先尝试从 Authorization 请求头获取
+        if (request.Headers.TryGetValue(WebConst.RequestHeaderTokenKey, out var token))
+        {
+            var tokenStr = token.ToString();
+            // 移除 Bearer 前缀（支持大小写不敏感）
+            if (tokenStr.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                return tokenStr.Substring("Bearer ".Length).Trim();
+            }
+            // 如果没有前缀，直接返回
+            return tokenStr.Trim();
+        }
+        return null;
     }
 }

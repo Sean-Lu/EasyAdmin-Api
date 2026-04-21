@@ -28,12 +28,12 @@ public class JwtConfig
     /// <summary>
     /// 生效时间
     /// </summary>
-    public DateTime NotBefore => DateTime.Now;
+    public DateTime NotBefore => DateTime.UtcNow;
 
     /// <summary>
     /// 过期时间
     /// </summary>
-    public DateTime Expiration => DateTime.Now.AddMinutes(Expired);
+    public DateTime Expiration => DateTime.UtcNow.AddMinutes(Expired);
 
     /// <summary>
     /// 密钥Bytes
