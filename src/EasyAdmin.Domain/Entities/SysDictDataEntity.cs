@@ -1,37 +1,34 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using EasyAdmin.Infrastructure.Enums;
 using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Domain.Entities;
 
 /// <summary>
-/// 字典表
+/// 字典数据表
 /// </summary>
-//[Table("SysDict")]
 [CodeFirst]
-public class SysDictEntity : TreeEntityBase<SysDictEntity>
+public class SysDictDataEntity : TenantEntityBase
 {
     /// <summary>
-    /// 编码
+    /// 字典类型ID
     /// </summary>
-    [MaxLength(50)]
-    public virtual string Code { get; set; }
+    public virtual long DictTypeId { get; set; }
     /// <summary>
-    /// 字段键
+    /// 字典键值
     /// </summary>
     public virtual int DictKey { get; set; }
     /// <summary>
-    /// 字段值
+    /// 字典值
     /// </summary>
-    [MaxLength(200)]
+    [Required]
+    [MaxLength(100)]
     public virtual string DictValue { get; set; }
     /// <summary>
-    /// 备注
+    /// 排序
     /// </summary>
-    [MaxLength(200)]
-    public virtual string Remark { get; set; }
+    public int Sort { get; set; }
     /// <summary>
     /// 状态（0-禁用，1-启用）
     /// </summary>
