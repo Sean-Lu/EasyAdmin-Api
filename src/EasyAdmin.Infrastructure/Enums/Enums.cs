@@ -1,4 +1,4 @@
-﻿namespace EasyAdmin.Infrastructure.Enums;
+namespace EasyAdmin.Infrastructure.Enums;
 
 /// <summary>
 /// 签到类型
@@ -34,5 +34,9 @@ public enum FileStoreType
     /// <summary>
     /// 本地文件
     /// </summary>
-    LocalFile = 0
+    LocalFile = 0,
+    /// <summary>
+    /// 阿里云 OSS
+    /// </summary>
+    AliyunOSS = 1
 }

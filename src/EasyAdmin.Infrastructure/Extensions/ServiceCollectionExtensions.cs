@@ -1,5 +1,6 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using EasyAdmin.Infrastructure.Storage;
 
 namespace EasyAdmin.Infrastructure.Extensions;
 
@@ -60,6 +61,19 @@ public static class ServiceCollectionExtensions
             }
         }
 
+        return services;
+    }
+
+    /// <summary>
+    /// 添加文件存储服务
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddFileStorage(this IServiceCollection services)
+    {
+        services.AddSingleton<IFileStorage, LocalFileStorage>();// 添加本地文件存储服务
+        services.AddSingleton<IFileStorage, AliyunOssStorage>();// 添加阿里云OSS文件存储服务
+        services.AddSingleton<IFileStorageFactory, FileStorageFactory>();// 添加文件存储工厂服务
         return services;
     }
 }

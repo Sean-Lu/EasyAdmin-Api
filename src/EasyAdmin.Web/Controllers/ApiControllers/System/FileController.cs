@@ -1,7 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Storage;
 using EasyAdmin.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,67 +16,51 @@ public class FileController(
     IConfiguration configuration,
     IWebHostEnvironment environment,
     IMapper mapper,
-    IFileService fileService
+    IFileService fileService,
+    IFileStorageFactory fileStorageFactory
     ) : BaseApiController
 {
-    private const string RootPath = "${RootPath}";// environment.ContentRootPath
-
     /// <summary>
     /// 上传文件
     /// </summary>
+    /// <param name="storeType">存储类型</param>
     /// <param name="description"></param>
     /// <param name="file"></param>
     /// <returns></returns>
     [HttpPost]
-    //[Consumes("multipart/form-data")]
-    public async Task<ApiResult<FileDto>> UploadFile([FromForm] string? description, IFormFile? file)
+    public async Task<ApiResult<FileDto>> UploadFile([FromForm] FileStoreType storeType, [FromForm] string? description, IFormFile? file)
     {
-        //var file = Request.Form.Files.FirstOrDefault();
-        //var description = Request.Form["description"].FirstOrDefault();
-
         if (file == null || file.Length == 0)
         {
             return Fail<FileDto>("文件不能为空");
         }
 
-        var uploadFilePath = Path.Combine(environment.ContentRootPath, "UploadFiles", TenantId > 0 ? TenantId.ToString() : string.Empty, UserId > 0 ? UserId.ToString() : string.Empty);
-        if (!Directory.Exists(uploadFilePath))
+        try
         {
-            Directory.CreateDirectory(uploadFilePath);
-        }
+            await using var stream = file.OpenReadStream();
+            var filePath = await fileStorageFactory.GetFileStorage(storeType).UploadAsync(stream, file.FileName, file.ContentType);
 
-        var fileName = file.FileName;
-        var filePath = Path.Combine(uploadFilePath, fileName);
-        if (System.IO.File.Exists(filePath))
-        {
-            var extension = Path.GetExtension(fileName);
-            filePath = Path.Combine(uploadFilePath, $"{Guid.NewGuid()}{extension}");
-        }
+            var fileDto = new FileDto
+            {
+                Name = file.FileName,
+                Path = filePath,
+                Size = file.Length,
+                ContentType = file.ContentType,
+                StoreType = storeType,
+                Description = description
+            };
+            if (!await fileService.AddAsync(fileDto))
+            {
+                return Fail<FileDto>("保存文件失败");
+            }
 
-        await using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await file.CopyToAsync(stream);
+            return Success(fileDto);
         }
-
-        if (filePath.StartsWith(environment.ContentRootPath))
+        catch (Exception ex)
         {
-            filePath = $"{RootPath}{filePath.Substring(environment.ContentRootPath.Length)}";
+            logger.LogError(ex, "上传文件失败");
+            return Fail<FileDto>($"上传文件失败: {ex.Message}");
         }
-        var fileDto = new FileDto
-        {
-            Name = fileName,
-            Path = filePath,
-            Size = file.Length,
-            ContentType = file.ContentType,
-            StoreType = FileStoreType.LocalFile,// 默认存储到本地
-            Description = description
-        };
-        if (!await fileService.AddAsync(fileDto))
-        {
-            return Fail<FileDto>("保存文件失败");
-        }
-
-        return Success(fileDto);
     }
 
     /// <summary>
@@ -91,26 +76,22 @@ public class FileController(
         {
             return NotFound("文件不存在");
         }
-        if (fileEntity.StoreType != FileStoreType.LocalFile)
-        {
-            return BadRequest("仅支持下载本地文件");
-        }
-        var filePath = fileEntity.Path;
-        if (string.IsNullOrWhiteSpace(filePath))
-        {
-            return NotFound("文件不存在");
-        }
-        if (filePath.Contains(RootPath))
-        {
-            filePath = filePath.Replace(RootPath, environment.ContentRootPath);
-        }
-        if (!System.IO.File.Exists(filePath))
-        {
-            return NotFound("文件不存在");
-        }
 
-        var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
-        return File(fileBytes, fileEntity.ContentType, fileEntity.Name);
+        try
+        {
+            var fileStorage = fileStorageFactory.GetFileStorage(fileEntity.StoreType);
+            var stream = await fileStorage.DownloadAsync(fileEntity.Path);
+            return File(stream, fileEntity.ContentType, fileEntity.Name);
+        }
+        catch (FileNotFoundException)
+        {
+            return NotFound("文件不存在");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "下载文件失败");
+            return BadRequest($"下载文件失败: {ex.Message}");
+        }
     }
 
     /// <summary>
@@ -127,17 +108,14 @@ public class FileController(
             return Fail<bool>("文件不存在");
         }
 
-        var filePath = fileEntity.Path;
-        if (fileEntity.StoreType == FileStoreType.LocalFile && !string.IsNullOrWhiteSpace(filePath))
+        try
         {
-            if (filePath.Contains(RootPath))
-            {
-                filePath = filePath.Replace(RootPath, environment.ContentRootPath);
-            }
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
+            var fileStorage = fileStorageFactory.GetFileStorage(fileEntity.StoreType);
+            await fileStorage.DeleteAsync(fileEntity.Path);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "删除存储文件失败");
         }
 
         return Success(await fileService.DeleteByIdAsync(id));

@@ -1,4 +1,4 @@
-﻿using System.Data.SQLite;
+using System.Data.SQLite;
 using System.Reflection;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
     public static void AddDomainDI(this IServiceCollection services)
     {
         services.AddServiceByInterfaceSuffix(Assembly.GetExecutingAssembly(), "Repository", ServiceLifetime.Transient);
+        services.AddFileStorage();// 添加文件存储服务
 
         IConfiguration configuration = services.GetConfiguration();
 
