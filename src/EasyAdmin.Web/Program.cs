@@ -48,15 +48,15 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<TenantFilter>();
 }).AddNewtonsoftJson(options =>
 {
-    // Newtonsoft.Json
-    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-    options.SerializerSettings.Converters.Add(new JsonLongToStringConverter());
+    // json序列化使用 Newtonsoft.Json
+    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();// 使用驼峰命名法(首字母小写)
+    options.SerializerSettings.Converters.Add(new JsonLongToStringConverter());// 将long类型字段(主键)转换成string返回(解决前端精度丢失问题)
     //options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;// 循环引用
 })/*.AddJsonOptions(options =>
 {
-    // System.Text.Json
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    options.JsonSerializerOptions.Converters.Add(new SystemTextJsonLongToStringConverter());
+    // json序列化使用 System.Text.Json
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;// 使用驼峰命名法(首字母小写)
+    options.JsonSerializerOptions.Converters.Add(new SystemTextJsonLongToStringConverter());// 将long类型字段(主键)转换成string返回(解决前端精度丢失问题)
 })*/;
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
