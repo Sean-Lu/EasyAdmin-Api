@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Domain.Contracts;
+using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
@@ -65,8 +65,8 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Id = 11000001, PId = 11000000, Sort = 1, Icon = "OrderedListOutlined", Title = "待办事项", Path = "/tool/todoList", State = CommonState.Enable },// To-do List
             new MenuEntity{ Id = 11000002, PId = 11000000, Sort = 2, Icon = "CheckCircleOutlined", Title = "签到", Path = "/tool/checkIn", State = CommonState.Enable },
             new MenuEntity{ Id = 11000003, PId = 11000000, Sort = 3, Icon = "FormOutlined", Title = "日报", Path = "/tool/dayWorkReport", State = CommonState.Enable },
-            new MenuEntity{ Id = 11000004, PId = 11000000, Sort = 4, Icon = "FormOutlined", Title = "周报", Path = "/tool/weekWorkReport", State = CommonState.Disable },
-            new MenuEntity{ Id = 11000005, PId = 11000000, Sort = 5, Icon = "FormOutlined", Title = "月报", Path = "/tool/monthWorkReport", State = CommonState.Disable },
+            new MenuEntity{ Id = 11000004, PId = 11000000, Sort = 4, Icon = "FormOutlined", Title = "周报", Path = "/tool/weekWorkReport", State = CommonState.Enable },
+            new MenuEntity{ Id = 11000005, PId = 11000000, Sort = 5, Icon = "FormOutlined", Title = "月报", Path = "/tool/monthWorkReport", State = CommonState.Enable },
             new MenuEntity{ Id = 11000006, PId = 11000000, Sort = 6, Icon = "KeyOutlined", Title = "加解密", Path = "/tool/crypto", State = CommonState.Enable },
 
             new MenuEntity{ Id = 12000000, PId = 0, Sort = 12, Icon = "ProfileOutlined", Title = "日志管理", Path = "/log", State = CommonState.Enable },
