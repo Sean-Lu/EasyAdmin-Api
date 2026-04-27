@@ -1,12 +1,21 @@
 ﻿namespace EasyAdmin.Application.Contracts;
 
-public interface IDtoBase
+/// <summary>
+/// 基础ID接口（只包含ID字段）
+/// </summary>
+public interface IIdBase
 {
     /// <summary>
     /// 主键
     /// </summary>
     long Id { get; set; }
+}
 
+/// <summary>
+/// 基础DTO接口
+/// </summary>
+public interface IDtoBase : IIdBase
+{
     /// <summary>
     /// 创建用户主键
     /// </summary>

@@ -40,3 +40,41 @@ public enum FileStoreType
     /// </summary>
     AliyunOSS = 1
 }
+
+/// <summary>
+/// 定时任务调度类型
+/// </summary>
+public enum ScheduleType
+{
+    /// <summary>
+    /// 简单调度
+    /// </summary>
+    Simple = 0,
+    /// <summary>
+    /// Cron调度
+    /// </summary>
+    Cron = 1
+}
+
+/// <summary>
+/// 定时任务简单调度时间单位
+/// </summary>
+public enum SimpleIntervalUnit
+{
+    /// <summary>
+    /// 秒
+    /// </summary>
+    Second = 0,
+    /// <summary>
+    /// 分钟
+    /// </summary>
+    Minute = 1,
+    /// <summary>
+    /// 小时
+    /// </summary>
+    Hour = 2,
+    /// <summary>
+    /// 天
+    /// </summary>
+    Day = 3
+}

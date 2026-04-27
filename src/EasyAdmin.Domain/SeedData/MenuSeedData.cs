@@ -48,7 +48,7 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Id = 8000008, PId = 8000000, Sort = 8, Icon = "AppstoreOutlined", Title = "参数管理", Path = "/system/param", State = CommonState.Enable },
             new MenuEntity{ Id = 8000009, PId = 8000000, Sort = 9, Icon = "AppstoreOutlined", Title = "应用管理", Path = "/system/client", State = CommonState.Disable },
             new MenuEntity{ Id = 8000010, PId = 8000000, Sort = 10, Icon = "AppstoreOutlined", Title = "缓存管理", Path = "/system/cache", State = CommonState.Disable },
-            new MenuEntity{ Id = 8000011, PId = 8000000, Sort = 11, Icon = "FieldTimeOutlined", Title = "定时任务", Path = "/system/job", State = CommonState.Disable },
+            new MenuEntity{ Id = 8000011, PId = 8000000, Sort = 11, Icon = "FieldTimeOutlined", Title = "定时任务", Path = "/system/job", State = CommonState.Enable },
             new MenuEntity{ Id = 8000013, PId = 8000000, Sort = 13, Icon = "UnorderedListOutlined", Title = "任务管理", Path = "/system/task", State = CommonState.Enable },
             new MenuEntity{ Id = 8000014, PId = 8000000, Sort = 14, Icon = "FileDoneOutlined", Title = "文件管理", Path = "/system/file", State = CommonState.Enable },
 
