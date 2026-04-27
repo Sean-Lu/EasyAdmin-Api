@@ -67,6 +67,13 @@ public interface ITodoItemService
     /// <returns></returns>
     Task<bool> UpdateSortOrderAsync(long id, int sortOrder);
     /// <summary>
+    /// 更新待办事项分类
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="categoryId"></param>
+    /// <returns></returns>
+    Task<bool> UpdateCategoryAsync(long id, long categoryId);
+    /// <summary>
     /// 根据ID获取待办事项
     /// </summary>
     /// <param name="id"></param>

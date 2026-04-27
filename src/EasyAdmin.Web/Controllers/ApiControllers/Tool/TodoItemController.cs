@@ -136,6 +136,19 @@ public class TodoItemController(
     }
 
     /// <summary>
+    /// 更新待办事项分类
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<bool>> UpdateCategory([FromBody] JObject? data)
+    {
+        var id = data["id"]?.Value<long>() ?? default;
+        var categoryId = data["categoryId"]?.Value<long>() ?? default;
+        return Success(await todoItemService.UpdateCategoryAsync(id, categoryId));
+    }
+
+    /// <summary>
     /// 获取待办事项列表
     /// </summary>
     /// <param name="categoryId">分类ID（可选）</param>

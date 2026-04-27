@@ -77,6 +77,12 @@ public class TodoItemService(
         return true;
     }
 
+    public async Task<bool> UpdateCategoryAsync(long id, long categoryId)
+    {
+        await todoItemRepository.UpdateAsync(new TodoItemEntity { CategoryId = categoryId }, entity => entity.CategoryId, entity => entity.Id == id);
+        return true;
+    }
+
     public async Task<TodoItemDto> GetByIdAsync(long id)
     {
         var entity = await todoItemRepository.GetByIdAsync(id);
