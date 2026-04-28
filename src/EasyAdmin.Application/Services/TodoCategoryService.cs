@@ -66,6 +66,24 @@ public class TodoCategoryService(
             entities = new List<TodoCategoryEntity> { defaultCategory };
         }
 
-        return mapper.Map<List<TodoCategoryDto>>(entities);
+        var dtos = mapper.Map<List<TodoCategoryDto>>(entities);
+
+        // 获取所有待处理的待办事项数量
+        var pendingCounts = (await todoItemRepository.QueryAsync(
+            entity => entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete && !entity.Done,
+            fieldExpression: entity => new { entity.CategoryId }
+        ))?.ToList();
+
+        var countDict = pendingCounts?.GroupBy(item => item.CategoryId)
+            .ToDictionary(g => g.Key, g => g.Count()) ?? new Dictionary<long, int>();
+
+        // 设置每个分类的待处理数量
+        foreach (var dto in dtos)
+        {
+            countDict.TryGetValue(dto.Id, out var count);
+            dto.PendingCount = count;
+        }
+
+        return dtos;
     }
 }

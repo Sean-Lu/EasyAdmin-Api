@@ -24,4 +24,8 @@ public class TodoCategoryDto : TenantDtoBase
     /// 排序顺序
     /// </summary>
     public int SortOrder { get; set; }
+    /// <summary>
+    /// 待处理数量
+    /// </summary>
+    public int PendingCount { get; set; }
 }
