@@ -9,7 +9,7 @@ public interface IDepartmentService
     Task<bool> AddAsync(DepartmentDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(DepartmentDto dto);
+    Task<bool> UpdateAsync(DepartmentUpdateDto dto);
     Task<bool> UpdateStateAsync(long id, CommonState state);
     Task<List<DepartmentEntity>> GetDepartmentTreeAsync(DepartmentListReqDto request);
     Task<DepartmentEntity> GetByIdAsync(long id);

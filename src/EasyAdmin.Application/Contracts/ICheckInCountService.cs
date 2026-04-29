@@ -9,7 +9,6 @@ public interface ICheckInCountService
     Task<bool> AddAsync(CheckInCountDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(CheckInCountDto dto);
     /// <summary>
     /// 增加连续签到天数，并更新最后签到时间
     /// </summary>

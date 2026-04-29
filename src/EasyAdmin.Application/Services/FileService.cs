@@ -33,11 +33,6 @@ public class FileService(
         return await fileRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(FileDto dto)
-    {
-        return await fileRepository.UpdateByDtoAsync(dto, mapper.Map<FileEntity>) > 0;
-    }
-
     public async Task<PageQueryResult<FileEntity>> PageAsync(FilePageReqDto request)
     {
         var orderBy = OrderByConditionBuilder<FileEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);

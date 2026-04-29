@@ -48,7 +48,7 @@ public class SysDictTypeController(
     }
 
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(SysDictTypeDto data)
+    public async Task<ApiResult<bool>> Update(SysDictTypeUpdateDto data)
     {
         if (string.IsNullOrEmpty(data.Name))
         {

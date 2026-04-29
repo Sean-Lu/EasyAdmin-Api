@@ -32,7 +32,7 @@ public class ParamService(
         return await paramRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(ParamDto dto)
+    public async Task<bool> UpdateAsync(ParamUpdateDto dto)
     {
         return await paramRepository.UpdateByDtoAsync(dto, mapper.Map<ParamEntity>) > 0;
     }

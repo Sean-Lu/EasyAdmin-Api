@@ -10,7 +10,7 @@ public interface ISysDictDataService
     Task<bool> AddAsync(SysDictDataDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(SysDictDataDto dto);
+    Task<bool> UpdateAsync(SysDictDataUpdateDto dto);
     Task<bool> UpdateStateAsync(long id, CommonState state);
     Task<PageQueryResult<SysDictDataEntity>> PageAsync(SysDictDataPageReqDto request);
     Task<List<SysDictDataEntity>> GetByTypeCodeAsync(string typeCode);

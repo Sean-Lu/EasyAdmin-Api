@@ -34,7 +34,7 @@ public class TaskService(
         return await taskRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(TaskDto dto)
+    public async Task<bool> UpdateAsync(TaskUpdateDto dto)
     {
         return await taskRepository.UpdateByDtoAsync(dto, mapper.Map<TaskEntity>) > 0;
     }

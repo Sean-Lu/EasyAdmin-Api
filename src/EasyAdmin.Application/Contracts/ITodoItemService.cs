@@ -30,7 +30,7 @@ public interface ITodoItemService
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
-    Task<bool> UpdateAsync(TodoItemDto dto);
+    Task<bool> UpdateAsync(TodoItemUpdateDto dto);
     /// <summary>
     /// 更新待办事项状态
     /// </summary>

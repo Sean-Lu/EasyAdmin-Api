@@ -33,7 +33,7 @@ public class WeekWorkReportService(
         return await weekWorkReportRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(WeekWorkReportDto dto)
+    public async Task<bool> UpdateAsync(WeekWorkReportUpdateDto dto)
     {
         return await weekWorkReportRepository.UpdateByDtoAsync(dto, mapper.Map<WeekWorkReportEntity>) > 0;
     }

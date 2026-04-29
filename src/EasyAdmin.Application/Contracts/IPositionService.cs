@@ -10,7 +10,7 @@ public interface IPositionService
     Task<bool> AddAsync(PositionDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(PositionDto dto);
+    Task<bool> UpdateAsync(PositionUpdateDto dto);
     Task<bool> UpdateStateAsync(long id, CommonState state);
     Task<PageQueryResult<PositionEntity>> PageAsync(PositionPageReqDto request);
     Task<List<PositionEntity>> GetListAsync();

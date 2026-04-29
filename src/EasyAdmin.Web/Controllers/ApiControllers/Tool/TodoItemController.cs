@@ -61,7 +61,7 @@ public class TodoItemController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(TodoItemDto data)
+    public async Task<ApiResult<bool>> Update(TodoItemUpdateDto data)
     {
         return Success(await todoItemService.UpdateAsync(data));
     }

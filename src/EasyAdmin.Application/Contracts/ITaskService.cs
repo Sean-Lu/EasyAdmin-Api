@@ -10,7 +10,7 @@ public interface ITaskService
     Task<bool> AddAsync(TaskDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(TaskDto dto);
+    Task<bool> UpdateAsync(TaskUpdateDto dto);
     Task<bool> UpdateStateAsync(long id, CommonState state);
     Task<PageQueryResult<TaskEntity>> PageAsync(TaskPageReqDto request);
     Task<TaskEntity> GetByIdAsync(long id);

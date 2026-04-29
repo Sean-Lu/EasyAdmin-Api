@@ -31,11 +31,6 @@ public class CheckInCountService(
         return await checkInCountRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(CheckInCountDto dto)
-    {
-        return await checkInCountRepository.UpdateByDtoAsync(dto, mapper.Map<CheckInCountEntity>) > 0;
-    }
-
     public async Task<bool> IncrAsync(long userId, CheckInType checkInType, DateTime lastCheckInTime, int incrCount, bool firstDay = false)
     {
         if (userId < 1 || incrCount < 0)

@@ -65,7 +65,7 @@ public class TaskController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(TaskDto data)
+    public async Task<ApiResult<bool>> Update(TaskUpdateDto data)
     {
         return Success(await taskService.UpdateAsync(data));
     }

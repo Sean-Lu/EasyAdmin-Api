@@ -65,7 +65,7 @@ public class TenantController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(TenantDto data)
+    public async Task<ApiResult<bool>> Update(TenantUpdateDto data)
     {
         return Success(await tenantService.UpdateAsync(data));
     }

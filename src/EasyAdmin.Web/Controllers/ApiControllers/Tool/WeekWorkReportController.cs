@@ -56,7 +56,7 @@ public class WeekWorkReportController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(WeekWorkReportDto data)
+    public async Task<ApiResult<bool>> Update(WeekWorkReportUpdateDto data)
     {
         return Success(await weekWorkReportService.UpdateAsync(data));
     }

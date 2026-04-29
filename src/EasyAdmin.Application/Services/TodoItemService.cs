@@ -42,7 +42,7 @@ public class TodoItemService(
         return true;
     }
 
-    public async Task<bool> UpdateAsync(TodoItemDto dto)
+    public async Task<bool> UpdateAsync(TodoItemUpdateDto dto)
     {
         return await todoItemRepository.UpdateByDtoAsync(dto, mapper.Map<TodoItemEntity>) > 0;
     }

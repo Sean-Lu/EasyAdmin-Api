@@ -43,7 +43,7 @@ public class MenuService(
         return await menuRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(MenuDto dto)
+    public async Task<bool> UpdateAsync(MenuUpdateDto dto)
     {
         return await menuRepository.UpdateByDtoAsync(dto, mapper.Map<MenuEntity>) > 0;
     }

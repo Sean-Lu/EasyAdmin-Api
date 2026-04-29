@@ -56,7 +56,7 @@ public class RoleController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(RoleDto data)
+    public async Task<ApiResult<bool>> Update(RoleUpdateDto data)
     {
         return Success(await roleService.UpdateAsync(data));
     }

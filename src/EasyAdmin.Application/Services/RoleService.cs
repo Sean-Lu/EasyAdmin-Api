@@ -56,7 +56,7 @@ public class RoleService(
         return await roleRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(RoleDto dto)
+    public async Task<bool> UpdateAsync(RoleUpdateDto dto)
     {
         if (!string.IsNullOrWhiteSpace(dto.Name) && await roleRepository.ExistsAsync(entity => entity.Name == dto.Name && !entity.IsDelete && entity.TenantId == TenantContextHolder.TenantId && entity.Id != dto.Id))
         {

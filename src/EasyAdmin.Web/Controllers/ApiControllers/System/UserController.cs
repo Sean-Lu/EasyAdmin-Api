@@ -63,7 +63,7 @@ public class UserController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(UserDto data)
+    public async Task<ApiResult<bool>> Update(UserUpdateDto data)
     {
         return Success(await userService.UpdateAsync(data));
     }

@@ -33,7 +33,7 @@ public class DayWorkReportService(
         return await dayWorkReportRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(DayWorkReportDto dto)
+    public async Task<bool> UpdateAsync(DayWorkReportUpdateDto dto)
     {
         return await dayWorkReportRepository.UpdateByDtoAsync(dto, mapper.Map<DayWorkReportEntity>) > 0;
     }

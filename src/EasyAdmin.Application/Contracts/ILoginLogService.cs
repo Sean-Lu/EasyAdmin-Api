@@ -9,7 +9,6 @@ public interface ILoginLogService
     Task<bool> AddAsync(LoginLogDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(LoginLogDto dto);
     Task<PageQueryResult<LoginLogEntity>> PageAsync(LoginLogPageReqDto request);
     Task<LoginLogEntity> GetByIdAsync(long id);
 }

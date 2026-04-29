@@ -56,7 +56,7 @@ public class MenuController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(MenuDto data)
+    public async Task<ApiResult<bool>> Update(MenuUpdateDto data)
     {
         return Success(await menuService.UpdateAsync(data));
     }

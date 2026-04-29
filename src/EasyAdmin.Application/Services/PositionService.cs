@@ -44,7 +44,7 @@ public class PositionService(
         return await positionRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(PositionDto dto)
+    public async Task<bool> UpdateAsync(PositionUpdateDto dto)
     {
         if (string.IsNullOrEmpty(dto.Name))
         {

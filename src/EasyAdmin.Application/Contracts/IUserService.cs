@@ -10,7 +10,7 @@ public interface IUserService
     Task<bool> AddAsync(UserDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(UserDto dto);
+    Task<bool> UpdateAsync(UserUpdateDto dto);
     Task<bool> UpdateStateAsync(long id, CommonState state);
     /// <summary>
     /// 更新用户最后登录时间

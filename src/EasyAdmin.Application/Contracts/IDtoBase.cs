@@ -1,15 +1,6 @@
-﻿namespace EasyAdmin.Application.Contracts;
+﻿using EasyAdmin.Domain.Contracts;
 
-/// <summary>
-/// 基础ID接口（只包含ID字段）
-/// </summary>
-public interface IIdBase
-{
-    /// <summary>
-    /// 主键
-    /// </summary>
-    long Id { get; set; }
-}
+namespace EasyAdmin.Application.Contracts;
 
 /// <summary>
 /// 基础DTO接口
@@ -39,20 +30,17 @@ public interface IDtoBase : IIdBase
     bool IsDelete { get; set; }
 }
 
-public interface ITreeDtoBase<TDto> : IDtoBase
+/// <summary>
+/// 树DTO接口
+/// </summary>
+public interface ITreeDtoBase<TDto> : ITreeIdBase, IDtoBase
 {
-    /// <summary>
-    /// 父主键
-    /// </summary>
-    long PId { get; set; }
-    /// <summary>
-    /// 排序
-    /// </summary>
-    int Sort { get; set; }
-
     List<TDto>? Children { get; set; }
 }
 
+/// <summary>
+/// 租户DTO接口
+/// </summary>
 public interface ITenantDtoBase : IDtoBase
 {
     /// <summary>
@@ -61,6 +49,9 @@ public interface ITenantDtoBase : IDtoBase
     long TenantId { get; set; }
 }
 
+/// <summary>
+/// 租户+树DTO接口
+/// </summary>
 public interface ITenantTreeDtoBase<TDto> : ITenantDtoBase, ITreeDtoBase<TDto>
 {
 }

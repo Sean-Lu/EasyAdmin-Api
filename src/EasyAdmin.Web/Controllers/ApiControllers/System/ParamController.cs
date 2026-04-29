@@ -56,7 +56,7 @@ public class ParamController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(ParamDto data)
+    public async Task<ApiResult<bool>> Update(ParamUpdateDto data)
     {
         return Success(await paramService.UpdateAsync(data));
     }

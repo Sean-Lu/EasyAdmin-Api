@@ -48,7 +48,7 @@ public class SysDictDataController(
     }
 
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(SysDictDataDto data)
+    public async Task<ApiResult<bool>> Update(SysDictDataUpdateDto data)
     {
         if (data.DictTypeId < 1)
         {

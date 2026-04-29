@@ -56,7 +56,7 @@ public class MonthWorkReportController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(MonthWorkReportDto data)
+    public async Task<ApiResult<bool>> Update(MonthWorkReportUpdateDto data)
     {
         return Success(await monthWorkReportService.UpdateAsync(data));
     }

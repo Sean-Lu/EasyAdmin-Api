@@ -111,7 +111,7 @@ public class TenantService(
         return await tenantRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(TenantDto dto)
+    public async Task<bool> UpdateAsync(TenantUpdateDto dto)
     {
         return await tenantRepository.UpdateByDtoAsync(dto, mapper.Map<TenantEntity>) > 0;
     }

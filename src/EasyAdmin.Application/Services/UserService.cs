@@ -69,7 +69,7 @@ public class UserService(
         return await userRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(UserDto dto)
+    public async Task<bool> UpdateAsync(UserUpdateDto dto)
     {
         return await userRepository.UpdateByDtoAsync(dto, mapper.Map<UserEntity>) > 0;
     }

@@ -9,7 +9,7 @@ public interface IDayWorkReportService
     Task<bool> AddAsync(DayWorkReportDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(DayWorkReportDto dto);
+    Task<bool> UpdateAsync(DayWorkReportUpdateDto dto);
     Task<PageQueryResult<DayWorkReportEntity>> PageAsync(DayWorkReportPageReqDto request);
     Task<DayWorkReportEntity> GetByIdAsync(long id);
 }

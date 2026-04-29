@@ -56,7 +56,7 @@ public class DayWorkReportController(
     /// <param name="data"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> Update(DayWorkReportDto data)
+    public async Task<ApiResult<bool>> Update(DayWorkReportUpdateDto data)
     {
         return Success(await dayWorkReportService.UpdateAsync(data));
     }

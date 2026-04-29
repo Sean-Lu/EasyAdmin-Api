@@ -32,11 +32,6 @@ public class LoginLogService(
         return await loginLogRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(LoginLogDto dto)
-    {
-        return await loginLogRepository.UpdateByDtoAsync(dto, mapper.Map<LoginLogEntity>) > 0;
-    }
-
     public async Task<PageQueryResult<LoginLogEntity>> PageAsync(LoginLogPageReqDto request)
     {
         var orderBy = OrderByConditionBuilder<LoginLogEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);

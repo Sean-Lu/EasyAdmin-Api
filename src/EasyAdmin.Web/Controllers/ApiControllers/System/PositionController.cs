@@ -66,7 +66,7 @@ public class PositionController(
     /// <returns></returns>
     [HttpPost]
     [ApiRepeatRequestFilter]
-    public async Task<ApiResult<bool>> Update(PositionDto data)
+    public async Task<ApiResult<bool>> Update(PositionUpdateDto data)
     {
         if (string.IsNullOrEmpty(data.Name))
         {

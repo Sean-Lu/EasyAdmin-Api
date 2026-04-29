@@ -1,11 +1,12 @@
 ﻿using EasyAdmin.Application.Contracts;
+using EasyAdmin.Domain.Contracts;
 
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 基础DTO类（只包含ID字段）
 /// </summary>
-public abstract class IdBase : IIdBase
+public abstract class DtoIdBase : IIdBase
 {
     /// <summary>
     /// 主键
@@ -16,7 +17,7 @@ public abstract class IdBase : IIdBase
 /// <summary>
 /// 基础DTO类
 /// </summary>
-public abstract class DtoBase : IdBase, IDtoBase
+public abstract class DtoBase : DtoIdBase, IDtoBase
 {
     /// <summary>
     /// 创建用户主键

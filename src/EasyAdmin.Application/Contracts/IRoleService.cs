@@ -10,7 +10,7 @@ public interface IRoleService
     Task<bool> AddAsync(RoleDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(RoleDto dto);
+    Task<bool> UpdateAsync(RoleUpdateDto dto);
     Task<bool> UpdateStateAsync(long id, CommonState state);
     Task<PageQueryResult<RoleEntity>> PageAsync(RolePageReqDto request);
     Task<List<RoleEntity>> GetAllRolesAsync();

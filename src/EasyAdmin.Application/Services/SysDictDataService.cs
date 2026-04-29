@@ -35,7 +35,7 @@ public class SysDictDataService(
         return await sysDictDataRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(SysDictDataDto dto)
+    public async Task<bool> UpdateAsync(SysDictDataUpdateDto dto)
     {
         return await sysDictDataRepository.UpdateByDtoAsync(dto, mapper.Map<SysDictDataEntity>) > 0;
     }

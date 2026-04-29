@@ -62,7 +62,7 @@ public class DepartmentController(
     /// <returns></returns>
     [HttpPost]
     [ApiRepeatRequestFilter]
-    public async Task<ApiResult<bool>> Update(DepartmentDto data)
+    public async Task<ApiResult<bool>> Update(DepartmentUpdateDto data)
     {
         if (string.IsNullOrEmpty(data.Name))
         {

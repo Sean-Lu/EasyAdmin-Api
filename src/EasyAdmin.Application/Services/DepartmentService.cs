@@ -36,7 +36,7 @@ public class DepartmentService(
         return await departmentRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(DepartmentDto dto)
+    public async Task<bool> UpdateAsync(DepartmentUpdateDto dto)
     {
         return await departmentRepository.UpdateByDtoAsync(dto, mapper.Map<DepartmentEntity>) > 0;
     }

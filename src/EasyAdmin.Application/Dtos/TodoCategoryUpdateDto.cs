@@ -8,7 +8,7 @@ namespace EasyAdmin.Application.Dtos;
 /// 待办事项分类更新DTO
 /// </summary>
 [AutoMap(typeof(TodoCategoryEntity), ReverseMap = true)]
-public class TodoCategoryUpdateDto : IdBase
+public class TodoCategoryUpdateDto : DtoIdBase
 {
     /// <summary>
     /// 分类名称

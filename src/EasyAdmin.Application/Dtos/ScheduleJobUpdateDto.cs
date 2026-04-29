@@ -8,7 +8,7 @@ namespace EasyAdmin.Application.Dtos;
 /// 更新定时任务 DTO（只包含用户可更新的字段）
 /// </summary>
 [AutoMap(typeof(ScheduleJobEntity), ReverseMap = true)]
-public class ScheduleJobUpdateDto : IdBase
+public class ScheduleJobUpdateDto : DtoIdBase
 {
     /// <summary>
     /// 任务名称

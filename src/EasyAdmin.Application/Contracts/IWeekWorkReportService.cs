@@ -9,7 +9,7 @@ public interface IWeekWorkReportService
     Task<bool> AddAsync(WeekWorkReportDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(WeekWorkReportDto dto);
+    Task<bool> UpdateAsync(WeekWorkReportUpdateDto dto);
     Task<PageQueryResult<WeekWorkReportEntity>> PageAsync(WeekWorkReportPageReqDto request);
     Task<WeekWorkReportEntity> GetByIdAsync(long id);
 }

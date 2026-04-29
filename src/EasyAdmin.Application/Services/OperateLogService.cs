@@ -32,11 +32,6 @@ public class OperateLogService(
         return await operateLogRepository.DeleteByIdsAsync(ids);
     }
 
-    public async Task<bool> UpdateAsync(OperateLogDto dto)
-    {
-        return await operateLogRepository.UpdateByDtoAsync(dto, mapper.Map<OperateLogEntity>) > 0;
-    }
-
     public async Task<PageQueryResult<OperateLogEntity>> PageAsync(OperateLogPageReqDto request)
     {
         var orderBy = OrderByConditionBuilder<OperateLogEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);

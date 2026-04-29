@@ -9,7 +9,7 @@ public interface IMenuService
     Task<bool> AddAsync(MenuDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
-    Task<bool> UpdateAsync(MenuDto dto);
+    Task<bool> UpdateAsync(MenuUpdateDto dto);
     Task<bool> UpdateStateAsync(long id, CommonState state);
     Task<List<MenuEntity>> GetMenuTreeAsync(long userId, MenuListReqDto request);
     Task<MenuEntity> GetByIdAsync(long id);
