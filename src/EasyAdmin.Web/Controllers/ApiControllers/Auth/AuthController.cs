@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Application.Contracts;
+using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Models;
@@ -55,7 +55,7 @@ public class AuthController(
             TenantId = user.TenantId,
             UserId = user.Id
         });
-        
+
         return Success(new LoginResponse
         {
             AccessToken = token
@@ -63,18 +63,16 @@ public class AuthController(
     }
 
     /// <summary>
-    /// 验证Token是否过期
+    /// 验证Token是否失效
     /// </summary>
     /// <returns></returns>
     [AllowAnonymous]
     [HttpPost]
     public ApiResult<object> CheckToken()
     {
-        var tokenExpiredTime = JwtHelper.GetTokenExpiredTime(this.Request);
-        var isTokenExpired = tokenExpiredTime.HasValue && DateTime.UtcNow > tokenExpiredTime.Value.ToUniversalTime();
+        var isTokenExpired = JwtHelper.IsTokenExpired(this.Request);
         return Success<object>(new
         {
-            ValidTo = tokenExpiredTime,
             Expired = isTokenExpired
         });
     }

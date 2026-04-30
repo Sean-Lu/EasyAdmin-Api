@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Web.Helper;
+using EasyAdmin.Web.Helper;
 using EasyAdmin.Web.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -22,22 +22,7 @@ public static class ServiceCollectionExtensions
             })
             .AddJwtBearer(options =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    //Token颁发机构
-                    ValidIssuer = JwtHelper.JwtConfig.Issuer,
-                    //颁发给谁
-                    ValidAudience = JwtHelper.JwtConfig.Audience,
-                    //这里的key要进行加密
-                    IssuerSigningKey = JwtHelper.JwtConfig.SymmetricSecurityKey,
-                    //是否验证Token有效期，使用当前时间与Token的Claims中的NotBefore和Expires对比
-                    ValidateLifetime = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    RequireExpirationTime = true,
-                    //ClockSkew = TimeSpan.FromSeconds(30)// 缓冲时间，默认5分钟
-                };
+                options.TokenValidationParameters = JwtHelper.JwtConfig.TokenValidationParameters;
             });
     }
 }

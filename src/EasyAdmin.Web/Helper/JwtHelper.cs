@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
@@ -33,7 +33,7 @@ public static class JwtHelper
                         Id = "Bearer",
                     }
                 },
-                new string[] { }
+                Array.Empty<string>()
             }
         });
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -63,7 +63,7 @@ public static class JwtHelper
     }
 
     /// <summary>
-    /// 获取Token过期时间
+    /// 获取Token过期时间。token失效时间 = 过期时间 + 缓冲时间（ClockSkew）
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
@@ -74,7 +74,7 @@ public static class JwtHelper
         {
             return null;
         }
-        
+
         try
         {
             // 手动解析 token 以获取 exp（因为 JwtSecurityTokenHandler 在某些情况下无法正确读取 exp）
@@ -85,13 +85,13 @@ public static class JwtHelper
                 // 补全 base64 可能缺失的 =
                 while (payloadBase64.Length % 4 != 0)
                     payloadBase64 += '=';
-                
+
                 var payloadBytes = Convert.FromBase64String(payloadBase64);
                 var payloadJson = System.Text.Encoding.UTF8.GetString(payloadBytes);
-                
+
                 // 解析 exp
                 var jsonDoc = System.Text.Json.JsonDocument.Parse(payloadJson);
-                if (jsonDoc.RootElement.TryGetProperty("exp", out var expElement) && 
+                if (jsonDoc.RootElement.TryGetProperty("exp", out var expElement) &&
                     expElement.TryGetInt64(out var expUnixTime))
                 {
                     return DateTimeOffset.FromUnixTimeSeconds(expUnixTime).UtcDateTime;
@@ -102,7 +102,7 @@ public static class JwtHelper
         {
             // 如果手动解析失败，尝试使用标准方法
         }
-        
+
         // 备用：使用标准方法
         try
         {
@@ -113,6 +113,37 @@ public static class JwtHelper
         catch (Exception)
         {
             return null;
+        }
+    }
+
+    /// <summary>
+    /// 验证token是否失效
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns>是否过期</returns>
+    public static bool IsTokenExpired(HttpRequest request)
+    {
+        var token = GetToken(request);
+        if (string.IsNullOrEmpty(token))
+        {
+            return true;
+        }
+
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            tokenHandler.ValidateToken(token, JwtConfig.TokenValidationParameters, out var validatedToken);
+
+            //var jwtToken = validatedToken as JwtSecurityToken;
+            //var validTo = jwtToken?.ValidTo.ToLocalTime();
+            //Console.WriteLine($"token过期时间：{validTo}，token失效时间：{validTo?.Add(JwtConfig.TokenValidationParameters.ClockSkew)}，当前时间：{DateTime.Now}");
+
+            return false;
+        }
+        catch (Exception)
+        {
+            // token 无效或已过期
+            return true;
         }
     }
 
