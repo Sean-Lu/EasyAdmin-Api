@@ -1,8 +1,9 @@
-﻿using System.Reflection;
+using System.Reflection;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Services;
 using EasyAdmin.Domain.Extensions;
 using EasyAdmin.Infrastructure.Extensions;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EasyAdmin.Application.Extensions;
@@ -17,12 +18,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddDomainDI();
 
-        services.AddAutoMapper(expression =>
-        {
-            expression.AllowNullCollections = true;
-            expression.AllowNullDestinationValues = true;
-            expression.AddMaps(typeof(AutoMapperProfile));
-        });
+        MapsterProfile.RegisterMaps();
+        services.AddMapster();
 
         services.AddServiceByInterfaceSuffix(Assembly.GetExecutingAssembly(), "Service", ServiceLifetime.Transient);
 

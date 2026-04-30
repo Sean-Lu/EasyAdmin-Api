@@ -1,10 +1,7 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
 
-[AutoMap(typeof(TaskEntity), ReverseMap = true)]
 public class TaskUpdateDto : DtoIdBase
 {
     public long UserId { get; set; }

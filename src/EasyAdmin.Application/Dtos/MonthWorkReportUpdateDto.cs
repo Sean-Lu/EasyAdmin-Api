@@ -1,9 +1,5 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
-
 namespace EasyAdmin.Application.Dtos;
 
-[AutoMap(typeof(MonthWorkReportEntity), ReverseMap = true)]
 public class MonthWorkReportUpdateDto : DtoIdBase
 {
     public long UserId { get; set; }

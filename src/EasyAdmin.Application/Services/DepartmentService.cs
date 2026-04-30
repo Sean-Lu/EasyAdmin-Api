@@ -1,4 +1,3 @@
-﻿using AutoMapper;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
@@ -8,6 +7,7 @@ using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Helper;
 using EasyAdmin.Infrastructure.Tenant;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Sean.Core.DbRepository.Extensions;
 using Sean.Core.DbRepository.Util;

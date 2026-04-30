@@ -1,5 +1,3 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
@@ -7,7 +5,6 @@ namespace EasyAdmin.Application.Dtos;
 /// <summary>
 /// 更新定时任务 DTO（只包含用户可更新的字段）
 /// </summary>
-[AutoMap(typeof(ScheduleJobEntity), ReverseMap = true)]
 public class ScheduleJobUpdateDto : DtoIdBase
 {
     /// <summary>

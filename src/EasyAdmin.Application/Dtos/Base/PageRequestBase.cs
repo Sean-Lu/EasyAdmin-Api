@@ -1,4 +1,4 @@
-﻿namespace EasyAdmin.Application.Dtos;
+namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 分页请求基础类

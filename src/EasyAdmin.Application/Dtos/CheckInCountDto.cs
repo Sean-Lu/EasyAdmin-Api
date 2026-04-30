@@ -1,5 +1,3 @@
-﻿using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
@@ -7,7 +5,6 @@ namespace EasyAdmin.Application.Dtos;
 /// <summary>
 /// 签到统计 DTO
 /// </summary>
-[AutoMap(typeof(CheckInCountEntity), ReverseMap = true)]
 public class CheckInCountDto : TenantDtoBase
 {
     /// <summary>

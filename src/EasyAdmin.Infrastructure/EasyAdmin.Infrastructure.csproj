@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Aliyun.OSS.SDK.NetCore" Version="2.13.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
-    <PackageReference Include="AutoMapper" Version="15.0.1" />
+    <PackageReference Include="Mapster.DependencyInjection" Version="10.0.7" />
     <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.1.9" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

@@ -1,6 +1,4 @@
 using System.ComponentModel;
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Attributes;
 
 namespace EasyAdmin.Application.Dtos;
@@ -8,7 +6,6 @@ namespace EasyAdmin.Application.Dtos;
 /// <summary>
 /// 月报导出 DTO
 /// </summary>
-[AutoMap(typeof(MonthWorkReportEntity))]
 public class MonthWorkReportExportDto
 {
     /// <summary>

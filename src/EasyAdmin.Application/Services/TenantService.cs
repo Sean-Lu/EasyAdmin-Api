@@ -1,4 +1,3 @@
-﻿using AutoMapper;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
@@ -10,6 +9,7 @@ using Sean.Core.DbRepository.Util;
 using Sean.Core.DbRepository;
 using Sean.Core.DbRepository.Extensions;
 using EasyAdmin.Infrastructure.Wrapper;
+using MapsterMapper;
 using Sean.Utility.Security.Provider;
 
 namespace EasyAdmin.Application.Services;

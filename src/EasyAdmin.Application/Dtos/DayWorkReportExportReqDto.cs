@@ -1,4 +1,4 @@
-﻿namespace EasyAdmin.Application.Dtos;
+namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 日报导出请求参数

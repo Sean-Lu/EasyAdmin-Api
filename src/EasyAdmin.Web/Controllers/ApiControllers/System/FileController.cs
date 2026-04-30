@@ -1,9 +1,9 @@
-using AutoMapper;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Storage;
 using EasyAdmin.Web.Models;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EasyAdmin.Web.Controllers;

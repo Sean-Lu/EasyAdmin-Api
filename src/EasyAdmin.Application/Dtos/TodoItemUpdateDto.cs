@@ -1,10 +1,7 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace EasyAdmin.Application.Dtos;
 
-[AutoMap(typeof(TodoItemEntity), ReverseMap = true)]
 public class TodoItemUpdateDto : DtoIdBase
 {
     public long CategoryId { get; set; }

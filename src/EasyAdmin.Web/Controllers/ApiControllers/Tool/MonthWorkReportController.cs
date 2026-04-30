@@ -1,8 +1,8 @@
-using AutoMapper;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Web.Filter;
 using EasyAdmin.Web.Models;
+using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 

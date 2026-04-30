@@ -1,5 +1,3 @@
-﻿using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
@@ -7,7 +5,6 @@ namespace EasyAdmin.Application.Dtos;
 /// <summary>
 /// 字典类型 DTO
 /// </summary>
-[AutoMap(typeof(SysDictTypeEntity), ReverseMap = true)]
 public class SysDictTypeDto : DtoBase
 {
     public virtual string Name { get; set; }

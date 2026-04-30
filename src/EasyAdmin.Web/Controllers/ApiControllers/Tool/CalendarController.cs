@@ -1,4 +1,3 @@
-﻿using AutoMapper;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Entities;
@@ -8,6 +7,7 @@ using EasyAdmin.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using EasyAdmin.Web.Extensions;
+using MapsterMapper;
 
 namespace EasyAdmin.Web.Controllers;
 

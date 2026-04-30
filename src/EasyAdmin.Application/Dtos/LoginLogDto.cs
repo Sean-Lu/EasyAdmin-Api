@@ -1,12 +1,8 @@
-﻿using AutoMapper;
-using EasyAdmin.Domain.Entities;
-
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 登录日志 DTO
 /// </summary>
-[AutoMap(typeof(LoginLogEntity), ReverseMap = true)]
 public class LoginLogDto : TenantDtoBase
 {
     /// <summary>

@@ -1,12 +1,8 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
-
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 月报 DTO
 /// </summary>
-[AutoMap(typeof(MonthWorkReportEntity), ReverseMap = true)]
 public class MonthWorkReportDto : TenantDtoBase
 {
     /// <summary>

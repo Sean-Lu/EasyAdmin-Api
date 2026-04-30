@@ -1,9 +1,9 @@
-using AutoMapper;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Tenant;
+using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Sean.Core.DbRepository;
 using Sean.Core.DbRepository.Extensions;

@@ -1,5 +1,3 @@
-﻿using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
@@ -7,7 +5,6 @@ namespace EasyAdmin.Application.Dtos;
 /// <summary>
 /// 部门 DTO
 /// </summary>
-[AutoMap(typeof(DepartmentEntity), ReverseMap = true)]
 public class DepartmentDto : TenantTreeDtoBase<DepartmentDto>
 {
     /// <summary>
@@ -35,7 +32,7 @@ public class DepartmentDto : TenantTreeDtoBase<DepartmentDto>
     /// </summary>
     public virtual string? Remark { get; set; }
     /// <summary>
-    /// 上级菜单完整路径
+    /// 上级部门完整路径
     /// </summary>
     public virtual string? ParentFullPath { get; set; }
 }

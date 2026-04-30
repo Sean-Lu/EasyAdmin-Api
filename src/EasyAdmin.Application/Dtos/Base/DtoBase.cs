@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Application.Contracts;
+using EasyAdmin.Application.Contracts;
 using EasyAdmin.Domain.Contracts;
 
 namespace EasyAdmin.Application.Dtos;

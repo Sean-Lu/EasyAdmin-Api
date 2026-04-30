@@ -1,5 +1,3 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace EasyAdmin.Application.Dtos;
@@ -7,7 +5,6 @@ namespace EasyAdmin.Application.Dtos;
 /// <summary>
 /// 待办事项DTO
 /// </summary>
-[AutoMap(typeof(TodoItemEntity), ReverseMap = true)]
 public class TodoItemDto : TenantDtoBase
 {
     /// <summary>

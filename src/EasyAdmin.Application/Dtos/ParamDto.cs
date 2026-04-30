@@ -1,5 +1,3 @@
-﻿using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
@@ -7,7 +5,6 @@ namespace EasyAdmin.Application.Dtos;
 /// <summary>
 /// 参数配置 DTO
 /// </summary>
-[AutoMap(typeof(ParamEntity), ReverseMap = true)]
 public class ParamDto : DtoBase
 {
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace EasyAdmin.Application.Dtos;
+namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 文件列表分页查询条件

@@ -1,12 +1,8 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
-
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 角色菜单权限 DTO
 /// </summary>
-[AutoMap(typeof(RoleMenuEntity), ReverseMap = true)]
 public class RoleMenuDto
 {
     /// <summary>

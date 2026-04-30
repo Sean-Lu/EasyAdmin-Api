@@ -1,12 +1,8 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
-
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 定时任务执行日志 DTO
 /// </summary>
-[AutoMap(typeof(ScheduleJobLogEntity), ReverseMap = true)]
 public class ScheduleJobLogDto : TenantDtoBase
 {
     /// <summary>

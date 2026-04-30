@@ -1,10 +1,7 @@
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Dtos;
 
-[AutoMap(typeof(UserEntity), ReverseMap = true)]
 public class UserUpdateDto : DtoIdBase
 {
     public string UserName { get; set; }

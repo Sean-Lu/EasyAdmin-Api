@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using AutoMapper;
-using EasyAdmin.Domain.Entities;
+using System.ComponentModel;
 using EasyAdmin.Infrastructure.Attributes;
 
 namespace EasyAdmin.Application.Dtos;
@@ -8,7 +6,6 @@ namespace EasyAdmin.Application.Dtos;
 /// <summary>
 /// 日报导出 DTO
 /// </summary>
-[AutoMap(typeof(DayWorkReportEntity))]
 public class DayWorkReportExportDto
 {
     /// <summary>

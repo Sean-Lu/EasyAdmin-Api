@@ -1,4 +1,4 @@
-﻿namespace EasyAdmin.Application.Dtos;
+namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
 /// 菜单列表查询条件
@@ -6,7 +6,7 @@
 public class MenuListReqDto
 {
     /// <summary>
-    /// 是否查询所有菜单（包含被禁用的）
+    /// 是否查询所有菜单（包括禁用的）
     /// </summary>
     public bool All { get; set; }
     /// <summary>
