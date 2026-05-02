@@ -74,14 +74,15 @@ builder.Services.AddSwaggerGen(options =>
     JwtHelper.SwaggerAddJwt(options);
 });
 
-// Configure CORS
+// 配置 CORS 跨域配置
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.SetIsOriginAllowed(origin => true)
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
