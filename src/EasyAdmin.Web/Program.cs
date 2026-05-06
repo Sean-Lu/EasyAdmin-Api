@@ -9,10 +9,12 @@ using Microsoft.OpenApi.Models;
 using Nacos.V2.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using Quartz;
+using Serilog;
 using Sean.Core.Redis.Extensions;
 using System.Reflection;
 using EasyAdmin.Infrastructure.Converter;
 using EasyAdmin.Web.Filter;
+using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 
 Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);// 设置当前工作目录：@".\"
@@ -22,6 +24,10 @@ ThreadPool.SetMinThreads(30, 30);
 ExcelPackage.License.SetNonCommercialPersonal("Sean");// EPPlus
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 配置 Serilog 日志记录
+builder.Host.UseSerilog((context, configuration) => configuration
+    .ReadFrom.Configuration(context.Configuration));
 
 //Console.WriteLine("环境变量 ASPNETCORE_URLS: " + Environment.GetEnvironmentVariable("ASPNETCORE_URLS"));// 控制台输出环境变量
 
@@ -44,10 +50,30 @@ if (enableNacos)
 //Console.WriteLine("配置 ASPNETCORE_URLS: " + builder.Configuration.GetValue<string>("ASPNETCORE_URLS"));
 
 #region [ConfigureServices] Add services to the container.
+// 配置 IIS 服务器选项
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.AllowSynchronousIO = true;
+});
+// 配置 Kestrel 服务器选项
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.AllowSynchronousIO = true;
+    options.Limits.MinRequestBodyDataRate = null;
+    options.Limits.MinResponseDataRate = null;
+});
+// 配置 API 行为选项
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;// 禁用内置的模型验证过滤器 ModelStateInvalidFilter
+});
+
 //builder.Services.AddControllersWithViews();
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<TenantFilter>();
+    options.Filters.Add<TenantFilter>();// 多租户过滤器
+    options.Filters.Add<ApiModelValidationFilter>();// 模型验证过滤器
+    options.Filters.Add<ApiExceptionFilterAttribute>();// 异常过滤器
 }).AddNewtonsoftJson(options =>
 {
     // json序列化使用 Newtonsoft.Json
@@ -90,25 +116,13 @@ var jwtConfig = new JwtConfig();
 builder.Configuration.Bind("Jwt", jwtConfig);
 builder.Services.AddJwtService(jwtConfig);
 
-builder.Services.Configure<IISServerOptions>(options =>
-{
-    options.AllowSynchronousIO = true;
-});
-builder.Services.Configure<KestrelServerOptions>(options =>
-{
-    options.AllowSynchronousIO = true;
-    options.Limits.MinRequestBodyDataRate = null;
-    options.Limits.MinResponseDataRate = null;
-});
-
-//var configuration = builder.Services.GetConfiguration();
-
 if (enableNacos)
 {
     builder.Services.AddNacosV2Config(builder.Configuration, sectionName: nacosConfigSectionName);// Nacos 配置中心：INacosConfigService
     //builder.Services.AddNacosAspNet(builder.Configuration, "nacos");// Nacos 服务发现
 }
 
+// 配置 Redis 缓存
 builder.Services.AddRedis(builder.Configuration);
 
 // 配置Quartz
@@ -158,8 +172,8 @@ app.UseMiddleware<GlobalExceptionMiddleware>();// 全局异常捕获中间件
 //if (app.Environment.IsDevelopment())
 {
     //app.UseDeveloperExceptionPage();
-app.UseSwagger();
-app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 //app.UseHttpsRedirection();

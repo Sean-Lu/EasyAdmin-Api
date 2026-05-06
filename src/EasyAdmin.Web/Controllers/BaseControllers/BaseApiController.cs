@@ -12,7 +12,6 @@ namespace EasyAdmin.Web.Controllers;
 [Route("api/[controller]/[action]")]
 [ApiController]
 [UserAuth]
-[ApiExceptionFilter]
 [Authorize]
 public abstract class BaseApiController : ControllerBase
 {
