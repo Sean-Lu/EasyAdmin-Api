@@ -5,7 +5,6 @@ using EasyAdmin.Web.Middleware;
 using EasyAdmin.Web.Models;
 using EasyAdmin.Web.Services;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.OpenApi.Models;
 using Nacos.V2.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using Quartz;
@@ -15,6 +14,7 @@ using System.Reflection;
 using EasyAdmin.Infrastructure.Converter;
 using EasyAdmin.Web.Filter;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi;
 using OfficeOpenXml;
 
 Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);// 设置当前工作目录：@".\"

@@ -50,7 +50,7 @@ public class AuthController(
             IP = HttpContext.GetClientIp()
         });// 新增用户登录历史记录
 
-        var token = JwtHelper.GetJwtToken(new JwtUserModel
+        var token = JwtHelper.GenerateToken(new JwtUserModel
         {
             TenantId = user.TenantId,
             UserId = user.Id
@@ -70,10 +70,11 @@ public class AuthController(
     [HttpPost]
     public ApiResult<object> CheckToken()
     {
-        var isTokenExpired = JwtHelper.IsTokenExpired(this.Request);
+        var tuple = JwtHelper.IsTokenExpired(this.Request);
         return Success<object>(new
         {
-            Expired = isTokenExpired
+            //ValidTo = tuple.Item2,// token失效时间=过期时间+缓冲时间(ClockSkew)
+            Expired = tuple.Item1// token是否失效
         });
     }
 

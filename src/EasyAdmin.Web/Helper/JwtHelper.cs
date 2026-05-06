@@ -1,10 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using EasyAdmin.Infrastructure.Const;
-using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Models;
 using EasyAdmin.Web.Models;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace EasyAdmin.Web.Helper;
@@ -22,26 +21,16 @@ public static class JwtHelper
     /// <param name="options"></param>
     public static void SwaggerAddJwt(SwaggerGenOptions options)
     {
-        options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+        options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
         {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer",
-                    }
-                },
-                Array.Empty<string>()
-            }
+            [new OpenApiSecuritySchemeReference("Bearer", document)] = new()
         });
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            Description = "JWT授权(数据将在请求头中进行传输) 在下方输入Bearer {token} 即可，注意两者之间有空格",
-            Name = WebConst.RequestHeaderTokenKey,//jwt默认的参数名称
-            In = ParameterLocation.Header,//jwt默认存放在请求头中
-            Type = SecuritySchemeType.ApiKey,
+            Description = "JWT Authorization header using the Bearer scheme.",
+            Name = WebConst.RequestHeaderTokenKey,
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
             BearerFormat = "JWT",
             Scheme = "Bearer"
         });
@@ -52,24 +41,66 @@ public static class JwtHelper
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
-    public static string GetJwtToken(JwtUserModel user)
+    public static string GenerateToken(JwtUserModel user)
     {
         var claims = new List<Claim>
         {
             new(nameof(JwtUserModel.TenantId),user.TenantId.ToString()),
             new(nameof(JwtUserModel.UserId),user.UserId.ToString()),
         };
-        return GetJwtToken(claims);
+        // token失效时间=过期时间+缓冲时间(ClockSkew)
+        var jwtSecurityToken = new JwtSecurityToken(
+            JwtConfig.Issuer,
+            JwtConfig.Audience,
+            claims,
+            JwtConfig.NotBefore,
+            JwtConfig.Expiration,// 过期时间
+            JwtConfig.SigningCredentials
+        );
+        var token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        token = "Bearer " + token;
+        return token;
     }
 
     /// <summary>
-    /// 获取Token过期时间。token失效时间 = 过期时间 + 缓冲时间（ClockSkew）
+    /// 获取token
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public static string? GetToken(HttpRequest request)
+    {
+        // 先尝试从 Authorization 请求头获取
+        if (request.Headers.TryGetValue(WebConst.RequestHeaderTokenKey, out var token))
+        {
+            var tokenStr = token.ToString();
+            // 移除 Bearer 前缀（支持大小写不敏感）
+            if (tokenStr.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                return tokenStr.Substring("Bearer ".Length).Trim();
+            }
+            // 如果没有前缀，直接返回
+            return tokenStr.Trim();
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// 获取Token过期时间。token失效时间=过期时间+缓冲时间(ClockSkew)
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
     public static DateTime? GetTokenExpiredTime(HttpRequest request)
     {
-        var token = GetToken(request);
+        return GetTokenExpiredTime(GetToken(request));
+    }
+
+    /// <summary>
+    /// 获取Token过期时间。token失效时间=过期时间+缓冲时间(ClockSkew)
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public static DateTime? GetTokenExpiredTime(string? token)
+    {
         if (string.IsNullOrEmpty(token))
         {
             return null;
@@ -120,31 +151,52 @@ public static class JwtHelper
     /// 验证token是否失效
     /// </summary>
     /// <param name="request"></param>
+    /// <param name="exceptionHandler"></param>
     /// <returns>是否过期</returns>
-    public static bool IsTokenExpired(HttpRequest request)
+    public static (bool, DateTime) IsTokenExpired(HttpRequest request, Action<Exception>? exceptionHandler = null)
     {
-        var token = GetToken(request);
+        return IsTokenExpired(GetToken(request), exceptionHandler);
+    }
+
+    /// <summary>
+    /// 验证token是否失效
+    /// </summary>
+    /// <param name="token"></param>
+    /// <param name="exceptionHandler"></param>
+    /// <returns>是否过期</returns>
+    public static (bool, DateTime) IsTokenExpired(string? token, Action<Exception>? exceptionHandler = null)
+    {
         if (string.IsNullOrEmpty(token))
         {
-            return true;
+            return (true, DateTime.MinValue);
         }
 
-        try
+        //try
+        //{
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    tokenHandler.ValidateToken(token, JwtConfig.TokenValidationParameters, out var validatedToken);
+        //    var jwtToken = validatedToken as JwtSecurityToken;
+        //    var validTo = jwtToken?.ValidTo.ToLocalTime();
+        //    var effectiveExpiredTime = validTo?.Add(JwtConfig.TokenValidationParameters.ClockSkew) ?? DateTime.MinValue;
+        //    //Console.WriteLine($"token过期时间：{validTo}，token失效时间：{effectiveExpiredTime}，当前时间：{DateTime.Now}");
+        //    return (false, effectiveExpiredTime);
+        //}
+        //catch (Exception ex)
+        //{
+        //    // token 无效或已过期
+        //    exceptionHandler?.Invoke(ex);
+        //    return (true, DateTime.MinValue);
+        //}
+
+        var expiredTime = GetTokenExpiredTime(token);
+        if (expiredTime == null)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            tokenHandler.ValidateToken(token, JwtConfig.TokenValidationParameters, out var validatedToken);
-
-            //var jwtToken = validatedToken as JwtSecurityToken;
-            //var validTo = jwtToken?.ValidTo.ToLocalTime();
-            //Console.WriteLine($"token过期时间：{validTo}，token失效时间：{validTo?.Add(JwtConfig.TokenValidationParameters.ClockSkew)}，当前时间：{DateTime.Now}");
-
-            return false;
+            return (true, DateTime.MinValue);
         }
-        catch (Exception)
-        {
-            // token 无效或已过期
-            return true;
-        }
+        var clockSkew = JwtConfig.TokenValidationParameters.ClockSkew;
+        var effectiveExpiredTime = expiredTime.Value.Add(clockSkew);
+        var isExpired = DateTime.UtcNow > effectiveExpiredTime;
+        return (isExpired, effectiveExpiredTime);
     }
 
     /// <summary>
@@ -171,47 +223,5 @@ public static class JwtHelper
             TenantId = Convert.ToInt64(claims.First(t => t.Type == nameof(JwtUserModel.TenantId)).Value),
             UserId = Convert.ToInt64(claims.First(t => t.Type == nameof(JwtUserModel.UserId)).Value),
         };
-    }
-
-    /// <summary>
-    /// 生成token
-    /// </summary>
-    /// <returns></returns>
-    private static string GetJwtToken(List<Claim>? claims)
-    {
-        // token总过期时间=过期时间+缓冲时间
-        var jwtSecurityToken = new JwtSecurityToken(
-            JwtConfig.Issuer,
-            JwtConfig.Audience,
-            claims ?? new List<Claim>(),
-            JwtConfig.NotBefore,
-            JwtConfig.Expiration,// 过期时间
-            JwtConfig.SigningCredentials
-        );
-        var token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        token = "Bearer " + token;
-        return token;
-    }
-
-    /// <summary>
-    /// 获取token
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    private static string? GetToken(HttpRequest request)
-    {
-        // 先尝试从 Authorization 请求头获取
-        if (request.Headers.TryGetValue(WebConst.RequestHeaderTokenKey, out var token))
-        {
-            var tokenStr = token.ToString();
-            // 移除 Bearer 前缀（支持大小写不敏感）
-            if (tokenStr.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            {
-                return tokenStr.Substring("Bearer ".Length).Trim();
-            }
-            // 如果没有前缀，直接返回
-            return tokenStr.Trim();
-        }
-        return null;
     }
 }
