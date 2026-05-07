@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Sean.Core.DbRepository;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,7 +17,7 @@ public class MenuEntity : TreeEntityBase<MenuEntity>
     /// 图标
     /// </summary>
     [MaxLength(50)]
-    public virtual string Icon { get; set; }
+    public virtual string? Icon { get; set; }
     /// <summary>
     /// 标题
     /// </summary>
@@ -32,7 +32,11 @@ public class MenuEntity : TreeEntityBase<MenuEntity>
     /// 外部链接地址
     /// </summary>
     [MaxLength(200)]
-    public virtual string OutLink { get; set; }
+    public virtual string? OutLink { get; set; }
+    /// <summary>
+    /// 外链打开方式（0-内嵌打开，1-新标签页打开）
+    /// </summary>
+    public virtual OutLinkOpenType? OutLinkOpenType { get; set; }
     /// <summary>
     /// 状态（0-禁用，1-启用）
     /// </summary>
@@ -42,5 +46,5 @@ public class MenuEntity : TreeEntityBase<MenuEntity>
     /// 上级菜单完整路径
     /// </summary>
     [NotMapped]
-    public virtual string ParentFullPath { get; set; }
+    public virtual string? ParentFullPath { get; set; }
 }

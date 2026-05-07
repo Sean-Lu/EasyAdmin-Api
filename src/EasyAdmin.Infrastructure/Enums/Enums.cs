@@ -78,3 +78,18 @@ public enum SimpleIntervalUnit
     /// </summary>
     Day = 3
 }
+
+/// <summary>
+/// 外链打开方式
+/// </summary>
+public enum OutLinkOpenType
+{
+    /// <summary>
+    /// 在当前Tab页面内嵌打开（iframe方式）
+    /// </summary>
+    Inline = 0,
+    /// <summary>
+    /// 在新标签页打开（target="_blank"）
+    /// </summary>
+    Blank = 1
+}

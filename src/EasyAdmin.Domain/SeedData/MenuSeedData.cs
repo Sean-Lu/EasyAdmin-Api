@@ -58,8 +58,9 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Id = 9000003, PId = 9000000, Sort = 3, Icon = "AppstoreOutlined", Title = "500页面", Path = "/500", State = CommonState.Disable },
 
             new MenuEntity{ Id = 10000000, PId = 0, Sort = 11, Icon = "LinkOutlined", Title = "外部链接", Path = "/link", State = CommonState.Enable },
-            new MenuEntity{ Id = 10000001, PId = 10000000, Sort = 1, Icon = "LinkOutlined", Title = "Gitee 仓库", Path = "/link/gitee", OutLink = "https://gitee.com/Sean-Lu", State = CommonState.Enable },
-            new MenuEntity{ Id = 10000002, PId = 10000000, Sort = 2, Icon = "LinkOutlined", Title = "GitHub 仓库", Path = "/link/github", OutLink = "https://github.com/Sean-Lu", State = CommonState.Enable },
+            new MenuEntity{ Id = 10000001, PId = 10000000, Sort = 1, Icon = "LinkOutlined", Title = "Gitee 仓库", Path = "/link/gitee", OutLink = "https://gitee.com/Sean-Lu", OutLinkOpenType = OutLinkOpenType.Blank, State = CommonState.Enable },
+            new MenuEntity{ Id = 10000002, PId = 10000000, Sort = 2, Icon = "LinkOutlined", Title = "GitHub 仓库", Path = "/link/github", OutLink = "https://github.com/Sean-Lu", OutLinkOpenType = OutLinkOpenType.Blank, State = CommonState.Enable },
+            new MenuEntity{ Id = 10000003, PId = 10000000, Sort = 3, Icon = "SearchOutlined", Title = "百度搜索", Path = "/link/baidu", OutLink = "https://www.baidu.com", OutLinkOpenType = OutLinkOpenType.Inline, State = CommonState.Enable },
 
             new MenuEntity{ Id = 11000000, PId = 0, Sort = 12, Icon = "ToolOutlined", Title = "工具", Path = "/tool", State = CommonState.Enable },
             new MenuEntity{ Id = 11000001, PId = 11000000, Sort = 1, Icon = "OrderedListOutlined", Title = "待办事项", Path = "/tool/todoList", State = CommonState.Enable },// To-do List

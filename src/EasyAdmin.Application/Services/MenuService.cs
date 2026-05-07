@@ -7,6 +7,7 @@ using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Helper;
 using EasyAdmin.Infrastructure.Tenant;
+using EasyAdmin.Infrastructure.Wrapper;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Sean.Core.DbRepository.Extensions;
@@ -28,8 +29,19 @@ public class MenuService(
     /// </summary>
     private static readonly List<long> SystemAdminRoleIgnoreMenuIds = new() { SysConst.TenantMenuId };
 
+    /// <summary>
+    /// 不支持iframe内嵌的第三方链接
+    /// </summary>
+    private static readonly Dictionary<string, string> UnSupportIframeLinks = new()
+    {
+        {"github.com", "GitHub"},
+        {"gitee.com", "Gitee"}
+    };
+
     public async Task<bool> AddAsync(MenuDto dto)
     {
+        ValidateOutLink(dto.OutLink, dto.OutLinkOpenType);
+
         var entity = mapper.Map<MenuEntity>(dto);
         return await menuRepository.AddAsync(entity);
     }
@@ -45,6 +57,8 @@ public class MenuService(
 
     public async Task<bool> UpdateAsync(MenuUpdateDto dto)
     {
+        ValidateOutLink(dto.OutLink, dto.OutLinkOpenType);
+
         return await menuRepository.UpdateByDtoAsync(dto, mapper.Map<MenuEntity>) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
@@ -139,5 +153,33 @@ public class MenuService(
         var parent = await menuRepository.GetByIdAsync(entity.PId);
         var parentFullPath = await GetParentFullPathAsync(parent);
         return $"{parentFullPath} / {parent.Title}";
+    }
+
+    private void ValidateOutLink(string outLink, OutLinkOpenType? openType)
+    {
+        if (string.IsNullOrWhiteSpace(outLink))
+        {
+            return;
+        }
+
+        if (!UrlHelper.IsValidUrl(outLink))
+        {
+            throw new ExplicitException($"外部链接格式无效: {outLink}");
+        }
+
+        if (!UrlHelper.IsAllowedHost(outLink))
+        {
+            var host = UrlHelper.GetHost(outLink);
+            throw new ExplicitException($"不允许访问的外部链接域名: {host}");
+        }
+
+        if (openType == OutLinkOpenType.Inline)
+        {
+            var host = UrlHelper.GetHost(outLink);
+            if (UnSupportIframeLinks.TryGetValue(host, out var name))
+            {
+                throw new ExplicitException($"{name}不支持iframe内嵌打开，请使用新标签页方式");
+            }
+        }
     }
 }

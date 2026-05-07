@@ -10,7 +10,7 @@ public class MenuDto : TreeDtoBase<MenuDto>
     /// <summary>
     /// 图标
     /// </summary>
-    public virtual string Icon { get; set; }
+    public virtual string? Icon { get; set; }
     /// <summary>
     /// 标题
     /// </summary>
@@ -22,7 +22,11 @@ public class MenuDto : TreeDtoBase<MenuDto>
     /// <summary>
     /// 外部链接地址
     /// </summary>
-    public virtual string OutLink { get; set; }
+    public virtual string? OutLink { get; set; }
+    /// <summary>
+    /// 外链打开方式（0-内嵌打开，1-新标签页打开）
+    /// </summary>
+    public virtual OutLinkOpenType? OutLinkOpenType { get; set; }
     /// <summary>
     /// 状态（0-禁用，1-启用）
     /// </summary>
@@ -30,5 +34,5 @@ public class MenuDto : TreeDtoBase<MenuDto>
     /// <summary>
     /// 上级菜单完整路径
     /// </summary>
-    public virtual string ParentFullPath { get; set; }
+    public virtual string? ParentFullPath { get; set; }
 }
