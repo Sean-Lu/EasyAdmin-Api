@@ -93,3 +93,37 @@ public enum OutLinkOpenType
     /// </summary>
     Blank = 1
 }
+
+/// <summary>
+/// 代码生成数据库类型
+/// </summary>
+public enum CodeGenDbType
+{
+    /// <summary>
+    /// MySQL
+    /// </summary>
+    MySql = 0,
+    /// <summary>
+    /// SQL Server
+    /// </summary>
+    SqlServer = 1,
+    /// <summary>
+    /// PostgreSQL
+    /// </summary>
+    PostgreSql = 2
+}
+
+/// <summary>
+/// 代码生成模板类型
+/// </summary>
+public enum CodeGenTemplateType
+{
+    /// <summary>
+    /// 内置模板
+    /// </summary>
+    BuiltIn = 0,
+    /// <summary>
+    /// 用户上传
+    /// </summary>
+    UserUpload = 1
+}

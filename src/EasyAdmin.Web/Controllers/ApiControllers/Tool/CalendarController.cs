@@ -12,7 +12,7 @@ using MapsterMapper;
 namespace EasyAdmin.Web.Controllers;
 
 /// <summary>
-/// 日历：签到
+/// 日历(签到)
 /// </summary>
 public class CalendarController(
     ILogger<CalendarController> logger,
