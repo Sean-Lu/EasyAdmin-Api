@@ -1,4 +1,5 @@
 using System.Text;
+using EasyAdmin.Infrastructure.Enums;
 using Microsoft.IdentityModel.Tokens;
 
 namespace EasyAdmin.Web.Models;
@@ -21,9 +22,29 @@ public class JwtConfig
     public string Audience { get; set; }
 
     /// <summary>
-    /// 过期时间（min）
+    /// Token模式：Single(单Token)/Refresh(双Token)
     /// </summary>
-    public int Expired { get; set; }
+    public TokenMode TokenMode { get; set; } = TokenMode.Single;
+
+    /// <summary>
+    /// 是否启用滑动过期（仅单Token模式有效）
+    /// </summary>
+    public bool UseSlidingExpiration { get; set; }
+
+    /// <summary>
+    /// 滑动过期阈值（分钟），token剩余时间小于此值时自动刷新
+    /// </summary>
+    public int SlidingExpirationThreshold { get; set; } = 30;
+
+    /// <summary>
+    /// AccessToken过期时间（分钟）
+    /// </summary>
+    public int Expired { get; set; } = 30;
+
+    /// <summary>
+    /// RefreshToken过期时间（分钟），仅双Token模式有效，默认7天(10080分钟)
+    /// </summary>
+    public int RefreshTokenExpired { get; set; } = 10080;
 
     /// <summary>
     /// 生效时间

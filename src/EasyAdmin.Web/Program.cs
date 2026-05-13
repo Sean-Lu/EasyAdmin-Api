@@ -12,6 +12,7 @@ using Serilog;
 using Sean.Core.Redis.Extensions;
 using System.Reflection;
 using EasyAdmin.Infrastructure.Converter;
+using EasyAdmin.Web.Contracts;
 using EasyAdmin.Web.Filter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
@@ -108,7 +109,8 @@ builder.Services.AddCors(options =>
         builder.SetIsOriginAllowed(origin => true)
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .AllowCredentials();
+            .AllowCredentials()
+            .WithExposedHeaders("X-New-Token", "Authorization");
     });
 });
 
@@ -124,6 +126,10 @@ if (enableNacos)
 
 // 配置 Redis 缓存
 builder.Services.AddRedis(builder.Configuration);
+
+// 注册 TokenService
+builder.Services.AddSingleton(jwtConfig);
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 // 配置Quartz
 builder.Services.AddQuartz(config =>
@@ -161,7 +167,7 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 app.UseMiddleware<GlobalExceptionMiddleware>();// 全局异常捕获中间件
-// app.UseMiddleware<SlidingExpirationJwtMiddleware>();// JWT滑动过期中间件：需要在客户端（例如JavaScript）中处理返回的新令牌，并在后续的请求中使用它。这通常涉及到监听响应头中的变化，并在需要时更新存储在客户端的令牌。
+app.UseMiddleware<SlidingExpirationJwtMiddleware>();// JWT滑动过期中间件：需要在客户端（例如JavaScript）中处理返回的新令牌，并在后续的请求中使用它。这通常涉及到监听响应头中的变化，并在需要时更新存储在客户端的令牌。
 
 //// 解决Nginx代理不能获取IP问题
 //app.UseForwardedHeaders(new ForwardedHeadersOptions

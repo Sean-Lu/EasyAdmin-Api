@@ -1,47 +1,110 @@
-﻿//namespace EasyAdmin.Web.Middleware;
+using EasyAdmin.Infrastructure.Models;
+using EasyAdmin.Web.Helper;
+using EasyAdmin.Web.Models;
+using Sean.Core.Redis;
+using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Web.Contracts;
+using EasyAdmin.Infrastructure.Const;
 
-//public class SlidingExpirationJwtMiddleware
-//{
-//    private readonly RequestDelegate _next;
-//    private readonly IConfiguration _configuration;
-//    private readonly IJwtTokenService _jwtTokenService; // 假设你有一个服务来生成JWT令牌
+namespace EasyAdmin.Web.Middleware;
 
-//    public SlidingExpirationJwtMiddleware(RequestDelegate next, IConfiguration configuration, IJwtTokenService jwtTokenService)
-//    {
-//        _next = next;
-//        _configuration = configuration;
-//        _jwtTokenService = jwtTokenService;
-//    }
+/// <summary>
+/// JWT滑动过期中间件
+/// </summary>
+public class SlidingExpirationJwtMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly JwtConfig _jwtConfig;
+    private readonly ITokenService _tokenService;
 
-//    public async Task InvokeAsync(HttpContext context)
-//    {
-//        // 检查请求头中是否有Authorization，并提取JWT
-//        var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-//        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
-//        {
-//            var token = authHeader.Substring("Bearer ".Length).Trim();
+    public SlidingExpirationJwtMiddleware(RequestDelegate next, JwtConfig jwtConfig, ITokenService tokenService)
+    {
+        _next = next;
+        _jwtConfig = jwtConfig;
+        _tokenService = tokenService;
+    }
 
-//            // 验证JWT有效性
-//            var isValid = await _jwtTokenService.ValidateTokenAsync(token);
-//            if (isValid)
-//            {
-//                // 检查是否接近过期时间
-//                var tokenExpiration = _jwtTokenService.GetExpirationTime(token);
-//                var now = DateTime.UtcNow;
-//                var isNearExpiration = tokenExpiration - now < TimeSpan.FromMinutes(5);
+    public async Task InvokeAsync(HttpContext context)
+    {
+        var token = JwtHelper.GetToken(context.Request);
+        if (!string.IsNullOrEmpty(token))
+        {
+            if (await _tokenService.IsTokenBlacklistedAsync(token))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    code = 401,
+                    success = false,
+                    msg = "Token已被禁用，请重新登录"
+                });
+                return;
+            }
+        }
 
-//                if (isNearExpiration)
-//                {
-//                    // 生成新的JWT令牌
-//                    var newToken = await _jwtTokenService.GenerateTokenAsync(user); // 假设user是已认证的用户对象
+        if (_jwtConfig.TokenMode == TokenMode.Refresh)
+        {
+            await _next(context);
+            return;
+        }
 
-//                    // 更新响应头中的Authorization
-//                    context.Response.Headers["Authorization"] = $"Bearer {newToken}";
-//                }
-//            }
-//        }
+        if (!_jwtConfig.UseSlidingExpiration)
+        {
+            await _next(context);
+            return;
+        }
 
-//        // 调用下一个中间件
-//        await _next(context);
-//    }
-//}
+        if (string.IsNullOrEmpty(token))
+        {
+            await _next(context);
+            return;
+        }
+
+        try
+        {
+            var (isExpired, expiredTime) = JwtHelper.IsTokenExpired(token);
+            if (isExpired)
+            {
+                await _next(context);
+                return;
+            }
+
+            var remainingTime = expiredTime - DateTime.UtcNow;
+            if (remainingTime.TotalMinutes < _jwtConfig.SlidingExpirationThreshold)
+            {
+                var user = context.User;
+                if (user.Identity != null && user.Identity.IsAuthenticated)
+                {
+                    var tenantIdClaim = user.FindFirst(nameof(JwtUserModel.TenantId));
+                    var userIdClaim = user.FindFirst(nameof(JwtUserModel.UserId));
+                    if (tenantIdClaim != null && userIdClaim != null &&
+                        long.TryParse(tenantIdClaim.Value, out var tenantId) &&
+                        long.TryParse(userIdClaim.Value, out var userId))
+                    {
+                        var newToken = JwtHelper.GenerateToken(new JwtUserModel
+                        {
+                            TenantId = tenantId,
+                            UserId = userId
+                        });
+
+                        var tokenKey = GetTokenKey(userId);
+                        await RedisHelper.StringSetAsync(tokenKey, newToken.Replace("Bearer ", string.Empty), TimeSpan.FromMinutes(_jwtConfig.Expired));
+
+                        context.Response.Headers["X-New-Token"] = newToken;
+                    }
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        await _next(context);
+    }
+
+    public static string GetTokenKey(long userId)
+    {
+        return $"{CacheKeyConst.TokenPrefix}{userId}";
+    }
+}

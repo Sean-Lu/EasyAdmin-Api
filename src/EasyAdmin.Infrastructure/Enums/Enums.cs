@@ -127,3 +127,19 @@ public enum CodeGenTemplateType
     /// </summary>
     UserUpload = 1
 }
+
+
+/// <summary>
+/// Token模式
+/// </summary>
+public enum TokenMode
+{
+    /// <summary>
+    /// 单token模式
+    /// </summary>
+    Single,
+    /// <summary>
+    /// 双token模式（AccessToken、RefreshToken）
+    /// </summary>
+    Refresh
+}

@@ -2,11 +2,14 @@ using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Models;
+using EasyAdmin.Web.Contracts;
 using EasyAdmin.Web.Extensions;
 using EasyAdmin.Web.Helper;
+using EasyAdmin.Web.Middleware;
 using EasyAdmin.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sean.Core.Redis;
 
 namespace EasyAdmin.Web.Controllers;
 
@@ -17,7 +20,8 @@ public class AuthController(
     ILogger<AuthController> logger,
     IConfiguration configuration,
     IUserService userService,
-    ILoginLogService loginLogService
+    ILoginLogService loginLogService,
+    ITokenService tokenService
     ) : BaseApiController
 {
     /// <summary>
@@ -50,16 +54,109 @@ public class AuthController(
             IP = HttpContext.GetClientIp()
         });// 新增用户登录历史记录
 
-        var token = JwtHelper.GenerateToken(new JwtUserModel
+        if (JwtHelper.JwtConfig.TokenMode == TokenMode.Refresh)
         {
-            TenantId = user.TenantId,
-            UserId = user.Id
-        });
+            // 双token模式
+            var ipAddress = HttpContext.GetClientIp();
+            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+            var (accessToken, refreshToken) = await tokenService.GenerateTokens(new JwtUserModel
+            {
+                TenantId = user.TenantId,
+                UserId = user.Id
+            }, ipAddress, userAgent);
+
+            return Success(new LoginResponse
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                ExpiresIn = JwtHelper.JwtConfig.Expired * 60
+            });
+        }
+        else
+        {
+            // 单token模式
+            var token = JwtHelper.GenerateToken(new JwtUserModel
+            {
+                TenantId = user.TenantId,
+                UserId = user.Id
+            });
+
+            if (JwtHelper.JwtConfig.UseSlidingExpiration)
+            {
+                var tokenKey = SlidingExpirationJwtMiddleware.GetTokenKey(user.Id);
+                await RedisHelper.StringSetAsync(tokenKey, token.Replace("Bearer ", string.Empty), TimeSpan.FromMinutes(JwtHelper.JwtConfig.Expired));
+            }
+
+            return Success(new LoginResponse
+            {
+                AccessToken = token,
+                ExpiresIn = JwtHelper.JwtConfig.Expired * 60
+            });
+        }
+    }
+
+    /// <summary>
+    /// 刷新Token（双Token模式）
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [AllowAnonymous]
+    [HttpPost]
+    public async Task<ApiResult<LoginResponse>> RefreshToken([FromBody] RefreshTokenRequest request)
+    {
+        if (string.IsNullOrEmpty(request.RefreshToken))
+        {
+            return Fail<LoginResponse>("刷新令牌不能为空！");
+        }
+
+        if (JwtHelper.JwtConfig.TokenMode != TokenMode.Refresh)
+        {
+            return Fail<LoginResponse>("当前未启用双Token模式！");
+        }
+
+        var ipAddress = HttpContext.GetClientIp();
+        var (success, accessToken, newRefreshToken, message) = await tokenService.RefreshTokenAsync(request.RefreshToken, ipAddress);
+
+        if (!success)
+        {
+            return Fail<LoginResponse>(message);
+        }
 
         return Success(new LoginResponse
         {
-            AccessToken = token
+            AccessToken = accessToken,
+            RefreshToken = newRefreshToken,
+            ExpiresIn = JwtHelper.JwtConfig.Expired * 60
         });
+    }
+
+    /// <summary>
+    /// 登出（使当前用户所有Token失效）
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<object>> Logout()
+    {
+        var userInfo = JwtHelper.GetUserInfo(this.Request);
+        if (userInfo.UserId <= 0)
+        {
+            return Fail<object>("用户未登录！");
+        }
+
+        if (JwtHelper.JwtConfig.TokenMode == TokenMode.Refresh)
+        {
+            await tokenService.RevokeAllUserTokensAsync(userInfo.UserId);
+        }
+        else
+        {
+            var token = JwtHelper.GetToken(this.Request);
+            if (!string.IsNullOrEmpty(token))
+            {
+                await tokenService.AddTokenToBlacklistAsync(token, "用户主动登出");
+            }
+        }
+
+        return Success<object>("登出成功！");
     }
 
     /// <summary>
@@ -68,13 +165,43 @@ public class AuthController(
     /// <returns></returns>
     [AllowAnonymous]
     [HttpPost]
-    public ApiResult<object> CheckToken()
+    public async Task<ApiResult<object>> CheckToken()
     {
-        var tuple = JwtHelper.IsTokenExpired(this.Request);
-        return Success<object>(new
+        var token = JwtHelper.GetToken(this.Request);
+        if (string.IsNullOrEmpty(token))
         {
-            //ValidTo = tuple.Item2,// token失效时间=过期时间+缓冲时间(ClockSkew)
-            Expired = tuple.Item1// token是否失效
+            return Success<object>(new { Expired = true, Message = "Token为空" });
+        }
+
+        if (await tokenService.IsTokenBlacklistedAsync(token))
+        {
+            return Success<object>(new { Expired = true, Message = "Token已被禁用" });
+        }
+
+        var (isExpired, expiredTime) = JwtHelper.IsTokenExpired(token);
+        
+        if (JwtHelper.JwtConfig.TokenMode == TokenMode.Refresh)
+        {
+            var refreshToken = Request.Headers["X-Refresh-Token"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                var refreshTokenModel = await tokenService.GetRefreshTokenAsync(refreshToken);
+                if (refreshTokenModel != null && refreshTokenModel.ExpiresAt > DateTime.UtcNow)
+                {
+                    return Success<object>(new 
+                    { 
+                        Expired = false, 
+                        AccessTokenExpired = isExpired,
+                        Message = isExpired ? "AccessToken已过期，可使用RefreshToken刷新" : "Token有效"
+                    });
+                }
+            }
+        }
+
+        return Success<object>(new 
+        { 
+            Expired = isExpired, 
+            Message = isExpired ? "Token已过期" : "Token有效" 
         });
     }
 
