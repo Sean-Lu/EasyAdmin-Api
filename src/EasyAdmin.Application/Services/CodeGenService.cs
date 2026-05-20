@@ -2,6 +2,7 @@ using System.Data;
 using System.Data.Common;
 using System.IO.Compression;
 using System.Text;
+using EasyAdmin.Application.CodeGen;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
@@ -32,7 +33,9 @@ public class CodeGenService(
 
     public async Task<List<CodeGenTemplateDto>> GetTemplateListAsync(CodeGenTemplateListReqDto request)
     {
-        var orderBy = OrderByConditionBuilder<CodeGenTemplateEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);
+        var orderBy = OrderByConditionBuilder<CodeGenTemplateEntity>.Build(OrderByType.Desc, entity => entity.SortOrder);
+        orderBy.Next = OrderByConditionBuilder<CodeGenTemplateEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);
+        orderBy.Next.Next = OrderByConditionBuilder<CodeGenTemplateEntity>.Build(OrderByType.Desc, entity => entity.Id);
         var list = await templateRepository.QueryAsync(
             WhereExpressionUtil.Create<CodeGenTemplateEntity>(entity => !entity.IsDelete)
                 .AndAlsoIF(!string.IsNullOrWhiteSpace(request.Name), entity => entity.Name.Contains(request.Name))
@@ -41,7 +44,6 @@ public class CodeGenService(
                 .AndAlsoIF(request.CategoryId != null && request.CategoryId > 0, entity => entity.CategoryId == request.CategoryId),
             orderBy: orderBy
         );
-
         return mapper.Map<List<CodeGenTemplateDto>>(list?.ToList() ?? new List<CodeGenTemplateEntity>());
     }
 
@@ -56,6 +58,7 @@ public class CodeGenService(
         var entity = mapper.Map<CodeGenTemplateEntity>(dto);
         entity.CreateTime = DateTime.Now;
         entity.UpdateTime = DateTime.Now;
+        entity.SortOrder = dto.SortOrder;
 
         if (entity.IsDefault)
         {
@@ -83,6 +86,7 @@ public class CodeGenService(
         entity.Description = dto.Description;
         entity.FilePath = dto.FilePath;
         entity.IsDefault = dto.IsDefault;
+        entity.SortOrder = dto.SortOrder;
         entity.State = dto.State;
         entity.UpdateTime = DateTime.Now;
 
@@ -115,6 +119,7 @@ public class CodeGenService(
     public async Task<List<DbConnectionConfigDto>> GetDbConfigListAsync(DbConnectionConfigListReqDto request)
     {
         var orderBy = OrderByConditionBuilder<DbConnectionConfigEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);
+        orderBy.Next = OrderByConditionBuilder<DbConnectionConfigEntity>.Build(OrderByType.Desc, entity => entity.Id);
         var list = await dbConfigRepository.QueryAsync(
             WhereExpressionUtil.Create<DbConnectionConfigEntity>(entity => !entity.IsDelete)
                 .AndAlsoIF(!string.IsNullOrWhiteSpace(request.Name), entity => entity.Name.Contains(request.Name))
@@ -347,6 +352,129 @@ public class CodeGenService(
 
         GeneratedCodeCache[taskId] = result;
         return result;
+    }
+
+    public async Task<CodeGenResultDto> GenerateCodeByConfigAsync(CodeGenConfigReqDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.ClassName))
+        {
+            throw new Exception("类名(ClassName)不能为空");
+        }
+
+        if (request.TemplateIds == null || !request.TemplateIds.Any())
+        {
+            throw new Exception("请选择至少一个代码模板");
+        }
+
+        var templates = (await templateRepository.QueryAsync(
+            WhereExpressionUtil.Create<CodeGenTemplateEntity>(entity => !entity.IsDelete && entity.State == CommonState.Enable)
+                .AndAlso(entity => request.TemplateIds.Contains(entity.Id))
+        ))?.ToList();
+
+        if (templates == null || !templates.Any())
+        {
+            throw new Exception("没有可用的代码模板");
+        }
+
+        var context = BuildRenderContext(request);
+        var resultFiles = new List<CodeGenFileDto>();
+        var taskId = Guid.NewGuid().ToString("N");
+
+        foreach (var template in templates)
+        {
+            var renderedContent = RenderTemplate(template.Content, context);
+            var filePath = RenderTemplate(template.FilePath, context);
+            var fileName = Path.GetFileName(filePath) ?? request.ClassName;
+
+            resultFiles.Add(new CodeGenFileDto
+            {
+                FileName = fileName,
+                FilePath = filePath,
+                Content = renderedContent,
+                FileExtension = Path.GetExtension(filePath) ?? string.Empty
+            });
+        }
+
+        var result = new CodeGenResultDto
+        {
+            TaskId = taskId,
+            Files = resultFiles
+        };
+
+        GeneratedCodeCache[taskId] = result;
+        return result;
+    }
+
+    public async Task<CodeFirstParseResultDto> ParseEntityCodeAsync(CodeFirstParseReqDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.SourceCode))
+        {
+            throw new Exception("源码不能为空");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Language))
+        {
+            throw new Exception("语言类型不能为空");
+        }
+
+        return await Task.Run(() =>
+        {
+            return request.Language.ToLower() switch
+            {
+                "csharp" or "c#" => CSharpEntityParser.Parse(request.SourceCode),
+                "java" => JavaEntityParser.Parse(request.SourceCode),
+                _ => throw new NotSupportedException($"不支持的语言类型: {request.Language}")
+            };
+        });
+    }
+
+    private object BuildRenderContext(CodeGenConfigReqDto request)
+    {
+        var instanceName = !string.IsNullOrWhiteSpace(request.InstanceName)
+            ? request.InstanceName
+            : ConvertToCamelCase(request.ClassName);
+
+        var tableName = !string.IsNullOrWhiteSpace(request.TableName)
+            ? request.TableName
+            : request.ClassName;
+
+        var tableComment = !string.IsNullOrWhiteSpace(request.TableComment)
+            ? request.TableComment
+            : request.ClassName;
+
+        var columnsList = new List<object>();
+        if (request.Columns != null && request.Columns.Any())
+        {
+            foreach (var c in request.Columns)
+            {
+                columnsList.Add(new
+                {
+                    ColumnName = c.ColumnName ?? c.PropertyName,
+                    FieldName = c.FieldName ?? ConvertToCamelCase(c.PropertyName),
+                    PropertyName = c.PropertyName,
+                    ColumnComment = c.ColumnComment ?? c.PropertyName,
+                    DbType = c.DbType ?? "",
+                    CSharpType = c.CSharpType ?? "string",
+                    JavaType = c.JavaType ?? "String",
+                    IsNullable = c.IsNullable,
+                    IsKey = c.IsKey,
+                    IsIdentity = c.IsIdentity
+                });
+            }
+        }
+
+        return new
+        {
+            TableName = tableName,
+            ClassName = request.ClassName,
+            InstanceName = instanceName,
+            TableComment = tableComment,
+            PackageName = request.PackageName ?? "",
+            ModuleName = request.ModuleName ?? "",
+            Author = request.Author ?? "",
+            Date = DateTime.Now.ToString("yyyy-MM-dd"),
+            Columns = columnsList
+        };
     }
 
     public async Task<byte[]> DownloadFileAsync(string taskId, string fileName)
@@ -707,7 +835,7 @@ public class CodeGenService(
         try
         {
             var handlebars = Handlebars.Create();
-            
+
             handlebars.RegisterHelper("or", (output, context, arguments) =>
             {
                 foreach (var arg in arguments)
@@ -726,7 +854,7 @@ public class CodeGenService(
 
             var compiledTemplate = handlebars.Compile(template);
             var result = compiledTemplate(context);
-            
+
             return System.Net.WebUtility.HtmlDecode(result);
         }
         catch (Exception ex)

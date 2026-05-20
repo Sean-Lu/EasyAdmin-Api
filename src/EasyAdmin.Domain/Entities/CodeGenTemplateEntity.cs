@@ -65,6 +65,12 @@ public class CodeGenTemplateEntity : EntityBase
     public virtual bool IsDefault { get; set; }
 
     /// <summary>
+    /// 排序号
+    /// </summary>
+    [Description("排序号")]
+    public virtual int SortOrder { get; set; }
+
+    /// <summary>
     /// 状态
     /// </summary>
     [Description("状态")]

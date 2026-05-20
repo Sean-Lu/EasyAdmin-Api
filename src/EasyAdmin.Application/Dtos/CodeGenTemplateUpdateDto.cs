@@ -36,6 +36,10 @@ public class CodeGenTemplateUpdateDto : DtoIdBase
     /// </summary>
     public bool IsDefault { get; set; }
     /// <summary>
+    /// 排序号
+    /// </summary>
+    public int SortOrder { get; set; }
+    /// <summary>
     /// 状态
     /// </summary>
     public CommonState State { get; set; }

@@ -21,6 +21,8 @@ public interface ICodeGenService
     Task<List<DbTableInfoDto>> GetDbTablesAsync(long id);
 
     Task<CodeGenResultDto> GenerateCodeAsync(CodeGenReqDto request);
+    Task<CodeGenResultDto> GenerateCodeByConfigAsync(CodeGenConfigReqDto request);
+    Task<CodeFirstParseResultDto> ParseEntityCodeAsync(CodeFirstParseReqDto request);
     Task<byte[]> DownloadFileAsync(string taskId, string fileName);
     Task<byte[]> DownloadPackageAsync(string taskId);
 }

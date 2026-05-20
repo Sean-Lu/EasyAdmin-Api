@@ -13,17 +13,329 @@ public class CodeGenTemplateSeedData : IEntitySeedData<CodeGenTemplateEntity>
     {
         return new[]
         {
+            #region 内置C#项目模板（示例）
+            // Entity实体
             new CodeGenTemplateEntity
             {
                 Id = 1,
-                Name = "Entity实体(MyBatis)",
-                Code = "entity_mybatis",
+                Name = "Entity实体(C#)",
+                Code = "csharp_entity",
                 CategoryId = 1,
+                TemplateType = CodeGenTemplateType.BuiltIn,
+                FilePath = "Entities/{{ClassName}}Entity.cs",
+                IsDefault = true,
+                SortOrder = 1,
+                State = CommonState.Enable,
+                Description = "C# Entity实体模板",
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Content = @"using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace {{PackageName}}.{{ModuleName}}.Entities
+{
+    /// <summary>
+    /// {{TableComment}}
+    /// </summary>
+    [Table(""{{TableName}}"")]
+    public class {{ClassName}}Entity
+    {
+{{#each Columns}}
+        /// <summary>
+        /// {{ColumnComment}}
+        /// </summary>
+{{#if IsKey}}
+        [Key]
+{{/if}}
+{{#if IsIdentity}}
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+{{/if}}
+        public {{CSharpType}} {{PropertyName}} { get; set; }
+{{/each}}
+    }
+}"
+            },
+            // Repository接口
+            new CodeGenTemplateEntity
+            {
+                Id = 2,
+                Name = "Repository接口(C#)",
+                Code = "csharp_repository_interface",
+                CategoryId = 1,
+                TemplateType = CodeGenTemplateType.BuiltIn,
+                FilePath = "Contracts/I{{ClassName}}Repository.cs",
+                IsDefault = true,
+                SortOrder = 2,
+                State = CommonState.Enable,
+                Description = "C# Repository接口模板",
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Content = @"using EasyAdmin.Domain.Entities;
+
+namespace {{PackageName}}.{{ModuleName}}.Contracts;
+
+public interface I{{ClassName}}Repository : IBaseRepositoryExt<{{ClassName}}Entity>
+{
+}"
+            },
+            // Repository实现
+            new CodeGenTemplateEntity
+            {
+                Id = 3,
+                Name = "Repository实现(C#)",
+                Code = "csharp_repository_impl",
+                CategoryId = 1,
+                TemplateType = CodeGenTemplateType.BuiltIn,
+                FilePath = "Repositories/{{ClassName}}Repository.cs",
+                IsDefault = true,
+                SortOrder = 3,
+                State = CommonState.Enable,
+                Description = "C# Repository实现模板",
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Content = @"using EasyAdmin.Domain.Contracts;
+using EasyAdmin.Domain.Entities;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+namespace {{PackageName}}.{{ModuleName}}.Repositories;
+
+public class {{ClassName}}Repository(
+    IConfiguration configuration,
+    ILogger<{{ClassName}}Repository> logger
+    ) : BaseRepositoryExt<{{ClassName}}Entity>(configuration, logger), I{{ClassName}}Repository
+{
+}"
+            },
+            // Service接口
+            new CodeGenTemplateEntity
+            {
+                Id = 4,
+                Name = "Service接口(C#)",
+                Code = "csharp_service_interface",
+                CategoryId = 1,
+                TemplateType = CodeGenTemplateType.BuiltIn,
+                FilePath = "Contracts/I{{ClassName}}Service.cs",
+                IsDefault = true,
+                SortOrder = 4,
+                State = CommonState.Enable,
+                Description = "C# Service接口模板",
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Content = @"using EasyAdmin.Application.Dtos;
+using EasyAdmin.Domain.Entities;
+using EasyAdmin.Infrastructure.Enums;
+using Sean.Core.DbRepository;
+
+namespace {{PackageName}}.{{ModuleName}}.Contracts;
+
+public interface I{{ClassName}}Service
+{
+    Task<bool> AddAsync({{ClassName}}AddDto dto);
+    Task<bool> DeleteByIdAsync(long id);
+    Task<bool> UpdateAsync({{ClassName}}UpdateDto dto);
+    Task<bool> UpdateStateAsync(long id, CommonState state);
+    Task<PageQueryResult<{{ClassName}}Entity>> PageAsync({{ClassName}}PageReqDto request);
+    Task<{{ClassName}}Entity> GetByIdAsync(long id);
+}"
+            },
+            // Service实现
+            new CodeGenTemplateEntity
+            {
+                Id = 5,
+                Name = "Service实现(C#)",
+                Code = "csharp_service_impl",
+                CategoryId = 1,
+                TemplateType = CodeGenTemplateType.BuiltIn,
+                FilePath = "Services/{{ClassName}}Service.cs",
+                IsDefault = true,
+                SortOrder = 5,
+                State = CommonState.Enable,
+                Description = "C# Service实现模板",
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Content = @"using {{PackageName}}.{{ModuleName}}.Contracts;
+using {{PackageName}}.{{ModuleName}}.Dtos;
+using EasyAdmin.Domain.Contracts;
+using EasyAdmin.Domain.Entities;
+using EasyAdmin.Infrastructure.Enums;
+using MapsterMapper;
+using Sean.Core.DbRepository;
+using Sean.Core.DbRepository.Extensions;
+using Sean.Core.DbRepository.Util;
+
+namespace {{PackageName}}.{{ModuleName}}.Services;
+
+public class {{ClassName}}Service(
+    ILogger<{{ClassName}}Service> logger,
+    IMapper mapper,
+    I{{ClassName}}Repository {{InstanceName}}Repository
+) : I{{ClassName}}Service
+{
+    public async Task<bool> AddAsync({{ClassName}}Dto dto)
+    {
+        var entity = mapper.Map<{{ClassName}}Entity>(dto);
+        return await {{InstanceName}}Repository.AddAsync(entity);
+    }
+
+    public async Task<bool> DeleteByIdAsync(long id)
+    {
+        return await {{InstanceName}}Repository.DeleteByIdAsync(id);
+    }
+
+    public async Task<bool> UpdateAsync({{ClassName}}UpdateDto dto)
+    {
+        return await {{InstanceName}}Repository.UpdateByDtoAsync(dto, mapper.Map<{{ClassName}}Entity>) > 0;
+    }
+
+    public async Task<bool> UpdateStateAsync(long id, CommonState state)
+    {
+        return await {{InstanceName}}Repository.UpdateAsync(new {{ClassName}}Entity { State = state }, entity => new { entity.State }, entity => entity.Id == id) > 0;
+    }
+
+    public async Task<PageQueryResult<{{ClassName}}Entity>> PageAsync({{ClassName}}PageReqDto request)
+    {
+        var orderBy = OrderByConditionBuilder<{{ClassName}}Entity>.Build(OrderByType.Desc, entity => entity.CreateTime);
+        orderBy.Next = OrderByConditionBuilder<{{ClassName}}Entity>.Build(OrderByType.Desc, entity => entity.Id);
+        return await {{InstanceName}}Repository.PageQueryAsync(
+            WhereExpressionUtil.Create<{{ClassName}}Entity>(entity => !entity.IsDelete),
+            orderBy, request.PageNumber, request.PageSize);
+    }
+
+    public async Task<{{ClassName}}Entity> GetByIdAsync(long id)
+    {
+        return await {{InstanceName}}Repository.GetByIdAsync(id);
+    }
+}"
+            },
+            // Controller
+            new CodeGenTemplateEntity
+            {
+                Id = 6,
+                Name = "Controller(C#)",
+                Code = "csharp_controller",
+                CategoryId = 1,
+                TemplateType = CodeGenTemplateType.BuiltIn,
+                FilePath = "Controllers/{{ClassName}}Controller.cs",
+                IsDefault = true,
+                SortOrder = 6,
+                State = CommonState.Enable,
+                Description = "C# Controller模板",
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Content = @"using {{PackageName}}.{{ModuleName}}.Contracts;
+using {{PackageName}}.{{ModuleName}}.Dtos;
+using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Web.Models;
+using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+
+namespace {{PackageName}}.{{ModuleName}}.Controllers;
+
+public class {{ClassName}}Controller(
+    ILogger<{{ClassName}}Controller> logger,
+    IMapper mapper,
+    I{{ClassName}}Service {{InstanceName}}Service
+) : BaseApiController
+{
+    /// <summary>
+    /// 新增
+    /// </summary>
+    /// <param name=""data""></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<bool>> Add({{ClassName}}AddDto data)
+    {
+        return Success(await {{InstanceName}}Service.AddAsync(data));
+    }
+
+    /// <summary>
+    /// 删除
+    /// </summary>
+    /// <param name=""data""></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<bool>> Delete([FromBody] JObject? data)
+    {
+        var ids = data[""ids""]?.Values<long>().ToList() ?? default;
+        if (ids != null && ids.Any())
+        {
+            // 批量删除
+            return Success(await {{InstanceName}}Service.DeleteByIdsAsync(ids));
+        }
+
+        // 单个删除
+        var id = data[""id""]?.Value<long>() ?? default;
+        return Success(await {{InstanceName}}Service.DeleteByIdAsync(id));
+    }
+
+    /// <summary>
+    /// 修改
+    /// </summary>
+    /// <param name=""data""></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<bool>> Update({{ClassName}}UpdateDto data)
+    {
+        return Success(await {{InstanceName}}Service.UpdateAsync(data));
+    }
+
+    /// <summary>
+    /// 修改状态
+    /// </summary>
+    /// <param name=""data""></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<bool>> UpdateState([FromBody] JObject? data)
+    {
+        var id = data[""id""]?.Value<long>() ?? default;
+        var state = (CommonState)(data[""state""]?.Value<int>() ?? default);
+        return Success(await {{InstanceName}}Service.UpdateStateAsync(id, state));
+    }
+
+    /// <summary>
+    /// 分页查询
+    /// </summary>
+    /// <param name=""request""></param>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<ApiResult<ApiResultPageData<{{ClassName}}Dto>>> Page([FromQuery] {{ClassName}}PageReqDto request)
+    {
+        var pageResult = await {{InstanceName}}Service.PageAsync(request);
+        return Success(mapper.Map<ApiResultPageData<{{ClassName}}Dto>>(pageResult));
+    }
+
+    /// <summary>
+    /// 查询详情
+    /// </summary>
+    /// <param name=""id""></param>
+    /// <returns></returns>
+    [HttpGet]
+    public async Task<ApiResult<{{ClassName}}Dto>> Detail(long id)
+    {
+        var entity = await {{InstanceName}}Service.GetByIdAsync(id);
+        return Success(mapper.Map<{{ClassName}}Dto>(entity));
+    }
+}"
+            },
+            #endregion
+
+            #region 内置Java项目模板（示例）
+            // Entity实体
+            new CodeGenTemplateEntity
+            {
+                Id = 10,
+                Name = "Entity实体(MyBatis)",
+                Code = "java_entity_mybatis",
+                CategoryId = 2,
                 TemplateType = CodeGenTemplateType.BuiltIn,
                 FilePath = "entity/{{ClassName}}.java",
                 IsDefault = true,
+                SortOrder = 1,
                 State = CommonState.Enable,
-                Description = "MyBatis实体模板",
+                Description = "Java MyBatis实体模板",
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
                 Content = @"package {{PackageName}}.{{ModuleName}}.entity;
@@ -54,58 +366,19 @@ public class {{ClassName}} {
 {{/each}}
 }"
             },
+            // Mapper接口
             new CodeGenTemplateEntity
             {
-                Id = 2,
-                Name = "Entity实体(EF Core)",
-                Code = "entity_efcore",
-                CategoryId = 2,
-                TemplateType = CodeGenTemplateType.BuiltIn,
-                FilePath = "Entities/{{ClassName}}.cs",
-                IsDefault = false,
-                State = CommonState.Enable,
-                Description = "EF Core实体模板",
-                CreateTime = DateTime.Now,
-                UpdateTime = DateTime.Now,
-                Content = @"using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace {{PackageName}}.{{ModuleName}}.Entities
-{
-    /// <summary>
-    /// {{TableComment}}
-    /// </summary>
-    [Table(""{{TableName}}"")]
-    public class {{ClassName}}Entity
-    {
-{{#each Columns}}
-        /// <summary>
-        /// {{ColumnComment}}
-        /// </summary>
-{{#if IsKey}}
-        [Key]
-{{/if}}
-{{#if IsIdentity}}
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-{{/if}}
-        public {{CSharpType}} {{PropertyName}} { get; set; }
-
-{{/each}}
-    }
-}"
-            },
-            new CodeGenTemplateEntity
-            {
-                Id = 3,
+                Id = 11,
                 Name = "Mapper接口(MyBatis)",
-                Code = "mapper_mybatis",
-                CategoryId = 1,
+                Code = "java_mapper_mybatis",
+                CategoryId = 2,
                 TemplateType = CodeGenTemplateType.BuiltIn,
                 FilePath = "mapper/{{ClassName}}Mapper.java",
                 IsDefault = true,
+                SortOrder = 2,
                 State = CommonState.Enable,
-                Description = "MyBatis Mapper接口",
+                Description = "Java MyBatis Mapper接口",
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
                 Content = @"package {{PackageName}}.{{ModuleName}}.mapper;
@@ -131,17 +404,127 @@ public interface {{ClassName}}Mapper {
     {{ClassName}} selectById({{#each Columns}}{{#if IsKey}}{{JavaType}} {{FieldName}}{{/if}}{{/each}});
 }"
             },
+            // Repository接口
             new CodeGenTemplateEntity
             {
-                Id = 4,
-                Name = "Service接口",
-                Code = "service_interface",
-                CategoryId = 1,
+                Id = 12,
+                Name = "Repository接口(Java)",
+                Code = "java_repository_interface",
+                CategoryId = 2,
+                TemplateType = CodeGenTemplateType.BuiltIn,
+                FilePath = "repository/{{ClassName}}Repository.java",
+                IsDefault = true,
+                SortOrder = 3,
+                State = CommonState.Enable,
+                Description = "Java Repository接口模板",
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Content = @"package {{PackageName}}.{{ModuleName}}.repository;
+
+import {{PackageName}}.{{ModuleName}}.entity.{{ClassName}};
+import java.util.List;
+
+/**
+ * {{TableComment}} Repository
+ * 
+ * @author {{Author}}
+ * @since {{Date}}
+ */
+public interface {{ClassName}}Repository {
+
+    int insert({{ClassName}} entity);
+
+    int updateById({{ClassName}} entity);
+
+    int deleteById({{#each Columns}}{{#if IsKey}}{{JavaType}} {{FieldName}}{{/if}}{{/each}});
+
+    {{ClassName}} selectById({{#each Columns}}{{#if IsKey}}{{JavaType}} {{FieldName}}{{/if}}{{/each}});
+
+    List<{{ClassName}}> selectAll();
+}"
+            },
+            // Repository实现
+            new CodeGenTemplateEntity
+            {
+                Id = 13,
+                Name = "Repository实现(Java)",
+                Code = "java_repository_impl",
+                CategoryId = 2,
+                TemplateType = CodeGenTemplateType.BuiltIn,
+                FilePath = "repository/impl/{{ClassName}}RepositoryImpl.java",
+                IsDefault = true,
+                SortOrder = 4,
+                State = CommonState.Enable,
+                Description = "Java Repository实现模板",
+                CreateTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                Content = @"package {{PackageName}}.{{ModuleName}}.repository.impl;
+
+import {{PackageName}}.{{ModuleName}}.entity.{{ClassName}};
+import {{PackageName}}.{{ModuleName}}.repository.{{ClassName}}Repository;
+import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
+
+/**
+ * {{TableComment}} Repository实现
+ * 
+ * @author {{Author}}
+ * @since {{Date}}
+ */
+@Repository
+public class {{ClassName}}RepositoryImpl implements {{ClassName}}Repository {
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Override
+    public int insert({{ClassName}} entity) {
+        // TODO: 实现插入逻辑
+        return 1;
+    }
+
+    @Override
+    public int updateById({{ClassName}} entity) {
+        // TODO: 实现更新逻辑
+        return 1;
+    }
+
+    @Override
+    public int deleteById({{#each Columns}}{{#if IsKey}}{{JavaType}} {{FieldName}}{{/if}}{{/each}}) {
+        // TODO: 实现删除逻辑
+        return 1;
+    }
+
+    @Override
+    public {{ClassName}} selectById({{#each Columns}}{{#if IsKey}}{{JavaType}} {{FieldName}}{{/if}}{{/each}}) {
+        // TODO: 实现查询逻辑
+        return null;
+    }
+
+    @Override
+    public List<{{ClassName}}> selectAll() {
+        // TODO: 实现查询逻辑
+        return new ArrayList<>();
+    }
+}"
+            },
+            // Service接口
+            new CodeGenTemplateEntity
+            {
+                Id = 14,
+                Name = "Service接口(Java)",
+                Code = "java_service_interface",
+                CategoryId = 2,
                 TemplateType = CodeGenTemplateType.BuiltIn,
                 FilePath = "service/I{{ClassName}}Service.java",
                 IsDefault = true,
+                SortOrder = 5,
                 State = CommonState.Enable,
-                Description = "Service接口模板",
+                Description = "Java Service接口模板",
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
                 Content = @"package {{PackageName}}.{{ModuleName}}.service;
@@ -165,17 +548,19 @@ public interface I{{ClassName}}Service {
     {{ClassName}} getById({{#each Columns}}{{#if IsKey}}{{JavaType}} {{FieldName}}{{/if}}{{/each}});
 }"
             },
+            // Service实现
             new CodeGenTemplateEntity
             {
-                Id = 5,
-                Name = "Service实现",
-                Code = "service_impl",
-                CategoryId = 1,
+                Id = 15,
+                Name = "Service实现(Java)",
+                Code = "java_service_impl",
+                CategoryId = 2,
                 TemplateType = CodeGenTemplateType.BuiltIn,
                 FilePath = "service/impl/{{ClassName}}ServiceImpl.java",
                 IsDefault = true,
+                SortOrder = 6,
                 State = CommonState.Enable,
-                Description = "Service实现模板",
+                Description = "Java Service实现模板",
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
                 Content = @"package {{PackageName}}.{{ModuleName}}.service.impl;
@@ -219,17 +604,19 @@ public class {{ClassName}}ServiceImpl implements I{{ClassName}}Service {
     }
 }"
             },
+            // Controller
             new CodeGenTemplateEntity
             {
-                Id = 6,
-                Name = "Controller",
-                Code = "controller",
-                CategoryId = 1,
+                Id = 16,
+                Name = "Controller(Java)",
+                Code = "java_controller",
+                CategoryId = 2,
                 TemplateType = CodeGenTemplateType.BuiltIn,
                 FilePath = "controller/{{ClassName}}Controller.java",
                 IsDefault = true,
+                SortOrder = 7,
                 State = CommonState.Enable,
-                Description = "Controller模板",
+                Description = "Java Controller模板",
                 CreateTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
                 Content = @"package {{PackageName}}.{{ModuleName}}.controller;
@@ -272,7 +659,8 @@ public class {{ClassName}}Controller {
         return {{InstanceName}}Service.getById({{#each Columns}}{{#if IsKey}}{{FieldName}}{{/if}}{{/each}});
     }
 }"
-            }
+            },
+            #endregion
         };
     }
 }

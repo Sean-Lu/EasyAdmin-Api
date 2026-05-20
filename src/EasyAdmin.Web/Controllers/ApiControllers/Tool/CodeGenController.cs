@@ -204,7 +204,7 @@ public class CodeGenController(
     #region 代码生成
 
     /// <summary>
-    /// 生成代码
+    /// 生成代码（数据库模式）
     /// </summary>
     /// <param name="data">生成参数</param>
     /// <returns>生成结果</returns>
@@ -213,6 +213,38 @@ public class CodeGenController(
     {
         var result = await codeGenService.GenerateCodeAsync(data);
         return Success(result);
+    }
+
+    /// <summary>
+    /// 生成代码（配置模式 / CodeFirst解析模式）
+    /// </summary>
+    /// <param name="data">配置参数</param>
+    /// <returns>生成结果</returns>
+    [HttpPost]
+    public async Task<ApiResult<CodeGenResultDto>> GenerateCodeByConfig(CodeGenConfigReqDto data)
+    {
+        var result = await codeGenService.GenerateCodeByConfigAsync(data);
+        return Success(result);
+    }
+
+    /// <summary>
+    /// 解析Entity源码并提取元数据
+    /// </summary>
+    /// <param name="data">源码和语言类型</param>
+    /// <returns>解析后的实体元数据</returns>
+    [HttpPost]
+    public async Task<ApiResult<CodeFirstParseResultDto>> ParseEntityCode(CodeFirstParseReqDto data)
+    {
+        try
+        {
+            var result = await codeGenService.ParseEntityCodeAsync(data);
+            return Success(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "解析Entity源码失败");
+            return Fail<CodeFirstParseResultDto>(ex.Message);
+        }
     }
 
     /// <summary>

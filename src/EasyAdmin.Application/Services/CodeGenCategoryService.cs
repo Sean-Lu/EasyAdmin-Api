@@ -19,8 +19,9 @@ public class CodeGenCategoryService(
 {
     public async Task<List<CodeGenCategoryDto>> GetTreeAsync()
     {
-        var orderBy = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Asc, entity => entity.SortOrder);
-        orderBy.Next = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Asc, entity => entity.Id);
+        var orderBy = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Desc, entity => entity.SortOrder);
+        orderBy.Next = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);
+        orderBy.Next.Next = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Desc, entity => entity.Id);
         var categories = await categoryRepository.QueryAsync(
             WhereExpressionUtil.Create<CodeGenCategoryEntity>(e => e.State == CommonState.Enable && !e.IsDelete),
             orderBy
@@ -31,8 +32,9 @@ public class CodeGenCategoryService(
 
     public async Task<List<CodeGenCategoryDto>> GetListAsync()
     {
-        var orderBy = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Asc, entity => entity.SortOrder);
-        orderBy.Next = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Asc, entity => entity.Id);
+        var orderBy = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Desc, entity => entity.SortOrder);
+        orderBy.Next = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);
+        orderBy.Next.Next = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Desc, entity => entity.Id);
         var categories = await categoryRepository.QueryAsync(
             WhereExpressionUtil.Create<CodeGenCategoryEntity>(e => !e.IsDelete),
             orderBy
