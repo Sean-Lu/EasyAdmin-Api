@@ -38,7 +38,8 @@ public class FileController(
         try
         {
             await using var stream = file.OpenReadStream();
-            var filePath = await fileStorageFactory.GetFileStorage(storeType).UploadAsync(stream, file.FileName, file.ContentType);
+            var relativePath = $"UploadFiles/{TenantId}/{UserId}/{file.FileName}";
+            var filePath = await fileStorageFactory.GetFileStorage(storeType).UploadAsync(stream, relativePath);
 
             var fileDto = new FileDto
             {

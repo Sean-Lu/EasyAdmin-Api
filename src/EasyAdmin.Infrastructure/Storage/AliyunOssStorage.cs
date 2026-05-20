@@ -22,26 +22,25 @@ public class AliyunOssStorage : IFileStorage
         _ossClient = new OssClient(_config.Endpoint, _config.AccessKeyId, _config.AccessKeySecret);
     }
 
-    public async Task<string> UploadAsync(Stream fileStream, string fileName, string contentType)
+    public async Task<string> UploadAsync(Stream fileStream, string relativePath)
     {
         try
         {
-            var objectName = GenerateObjectName(fileName);
-            var putRequest = new PutObjectRequest(_config.BucketName, objectName, fileStream);
-
+            var objectKey = relativePath.Replace("\\", "/");
+            var putRequest = new PutObjectRequest(_config.BucketName, objectKey, fileStream);
             var result = await Task.Run(() => _ossClient.PutObject(putRequest));
 
             if (result.HttpStatusCode == System.Net.HttpStatusCode.OK)
             {
-                _logger.LogInformation("文件上传到OSS成功: {ObjectName}", objectName);
-                return objectName;
+                _logger.LogInformation("文件上传到阿里云OSS成功: {ObjectName}", objectKey);
+                return objectKey;
             }
 
-            throw new InvalidOperationException($"上传失败，状态码: {result.HttpStatusCode}");
+            throw new InvalidOperationException($"文件上传到阿里云OSS失败，状态码: {result.HttpStatusCode}");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "文件上传到OSS失败: {FileName}", fileName);
+            _logger.LogError(ex, "文件上传到阿里云OSS失败: {Path}", relativePath);
             throw;
         }
     }
@@ -67,7 +66,7 @@ public class AliyunOssStorage : IFileStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "从OSS下载文件失败: {FilePath}", filePath);
+            _logger.LogError(ex, "从阿里云OSS下载文件失败: {FilePath}", filePath);
             throw;
         }
     }
@@ -86,7 +85,7 @@ public class AliyunOssStorage : IFileStorage
 
             if (result.HttpStatusCode == System.Net.HttpStatusCode.NoContent)
             {
-                _logger.LogInformation("文件从OSS删除成功: {ObjectName}", objectName);
+                _logger.LogInformation("文件从阿里云OSS删除成功: {ObjectName}", objectName);
                 return true;
             }
 
@@ -94,7 +93,7 @@ public class AliyunOssStorage : IFileStorage
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "从OSS删除文件失败: {FilePath}", filePath);
+            _logger.LogError(ex, "从阿里云OSS删除文件失败: {FilePath}", filePath);
             return false;
         }
     }
@@ -117,12 +116,6 @@ public class AliyunOssStorage : IFileStorage
         }
 
         return $"https://{_config.BucketName}.{_config.Endpoint}/{filePath}";
-    }
-
-    private static string GenerateObjectName(string fileName)
-    {
-        var extension = Path.GetExtension(fileName);
-        return $"{DateTime.Now:yyyyMMdd}/{Guid.NewGuid()}{extension}";
     }
 
     private static string ExtractObjectName(string filePath)

@@ -9,12 +9,9 @@ public interface IFileStorage
     /// 上传文件
     /// </summary>
     /// <param name="fileStream">文件流</param>
-    /// <param name="fileName">文件名</param>
-    /// <param name="contentType">文件内容类型</param>
+    /// <param name="relativePath">相对路径</param>
     /// <returns>文件路径</returns>
-    /// <exception cref="ArgumentNullException">文件流或文件名为空</exception>
-    /// <exception cref="ArgumentException">文件内容类型为空</exception>
-    Task<string> UploadAsync(Stream fileStream, string fileName, string contentType);
+    Task<string> UploadAsync(Stream fileStream, string relativePath);
     /// <summary>
     /// 下载文件
     /// </summary>

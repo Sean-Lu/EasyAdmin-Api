@@ -130,6 +130,21 @@ public enum CodeGenTemplateType
 
 
 /// <summary>
+/// 更新包类型
+/// </summary>
+public enum UpdatePackageType
+{
+    /// <summary>
+    /// 全量更新包
+    /// </summary>
+    Full = 0,
+    /// <summary>
+    /// 增量更新包
+    /// </summary>
+    Incremental = 1
+}
+
+/// <summary>
 /// Token模式
 /// </summary>
 public enum TokenMode

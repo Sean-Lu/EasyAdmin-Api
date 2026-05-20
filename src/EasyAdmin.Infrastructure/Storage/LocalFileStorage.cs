@@ -1,4 +1,3 @@
-using EasyAdmin.Infrastructure.Tenant;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 
@@ -20,32 +19,21 @@ public class LocalFileStorage : IFileStorage
         _rootPath = configuration.GetValue<string>("LocalFileStorage:RootPath", DefaultRootPath);
     }
 
-    public async Task<string> UploadAsync(Stream fileStream, string fileName, string contentType)
+    public async Task<string> UploadAsync(Stream fileStream, string relativePath)
     {
-        var uploadFilePath = Path.Combine(_rootPath, "UploadFiles", TenantContextHolder.TenantId.ToString(), TenantContextHolder.UserId.ToString());
-        if (!Directory.Exists(uploadFilePath))
+        var filePath = Path.Combine(_rootPath, relativePath);
+        var dir = Path.GetDirectoryName(filePath);
+        if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
         {
-            Directory.CreateDirectory(uploadFilePath);
-        }
-
-        var filePath = Path.Combine(uploadFilePath, fileName);
-        if (File.Exists(filePath))
-        {
-            var extension = Path.GetExtension(fileName);
-            filePath = Path.Combine(uploadFilePath, $"{Guid.NewGuid()}{extension}");
+            Directory.CreateDirectory(dir);
         }
 
         await using var outputStream = new FileStream(filePath, FileMode.Create);
         await fileStream.CopyToAsync(outputStream);
 
-        var relativePath = filePath;
-        if (relativePath.StartsWith(_rootPath))
-        {
-            relativePath = $"{RootPathPlaceholder}{relativePath.Substring(_rootPath.Length)}";
-        }
-
-        _logger.LogInformation("文件上传成功: {FilePath}", relativePath);
-        return relativePath;
+        var storagePath = $"{RootPathPlaceholder}/{relativePath.Replace("\\", "/")}";
+        _logger.LogInformation("文件上传成功: {FilePath}", storagePath);
+        return storagePath;
     }
 
     public Task<Stream> DownloadAsync(string filePath)
