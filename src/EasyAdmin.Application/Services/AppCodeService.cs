@@ -41,9 +41,7 @@ public class AppCodeService(
 
     public async Task<bool> UpdateAsync(AppCodeUpdateDto dto)
     {
-        var entity = mapper.Map<AppCodeEntity>(dto);
-        return await appCodeRepository.UpdateAsync(entity,
-            e => new { e.Code, e.Name, e.Description, e.State, e.UpdateTime }) > 0;
+        return await appCodeRepository.UpdateByDtoAsync(dto, mapper.Map<AppCodeEntity>) > 0;
     }
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)

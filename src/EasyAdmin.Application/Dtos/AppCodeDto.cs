@@ -22,7 +22,6 @@ public class AppCodeUpdateDto : DtoIdBase
     public string Code { get; set; }
     public string Name { get; set; }
     public string? Description { get; set; }
-    public CommonState State { get; set; }
 }
 
 public class AppCodePageReqDto : PageRequestBase
