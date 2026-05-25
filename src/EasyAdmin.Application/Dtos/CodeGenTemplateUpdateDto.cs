@@ -22,7 +22,7 @@ public class CodeGenTemplateUpdateDto : DtoIdBase
     /// <summary>
     /// 模板描述
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
     /// <summary>
     /// 分类ID
     /// </summary>

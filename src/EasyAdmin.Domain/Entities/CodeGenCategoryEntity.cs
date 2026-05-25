@@ -24,7 +24,7 @@ public class CodeGenCategoryEntity : EntityBase
 
     [MaxLength(500)]
     [Description("分类描述")]
-    public virtual string Description { get; set; }
+    public virtual string? Description { get; set; }
 
     [Description("是否内置分类")]
     public virtual bool IsBuiltIn { get; set; }

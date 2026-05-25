@@ -26,7 +26,7 @@ public class CodeGenTemplateDto : DtoBase
     /// <summary>
     /// 代码生成模板描述
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
     /// <summary>
     /// 分类ID
     /// </summary>

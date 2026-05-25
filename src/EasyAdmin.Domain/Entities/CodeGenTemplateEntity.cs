@@ -43,7 +43,7 @@ public class CodeGenTemplateEntity : EntityBase
     /// </summary>
     [MaxLength(500)]
     [Description("模板描述")]
-    public virtual string Description { get; set; }
+    public virtual string? Description { get; set; }
 
     /// <summary>
     /// 分类ID
