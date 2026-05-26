@@ -34,7 +34,7 @@ public class CodeGenTemplateDto : DtoBase
     /// <summary>
     /// 分类名称
     /// </summary>
-    public string CategoryName { get; set; }
+    public string? CategoryName { get; set; }
     /// <summary>
     /// 文件路径模板（包含目录和文件名，支持模板变量如 {{ClassName}}）
     /// </summary>
