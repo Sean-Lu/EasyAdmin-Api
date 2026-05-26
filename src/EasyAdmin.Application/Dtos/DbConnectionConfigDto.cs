@@ -40,10 +40,6 @@ public class DbConnectionConfigDto : DtoBase
     /// </summary>
     public string? ConnectionString { get; set; }
     /// <summary>
-    /// 是否默认配置
-    /// </summary>
-    public bool IsDefault { get; set; }
-    /// <summary>
     /// 状态
     /// </summary>
     public CommonState State { get; set; }

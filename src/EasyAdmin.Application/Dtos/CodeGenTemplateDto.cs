@@ -8,23 +8,23 @@ namespace EasyAdmin.Application.Dtos;
 public class CodeGenTemplateDto : DtoBase
 {
     /// <summary>
-    /// 代码生成模板名称
+    /// 模板名称
     /// </summary>
     public string Name { get; set; }
     /// <summary>
-    /// 代码生成模板代码
+    /// 模板编码
     /// </summary>
     public string Code { get; set; }
     /// <summary>
-    /// 代码生成模板类型
+    /// 模板类型
     /// </summary>
     public CodeGenTemplateType TemplateType { get; set; }
     /// <summary>
-    /// 代码生成模板内容
+    /// 模板内容
     /// </summary>
     public string Content { get; set; }
     /// <summary>
-    /// 代码生成模板描述
+    /// 模板描述
     /// </summary>
     public string? Description { get; set; }
     /// <summary>

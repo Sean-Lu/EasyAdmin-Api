@@ -1,4 +1,4 @@
-using System.Data;
+using System.Collections.Concurrent;
 using System.Data.Common;
 using System.IO.Compression;
 using System.Text;
@@ -8,6 +8,7 @@ using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Wrapper;
 using HandlebarsDotNet;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
@@ -53,44 +54,17 @@ public class CodeGenService(
         return mapper.Map<CodeGenTemplateDto>(entity);
     }
 
-    public async Task<bool> AddTemplateAsync(CodeGenTemplateDto dto)
+    public async Task<bool> AddTemplateAsync(CodeGenTemplateAddDto dto)
     {
         var entity = mapper.Map<CodeGenTemplateEntity>(dto);
-        entity.CreateTime = DateTime.Now;
-        entity.UpdateTime = DateTime.Now;
-        entity.SortOrder = dto.SortOrder;
-
-        if (entity.IsDefault)
-        {
-            await SetOtherTemplatesNotDefaultAsync();
-        }
-
+        entity.TemplateType = CodeGenTemplateType.UserUpload;
+        entity.State = CommonState.Enable;
         return await templateRepository.AddAsync(entity);
     }
 
     public async Task<bool> UpdateTemplateAsync(CodeGenTemplateUpdateDto dto)
     {
-        var entity = await templateRepository.GetByIdAsync(dto.Id);
-        if (entity == null || entity.Id <= 0)
-        {
-            throw new Exception("模板不存在");
-        }
-
-        if (dto.IsDefault && !entity.IsDefault)
-        {
-            await SetOtherTemplatesNotDefaultAsync();
-        }
-
-        entity.Name = dto.Name;
-        entity.Code = dto.Code;
-        entity.Description = dto.Description;
-        entity.FilePath = dto.FilePath;
-        entity.IsDefault = dto.IsDefault;
-        entity.SortOrder = dto.SortOrder;
-        entity.State = dto.State;
-        entity.UpdateTime = DateTime.Now;
-
-        return await templateRepository.UpdateAsync(entity) > 0;
+        return await templateRepository.UpdateByDtoAsync(dto, mapper.Map<CodeGenTemplateEntity>) > 0;
     }
 
     public async Task<bool> DeleteTemplateAsync(long id)
@@ -101,15 +75,6 @@ public class CodeGenService(
     public async Task<bool> DeleteTemplatesAsync(List<long> ids)
     {
         return await templateRepository.DeleteByIdsAsync(ids);
-    }
-
-    private async Task SetOtherTemplatesNotDefaultAsync()
-    {
-        await templateRepository.UpdateAsync(
-            new CodeGenTemplateEntity { IsDefault = false },
-            entity => new { entity.IsDefault },
-            entity => entity.IsDefault && !entity.IsDelete
-        );
     }
 
     #endregion
@@ -140,53 +105,23 @@ public class CodeGenService(
     public async Task<DbConnectionConfigDto> GetDbConfigByIdAsync(long id)
     {
         var entity = await dbConfigRepository.GetByIdAsync(id);
+        entity.Password = DecryptPassword(entity.Password);
         return mapper.Map<DbConnectionConfigDto>(entity);
     }
 
     public async Task<bool> AddDbConfigAsync(DbConnectionConfigUpdateDto dto)
     {
         var entity = mapper.Map<DbConnectionConfigEntity>(dto);
-        entity.Password = EncryptPassword(dto.Password);
-        entity.CreateTime = DateTime.Now;
-        entity.UpdateTime = DateTime.Now;
-
-        if (entity.IsDefault)
-        {
-            await SetOtherDbConfigsNotDefaultAsync();
-        }
-
+        entity.Password = EncryptPassword(entity.Password);
+        entity.State = CommonState.Enable;
         return await dbConfigRepository.AddAsync(entity);
     }
 
     public async Task<bool> UpdateDbConfigAsync(DbConnectionConfigUpdateDto dto)
     {
-        var entity = await dbConfigRepository.GetByIdAsync(dto.Id);
-        if (entity == null || entity.Id <= 0)
-        {
-            throw new Exception("数据库配置不存在");
-        }
-
-        if (dto.IsDefault && !entity.IsDefault)
-        {
-            await SetOtherDbConfigsNotDefaultAsync();
-        }
-
-        entity.Name = dto.Name;
-        entity.DbType = dto.DbType;
-        entity.Host = dto.Host;
-        entity.Port = dto.Port;
-        entity.Database = dto.Database;
-        entity.Username = dto.Username;
-        if (!string.IsNullOrWhiteSpace(dto.Password))
-        {
-            entity.Password = EncryptPassword(dto.Password);
-        }
-        entity.ConnectionString = dto.ConnectionString;
-        entity.IsDefault = dto.IsDefault;
-        entity.State = dto.State;
-        entity.UpdateTime = DateTime.Now;
-
-        return await dbConfigRepository.UpdateAsync(entity) > 0;
+        var entity = mapper.Map<DbConnectionConfigEntity>(dto);
+        entity.Password = EncryptPassword(entity.Password);
+        return await dbConfigRepository.UpdateByDtoAsync<DbConnectionConfigUpdateDto>(entity) > 0;
     }
 
     public async Task<bool> DeleteDbConfigAsync(long id)
@@ -199,21 +134,12 @@ public class CodeGenService(
         return await dbConfigRepository.DeleteByIdsAsync(ids);
     }
 
-    private async Task SetOtherDbConfigsNotDefaultAsync()
-    {
-        await dbConfigRepository.UpdateAsync(
-            new DbConnectionConfigEntity { IsDefault = false },
-            entity => new { entity.IsDefault },
-            entity => entity.IsDefault && !entity.IsDelete
-        );
-    }
-
     public async Task<bool> TestDbConnectionAsync(long id)
     {
         var entity = await dbConfigRepository.GetByIdAsync(id);
         if (entity == null || entity.Id <= 0)
         {
-            throw new Exception("数据库配置不存在");
+            throw new ExplicitException("数据库配置不存在");
         }
 
         try
@@ -226,7 +152,7 @@ public class CodeGenService(
         catch (Exception ex)
         {
             logger.LogError(ex, "测试数据库连接失败");
-            throw new Exception($"数据库连接失败: {ex.Message}");
+            throw new ExplicitException($"数据库连接失败: {ex.Message}");
         }
     }
 
@@ -235,7 +161,7 @@ public class CodeGenService(
         var entity = await dbConfigRepository.GetByIdAsync(id);
         if (entity == null || entity.Id <= 0)
         {
-            throw new Exception("数据库配置不存在");
+            throw new ExplicitException("数据库配置不存在");
         }
 
         try
@@ -264,7 +190,7 @@ public class CodeGenService(
         catch (Exception ex)
         {
             logger.LogError(ex, "获取数据库表列表失败");
-            throw new Exception($"获取表列表失败: {ex.Message}");
+            throw new ExplicitException($"获取表列表失败: {ex.Message}");
         }
     }
 
@@ -272,14 +198,16 @@ public class CodeGenService(
 
     #region 代码生成
 
-    private static readonly Dictionary<string, CodeGenResultDto> GeneratedCodeCache = new();
+    private static readonly Encoding GeneratedCodeEncoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+    private static readonly TimeSpan GeneratedCodeCacheDuration = TimeSpan.FromMinutes(30);
+    private static readonly ConcurrentDictionary<string, GeneratedCodeCacheItem> GeneratedCodeCache = new();
 
     public async Task<CodeGenResultDto> GenerateCodeAsync(CodeGenReqDto request)
     {
         var dbConfig = await dbConfigRepository.GetByIdAsync(request.DbConfigId);
         if (dbConfig == null || dbConfig.Id <= 0)
         {
-            throw new Exception("数据库配置不存在");
+            throw new ExplicitException("数据库配置不存在");
         }
 
         var templates = (await templateRepository.QueryAsync(
@@ -289,7 +217,7 @@ public class CodeGenService(
 
         if (templates == null || !templates.Any())
         {
-            throw new Exception("没有可用的代码模板");
+            throw new ExplicitException("没有可用的代码模板");
         }
 
         using var connection = CreateDbConnection(dbConfig);
@@ -350,7 +278,7 @@ public class CodeGenService(
             Files = resultFiles
         };
 
-        GeneratedCodeCache[taskId] = result;
+        SetGeneratedCodeCache(taskId, result);
         return result;
     }
 
@@ -358,12 +286,12 @@ public class CodeGenService(
     {
         if (string.IsNullOrWhiteSpace(request.ClassName))
         {
-            throw new Exception("类名(ClassName)不能为空");
+            throw new ExplicitException("类名(ClassName)不能为空");
         }
 
         if (request.TemplateIds == null || !request.TemplateIds.Any())
         {
-            throw new Exception("请选择至少一个代码模板");
+            throw new ExplicitException("请选择至少一个代码模板");
         }
 
         var templates = (await templateRepository.QueryAsync(
@@ -373,7 +301,7 @@ public class CodeGenService(
 
         if (templates == null || !templates.Any())
         {
-            throw new Exception("没有可用的代码模板");
+            throw new ExplicitException("没有可用的代码模板");
         }
 
         var context = BuildRenderContext(request);
@@ -401,7 +329,7 @@ public class CodeGenService(
             Files = resultFiles
         };
 
-        GeneratedCodeCache[taskId] = result;
+        SetGeneratedCodeCache(taskId, result);
         return result;
     }
 
@@ -409,12 +337,12 @@ public class CodeGenService(
     {
         if (string.IsNullOrWhiteSpace(request.SourceCode))
         {
-            throw new Exception("源码不能为空");
+            throw new ExplicitException("源码不能为空");
         }
 
         if (string.IsNullOrWhiteSpace(request.Language))
         {
-            throw new Exception("语言类型不能为空");
+            throw new ExplicitException("语言类型不能为空");
         }
 
         return await Task.Run(() =>
@@ -479,25 +407,25 @@ public class CodeGenService(
 
     public async Task<byte[]> DownloadFileAsync(string taskId, string fileName)
     {
-        if (!GeneratedCodeCache.TryGetValue(taskId, out var result))
+        if (!TryGetGeneratedCode(taskId, out var result))
         {
-            throw new Exception("生成任务不存在或已过期");
+            throw new ExplicitException("生成任务不存在或已过期");
         }
 
         var file = result.Files.FirstOrDefault(f => f.FileName == fileName);
         if (file == null)
         {
-            throw new Exception("文件不存在");
+            throw new ExplicitException("文件不存在");
         }
 
-        return await Task.FromResult(Encoding.UTF8.GetBytes(file.Content));
+        return await Task.FromResult(GeneratedCodeEncoding.GetBytes(file.Content));
     }
 
     public async Task<byte[]> DownloadPackageAsync(string taskId)
     {
-        if (!GeneratedCodeCache.TryGetValue(taskId, out var result))
+        if (!TryGetGeneratedCode(taskId, out var result))
         {
-            throw new Exception("生成任务不存在或已过期");
+            throw new ExplicitException("生成任务不存在或已过期");
         }
 
         using var memoryStream = new MemoryStream();
@@ -508,13 +436,54 @@ public class CodeGenService(
                 var entryPath = file.FilePath.Replace('\\', '/');
                 var entry = archive.CreateEntry(entryPath);
                 using var entryStream = entry.Open();
-                using var writer = new StreamWriter(entryStream, Encoding.UTF8);
+                using var writer = new StreamWriter(entryStream, GeneratedCodeEncoding);
                 await writer.WriteAsync(file.Content);
             }
         }
 
         return memoryStream.ToArray();
     }
+
+    private static void SetGeneratedCodeCache(string taskId, CodeGenResultDto result)
+    {
+        CleanupExpiredGeneratedCodeCache();
+        GeneratedCodeCache[taskId] = new GeneratedCodeCacheItem(
+            result,
+            DateTimeOffset.UtcNow.Add(GeneratedCodeCacheDuration)
+        );
+    }
+
+    private static bool TryGetGeneratedCode(string taskId, out CodeGenResultDto result)
+    {
+        result = null!;
+        if (!GeneratedCodeCache.TryGetValue(taskId, out var cacheItem))
+        {
+            return false;
+        }
+
+        if (cacheItem.ExpiresAt > DateTimeOffset.UtcNow)
+        {
+            result = cacheItem.Result;
+            return true;
+        }
+
+        GeneratedCodeCache.TryRemove(taskId, out _);
+        return false;
+    }
+
+    private static void CleanupExpiredGeneratedCodeCache()
+    {
+        var now = DateTimeOffset.UtcNow;
+        foreach (var (taskId, cacheItem) in GeneratedCodeCache)
+        {
+            if (cacheItem.ExpiresAt <= now)
+            {
+                GeneratedCodeCache.TryRemove(taskId, out _);
+            }
+        }
+    }
+
+    private sealed record GeneratedCodeCacheItem(CodeGenResultDto Result, DateTimeOffset ExpiresAt);
 
     #endregion
 
@@ -860,7 +829,7 @@ public class CodeGenService(
         catch (Exception ex)
         {
             logger.LogError(ex, "模板渲染失败");
-            throw new Exception($"模板渲染失败: {ex.Message}");
+            throw new ExplicitException($"模板渲染失败: {ex.Message}");
         }
     }
 

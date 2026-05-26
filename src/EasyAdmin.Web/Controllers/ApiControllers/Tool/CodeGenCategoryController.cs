@@ -67,8 +67,7 @@ public class CodeGenCategoryController(
     [HttpPost]
     public async Task<ApiResult<bool>> Update(CodeGenCategoryUpdateDto request)
     {
-        await categoryService.UpdateAsync(request);
-        return Success(true);
+        return Success(await categoryService.UpdateAsync(request));
     }
 
     /// <summary>
@@ -80,8 +79,7 @@ public class CodeGenCategoryController(
     public async Task<ApiResult<bool>> Delete([FromBody] JObject? data)
     {
         var id = data["id"]?.Value<long>() ?? default;
-        await categoryService.DeleteAsync(id);
-        return Success(true);
+        return Success(await categoryService.DeleteAsync(id));
     }
 
     /// <summary>

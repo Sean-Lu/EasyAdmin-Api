@@ -3,6 +3,7 @@ using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Wrapper;
 using MapsterMapper;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,7 +15,7 @@ namespace EasyAdmin.Application.Services;
 public class CodeGenCategoryService(
     ILogger<CodeGenCategoryService> logger,
     ICodeGenCategoryRepository categoryRepository,
-    IMapper mapper) 
+    IMapper mapper)
     : ICodeGenCategoryService
 {
     public async Task<List<CodeGenCategoryDto>> GetTreeAsync()
@@ -48,76 +49,40 @@ public class CodeGenCategoryService(
         var category = await categoryRepository.GetByIdAsync(id);
         if (category == null || category.IsDelete)
         {
-            throw new Exception("分类不存在");
+            throw new ExplicitException("分类不存在");
         }
         return mapper.Map<CodeGenCategoryDto>(category);
     }
 
-    public async Task<long> AddAsync(CodeGenCategoryAddDto request)
+    public async Task<long> AddAsync(CodeGenCategoryAddDto dto)
     {
-        ValidateAddRequest(request);
+        await ValidateAddDtoAsync(dto);
 
-        var category = new CodeGenCategoryEntity
-        {
-            Name = request.Name,
-            Code = request.Code,
-            SortOrder = request.SortOrder,
-            Description = request.Description,
-            IsBuiltIn = false,
-            State = CommonState.Enable,
-            CreateTime = DateTime.Now,
-            UpdateTime = DateTime.Now
-        };
-
+        var category = mapper.Map<CodeGenCategoryEntity>(dto);
+        category.IsBuiltIn = false;
+        category.State = CommonState.Enable;
         await categoryRepository.AddAsync(category);
-
-        logger.LogInformation("新增分类: {Name}", request.Name);
         return category.Id;
     }
 
-    public async Task UpdateAsync(CodeGenCategoryUpdateDto request)
+    public async Task<bool> UpdateAsync(CodeGenCategoryUpdateDto dto)
     {
-        var category = await categoryRepository.GetByIdAsync(request.Id);
-        if (category == null || category.IsDelete)
-        {
-            throw new Exception("分类不存在");
-        }
-
-        if (category.IsBuiltIn)
-        {
-            throw new Exception("内置分类不允许修改");
-        }
-
-        category.Name = request.Name;
-        category.Code = request.Code;
-        category.SortOrder = request.SortOrder;
-        category.Description = request.Description;
-        category.State = (CommonState)request.State;
-        category.UpdateTime = DateTime.Now;
-
-        await categoryRepository.UpdateAsync(category);
-
-        logger.LogInformation("更新分类: {Id}", request.Id);
+        return await categoryRepository.UpdateByDtoAsync(dto, mapper.Map<CodeGenCategoryEntity>) > 0;
     }
 
-    public async Task DeleteAsync(long id)
+    public async Task<bool> DeleteAsync(long id)
     {
         var category = await categoryRepository.GetByIdAsync(id);
         if (category == null || category.IsDelete)
         {
-            throw new Exception("分类不存在");
+            throw new ExplicitException("分类不存在");
         }
-
         if (category.IsBuiltIn)
         {
-            throw new Exception("内置分类不允许删除");
+            throw new ExplicitException("内置分类不允许删除");
         }
 
-        category.IsDelete = true;
-        category.UpdateTime = DateTime.Now;
-        await categoryRepository.UpdateAsync(category);
-
-        logger.LogInformation("删除分类: {Id}", id);
+        return await categoryRepository.DeleteByIdAsync(id);
     }
 
     public async Task<string> ExportAsync()
@@ -126,63 +91,33 @@ public class CodeGenCategoryService(
         return JsonConvert.SerializeObject(categories, Formatting.Indented);
     }
 
-    public async Task ImportAsync(CodeGenCategoryImportDto request)
+    public async Task ImportAsync(CodeGenCategoryImportDto dto)
     {
-        if (request.Categories == null || !request.Categories.Any())
+        if (dto.Categories == null || !dto.Categories.Any())
         {
-            throw new Exception("没有需要导入的分类数据");
+            throw new ExplicitException("没有需要导入的分类数据");
         }
 
-        foreach (var item in request.Categories)
+        foreach (var item in dto.Categories)
         {
-            ValidateAddRequest(item);
+            await ValidateAddDtoAsync(item);
+            await AddAsync(item);
         }
-
-        foreach (var item in request.Categories)
-        {
-            try
-            {
-                var orderBy = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Asc, entity => entity.Id);
-                var existingList = await categoryRepository.QueryAsync(
-                    WhereExpressionUtil.Create<CodeGenCategoryEntity>(e => e.Code == item.Code && !e.IsDelete),
-                    orderBy
-                );
-                var existing = existingList?.FirstOrDefault();
-
-                if (existing == null)
-                {
-                    await AddAsync(item);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning("导入分类失败: {Name}, 错误: {Message}", item.Name, ex.Message);
-            }
-        }
-
-        logger.LogInformation("导入分类完成，共 {Count} 条", request.Categories.Count);
     }
 
-    private void ValidateAddRequest(CodeGenCategoryAddDto request)
+    private async Task ValidateAddDtoAsync(CodeGenCategoryAddDto dto)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
+        if (string.IsNullOrWhiteSpace(dto.Name))
         {
-            throw new Exception("分类名称不能为空");
+            throw new ExplicitException("分类名称不能为空");
         }
-        if (string.IsNullOrWhiteSpace(request.Code))
+        if (string.IsNullOrWhiteSpace(dto.Code))
         {
-            throw new Exception("分类编码不能为空");
+            throw new ExplicitException("分类编码不能为空");
         }
-
-        var orderBy = OrderByConditionBuilder<CodeGenCategoryEntity>.Build(OrderByType.Asc, entity => entity.Id);
-        var existingList = categoryRepository.Query(
-            WhereExpressionUtil.Create<CodeGenCategoryEntity>(e => e.Code == request.Code && !e.IsDelete),
-            orderBy
-        );
-        var existing = existingList?.FirstOrDefault();
-        if (existing != null)
+        if (await categoryRepository.ExistsAsync(WhereExpressionUtil.Create<CodeGenCategoryEntity>(e => e.Code == dto.Code && !e.IsDelete)))
         {
-            throw new Exception("分类编码已存在");
+            throw new ExplicitException("分类编码已存在");
         }
     }
 }

@@ -50,10 +50,8 @@ public class CodeGenController(
     /// <returns>是否成功</returns>
     [HttpPost]
     [ApiRepeatRequestFilter]
-    public async Task<ApiResult<bool>> AddTemplate(CodeGenTemplateDto data)
+    public async Task<ApiResult<bool>> AddTemplate(CodeGenTemplateAddDto data)
     {
-        data.CreateUserId = UserId;
-        data.UpdateUserId = UserId;
         var result = await codeGenService.AddTemplateAsync(data);
         return Success(result);
     }

@@ -1,9 +1,9 @@
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
-/// 代码生成模板更新 DTO
+/// 代码生成模板新增 DTO
 /// </summary>
-public class CodeGenTemplateUpdateDto : DtoIdBase
+public class CodeGenTemplateAddDto
 {
     /// <summary>
     /// 模板名称
@@ -13,6 +13,10 @@ public class CodeGenTemplateUpdateDto : DtoIdBase
     /// 模板编码
     /// </summary>
     public string Code { get; set; }
+    /// <summary>
+    /// 模板内容
+    /// </summary>
+    public string Content { get; set; }
     /// <summary>
     /// 模板描述
     /// </summary>

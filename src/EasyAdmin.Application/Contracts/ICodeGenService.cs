@@ -6,7 +6,7 @@ public interface ICodeGenService
 {
     Task<List<CodeGenTemplateDto>> GetTemplateListAsync(CodeGenTemplateListReqDto request);
     Task<CodeGenTemplateDto> GetTemplateByIdAsync(long id);
-    Task<bool> AddTemplateAsync(CodeGenTemplateDto dto);
+    Task<bool> AddTemplateAsync(CodeGenTemplateAddDto dto);
     Task<bool> UpdateTemplateAsync(CodeGenTemplateUpdateDto dto);
     Task<bool> DeleteTemplateAsync(long id);
     Task<bool> DeleteTemplatesAsync(List<long> ids);
