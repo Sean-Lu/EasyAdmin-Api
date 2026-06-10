@@ -71,6 +71,7 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Id = 11000005, PId = 11000000, Sort = 5, Icon = "FormOutlined", Title = "月报", Path = "/tool/monthWorkReport", State = CommonState.Enable },
             new MenuEntity{ Id = 11000006, PId = 11000000, Sort = 6, Icon = "KeyOutlined", Title = "加解密", Path = "/tool/crypto", State = CommonState.Enable },
             new MenuEntity{ Id = 11000007, PId = 11000000, Sort = 7, Icon = "CodeOutlined", Title = "代码生成", Path = "/tool/codeGen", State = CommonState.Enable },
+            new MenuEntity{ Id = 11000008, PId = 11000000, Sort = 8, Icon = "GiftOutlined", Title = "百宝箱", Path = "/tool/commonTools", State = CommonState.Enable },
 
             new MenuEntity{ Id = 12000000, PId = 0, Sort = 12, Icon = "ProfileOutlined", Title = "日志管理", Path = "/log", State = CommonState.Enable },
             new MenuEntity{ Id = 12000001, PId = 12000000, Sort = 1, Icon = "AppstoreOutlined", Title = "登录日志", Path = "/log/loginLog", State = CommonState.Enable },
