@@ -27,6 +27,21 @@ public enum CommonState
 }
 
 /// <summary>
+/// 随机决策类型
+/// </summary>
+public enum DecisionItemType
+{
+    /// <summary>
+    /// 吃什么
+    /// </summary>
+    Food = 1,
+    /// <summary>
+    /// 去哪玩
+    /// </summary>
+    Place = 2
+}
+
+/// <summary>
 /// 文件存储类型
 /// </summary>
 public enum FileStoreType

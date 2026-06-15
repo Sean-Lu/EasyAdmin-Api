@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using EasyAdmin.Domain.Contracts;
@@ -40,7 +40,7 @@ public abstract class TreeEntityBase<TEntity> : EntityBase, ITreeEntityBase<TEnt
     [Description("父主键")]
     public virtual long PId { get; set; }
     [Description("排序")]
-    public int Sort { get; set; }
+    public virtual int Sort { get; set; }
 
     [NotMapped]
     public virtual List<TEntity>? Children { get; set; }
@@ -65,8 +65,8 @@ public abstract class TenantTreeEntityBase<TEntity> : TenantEntityBase, ITenantT
     [Description("父主键")]
     public virtual long PId { get; set; }
     [Description("排序")]
-    public int Sort { get; set; }
+    public virtual int Sort { get; set; }
 
     [NotMapped]
-    public List<TEntity>? Children { get; set; }
+    public virtual List<TEntity>? Children { get; set; }
 }

@@ -51,7 +51,7 @@ public abstract class TreeDtoBase<TDto> : DtoBase, ITreeDtoBase<TDto>
     /// <summary>
     /// 排序
     /// </summary>
-    public int Sort { get; set; }
+    public virtual int Sort { get; set; }
 
     /// <summary>
     /// 子节点
@@ -76,10 +76,10 @@ public abstract class TenantTreeDtoBase<TDto> : TenantDtoBase, ITenantTreeDtoBas
     /// <summary>
     /// 排序
     /// </summary>
-    public int Sort { get; set; }
+    public virtual int Sort { get; set; }
 
     /// <summary>
     /// 子节点
     /// </summary>
-    public List<TDto>? Children { get; set; }
+    public virtual List<TDto>? Children { get; set; }
 }
