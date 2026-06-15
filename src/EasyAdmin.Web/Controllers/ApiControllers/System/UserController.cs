@@ -1,6 +1,7 @@
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Storage;
 using EasyAdmin.Web.Filter;
 using EasyAdmin.Web.Models;
 using MapsterMapper;
@@ -17,9 +18,28 @@ public class UserController(
     IConfiguration configuration,
     IMapper mapper,
     IUserService userService,
-    IUserRoleService userRoleService
+    IUserRoleService userRoleService,
+    IFileService fileService,
+    IFileStorageFactory fileStorageFactory
     ) : BaseApiController
 {
+    private const long AvatarMaxSize = 2 * 1024 * 1024;
+    private static readonly HashSet<string> AvatarContentTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp"
+    };
+    private static readonly HashSet<string> AvatarExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".webp"
+    };
+
     /// <summary>
     /// 新增用户
     /// </summary>
@@ -123,6 +143,78 @@ public class UserController(
     public async Task<ApiResult<UserDto>> GetUserInfo()
     {
         return Success(mapper.Map<UserDto>(await userService.GetByIdAsync(UserId)));
+    }
+
+    /// <summary>
+    /// 修改当前用户资料
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<bool>> UpdateProfile(UserProfileUpdateDto data)
+    {
+        var oldAvatarFileId = (await userService.GetByIdAsync(UserId))?.AvatarFileId;
+        var result = await userService.UpdateProfileAsync(UserId, data);
+        if (result && oldAvatarFileId != data.AvatarFileId && oldAvatarFileId is > 0)
+        {
+            var fileEntity = await fileService.GetByIdAsync(oldAvatarFileId.Value);
+            if (fileEntity != null && fileEntity.Id >= 1)
+            {
+                await fileStorageFactory.GetFileStorage(fileEntity.StoreType).DeleteAsync(fileEntity.Path);
+                await fileService.DeleteByIdAsync(oldAvatarFileId.Value);
+            }
+        }
+        return Success(result);
+    }
+
+    /// <summary>
+    /// 上传当前用户头像
+    /// </summary>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    [HttpPost]
+    public async Task<ApiResult<long>> UploadAvatar(IFormFile? file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return Fail<long>("头像不能为空");
+        }
+        if (file.Length > AvatarMaxSize)
+        {
+            return Fail<long>("头像大小不能超过 2MB");
+        }
+        if (!AvatarContentTypes.Contains(file.ContentType))
+        {
+            return Fail<long>("仅支持 JPG、PNG、GIF、WEBP 图片");
+        }
+
+        var extension = Path.GetExtension(file.FileName);
+        if (!AvatarExtensions.Contains(extension))
+        {
+            return Fail<long>("仅支持 JPG、PNG、GIF、WEBP 图片");
+        }
+
+        var fileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+        var relativePath = $"UploadFiles/avatars/{TenantId}/{UserId}/{fileName}";
+        await using var stream = file.OpenReadStream();
+        var storeType = configuration.GetValue<FileStoreType>("FileStorage:StorageType");
+        var filePath = await fileStorageFactory.GetFileStorage(storeType).UploadAsync(stream, relativePath);
+
+        var fileDto = new FileDto
+        {
+            Name = file.FileName,
+            Path = filePath,
+            Size = file.Length,
+            ContentType = file.ContentType,
+            StoreType = storeType,
+            Description = "用户头像"
+        };
+        var fileId = await fileService.AddAndReturnIdAsync(fileDto);
+        if (fileId < 1)
+        {
+            return Fail<long>("保存头像文件失败");
+        }
+        return Success(fileId);
     }
 
     /// <summary>

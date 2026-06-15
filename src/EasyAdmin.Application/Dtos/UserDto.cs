@@ -16,6 +16,10 @@ public class UserDto : TenantDtoBase
     /// </summary>
     public virtual string? NickName { get; set; }
     /// <summary>
+    /// 头像地址
+    /// </summary>
+    public virtual long? AvatarFileId { get; set; }
+    /// <summary>
     /// 手机号码
     /// </summary>
     public virtual string? PhoneNumber { get; set; }

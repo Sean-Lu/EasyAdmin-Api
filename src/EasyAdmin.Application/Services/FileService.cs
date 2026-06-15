@@ -23,6 +23,12 @@ public class FileService(
         return await fileRepository.AddAsync(entity);
     }
 
+    public async Task<long> AddAndReturnIdAsync(FileDto dto)
+    {
+        var entity = mapper.Map<FileEntity>(dto);
+        return await fileRepository.AddAsync(entity) ? entity.Id : 0;
+    }
+
     public async Task<bool> DeleteByIdAsync(long id)
     {
         return await fileRepository.DeleteByIdAsync(id);

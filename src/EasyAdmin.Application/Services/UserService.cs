@@ -73,6 +73,22 @@ public class UserService(
     {
         return await userRepository.UpdateByDtoAsync(dto, mapper.Map<UserEntity>) > 0;
     }
+    public async Task<bool> UpdateProfileAsync(long userId, UserProfileUpdateDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.NickName))
+        {
+            throw new ExplicitException("昵称不能为空");
+        }
+
+        return await userRepository.UpdateAsync(
+            new UserEntity
+            {
+                NickName = dto.NickName.Trim(),
+                AvatarFileId = dto.AvatarFileId
+            },
+            entity => new { entity.NickName, entity.AvatarFileId },
+            entity => entity.Id == userId) > 0;
+    }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {
         return await userRepository.UpdateAsync(new UserEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id) > 0;

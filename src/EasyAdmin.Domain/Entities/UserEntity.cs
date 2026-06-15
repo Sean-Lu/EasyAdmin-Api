@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Sean.Core.DbRepository;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -31,6 +31,10 @@ public class UserEntity : TenantEntityBase
     /// </summary>
     [MaxLength(50)]
     public virtual string NickName { get; set; }
+    /// <summary>
+    /// 头像地址
+    /// </summary>
+    public virtual long? AvatarFileId { get; set; }
     /// <summary>
     /// 手机号码
     /// </summary>

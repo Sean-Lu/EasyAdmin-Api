@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Application.Dtos;
+using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 using Sean.Core.DbRepository;
@@ -11,6 +11,7 @@ public interface IUserService
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
     Task<bool> UpdateAsync(UserUpdateDto dto);
+    Task<bool> UpdateProfileAsync(long userId, UserProfileUpdateDto dto);
     Task<bool> UpdateStateAsync(long id, CommonState state);
     /// <summary>
     /// 更新用户最后登录时间
