@@ -81,7 +81,7 @@ public class NotificationService(
     {
         var orderBy = OrderByConditionBuilder<NotificationEntity>.Build(OrderByType.Desc, entity => entity.SendTime);
         orderBy.Next = OrderByConditionBuilder<NotificationEntity>.Build(OrderByType.Desc, entity => entity.Id);
-        return await notificationRepository.PageQueryAsync(WhereExpressionUtil.Create<NotificationEntity>(entity => entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
+        return await notificationRepository.PageQueryAsync(WhereExpressionUtil.Create<NotificationEntity>(entity => entity.SenderUserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
             .AndAlsoIF(!string.IsNullOrWhiteSpace(request.Title), entity => entity.Title.Contains(request.Title))
             .AndAlsoIF(request.NoticeType.HasValue, entity => entity.NoticeType == request.NoticeType), orderBy, request.PageNumber, request.PageSize);
     }
