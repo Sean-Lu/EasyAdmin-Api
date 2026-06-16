@@ -27,6 +27,25 @@ public enum CommonState
 }
 
 /// <summary>
+/// 通知类型
+/// </summary>
+public enum NotificationNoticeType
+{
+    /// <summary>
+    /// 普通
+    /// </summary>
+    Normal = 1,
+    /// <summary>
+    /// 重要
+    /// </summary>
+    Important = 2,
+    /// <summary>
+    /// 紧急
+    /// </summary>
+    Urgent = 3
+}
+
+/// <summary>
 /// 随机决策类型
 /// </summary>
 public enum DecisionItemType
