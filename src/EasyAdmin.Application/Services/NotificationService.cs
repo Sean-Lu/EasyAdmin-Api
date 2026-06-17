@@ -18,6 +18,7 @@ public class NotificationService(
     IMapper mapper,
     INotificationRepository notificationRepository,
     IUserNotificationRepository userNotificationRepository,
+    INotificationChannelDispatcher notificationChannelDispatcher,
     IUserRepository userRepository,
     IUserRoleRepository userRoleRepository,
     IDepartmentRepository departmentRepository
@@ -45,19 +46,33 @@ public class NotificationService(
             return false;
         }
 
-        foreach (var userId in recipientUserIds)
+        if (dto.SendInSystem)
         {
-            if (!await userNotificationRepository.AddAsync(new UserNotificationEntity
+            // 生成站内消息
+            foreach (var userId in recipientUserIds)
             {
-                NotificationId = notification.Id,
-                UserId = userId,
-                IsRead = false
-            }))
-            {
-                logger.LogWarning("保存用户消息失败: NotificationId={NotificationId}, UserId={UserId}", notification.Id, userId);
-                return false;
+                if (!await userNotificationRepository.AddAsync(new UserNotificationEntity
+                {
+                    NotificationId = notification.Id,
+                    UserId = userId,
+                    IsRead = false
+                }))
+                {
+                    logger.LogWarning("保存用户消息失败: NotificationId={NotificationId}, UserId={UserId}", notification.Id, userId);
+                    return false;
+                }
             }
         }
+
+        // 分发外部通道
+        await notificationChannelDispatcher.DispatchAsync(new NotificationChannelDispatchRequest
+        {
+            Title = dto.Title,
+            Content = dto.Content,
+            SendEmail = dto.SendEmail,
+            SendSms = dto.SendSms,
+            Recipients = users.Where(user => recipientUserIds.Contains(user.Id)).ToList()
+        });
 
         return true;
     }

@@ -31,6 +31,24 @@ public class NotificationEntity : TenantEntityBase
     public virtual NotificationNoticeType NoticeType { get; set; }
 
     /// <summary>
+    /// 是否发送站内消息
+    /// </summary>
+    [DefaultValue(true)]
+    public virtual bool SendInSystem { get; set; }
+
+    /// <summary>
+    /// 是否发送邮件
+    /// </summary>
+    [DefaultValue(false)]
+    public virtual bool SendEmail { get; set; }
+
+    /// <summary>
+    /// 是否发送短信
+    /// </summary>
+    [DefaultValue(false)]
+    public virtual bool SendSms { get; set; }
+
+    /// <summary>
     /// 接收范围摘要
     /// </summary>
     [MaxLength(500)]
