@@ -1,6 +1,7 @@
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Wrapper;
 using EasyAdmin.Web.Models;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ public class AppCodeController(
         {
             return Success(await appCodeService.AddAsync(data));
         }
-        catch (InvalidOperationException ex)
+        catch (ExplicitException ex)
         {
             return Fail<bool>(ex.Message);
         }

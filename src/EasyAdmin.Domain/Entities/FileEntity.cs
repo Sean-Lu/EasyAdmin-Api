@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Enums;
 using Sean.Core.DbRepository;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -36,6 +36,10 @@ public class FileEntity : TenantEntityBase
     /// 文件存储类型
     /// </summary>
     public virtual FileStoreType StoreType { get; set; }
+    /// <summary>
+    /// 业务分类
+    /// </summary>
+    public virtual FileBizType BizType { get; set; }
     /// <summary>
     /// 描述
     /// </summary>

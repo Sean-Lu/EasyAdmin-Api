@@ -1,6 +1,7 @@
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Wrapper;
 using EasyAdmin.Web.Models;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -68,7 +69,7 @@ public class UpdateController(
             var id = await versionService.RegisterAsync(dto, zipPath);
             return Success(id);
         }
-        catch (InvalidOperationException ex)
+        catch (ExplicitException ex)
         {
             return Fail<long>(ex.Message);
         }
@@ -122,7 +123,7 @@ public class UpdateController(
             }
             return Success(await versionService.DeleteAsync(singleId));
         }
-        catch (InvalidOperationException ex)
+        catch (ExplicitException ex)
         {
             return Fail<bool>(ex.Message);
         }
@@ -162,7 +163,7 @@ public class UpdateController(
         {
             return Success(await versionService.UpdateStateAsync(id, state));
         }
-        catch (InvalidOperationException ex)
+        catch (ExplicitException ex)
         {
             return Fail<bool>(ex.Message);
         }
@@ -193,7 +194,7 @@ public class UpdateController(
         {
             return Success(await versionService.DetailAsync(id));
         }
-        catch (InvalidOperationException ex)
+        catch (ExplicitException ex)
         {
             return Fail<UpdateVersionDetailDto>(ex.Message);
         }
@@ -295,7 +296,7 @@ public class UpdateController(
             var result = await versionService.GetManifestAsync(currentVersionCode, targetVersionCode, appCode, platform);
             return Success(result);
         }
-        catch (InvalidOperationException ex)
+        catch (ExplicitException ex)
         {
             return Fail<UpdateManifestResultDto>(ex.Message);
         }
@@ -369,7 +370,7 @@ public class UpdateController(
             var (zipStream, fileName) = await versionService.DownloadZipAsync(versionId);
             return File(zipStream, "application/zip", fileName);
         }
-        catch (InvalidOperationException ex)
+        catch (ExplicitException ex)
         {
             return NotFound(ex.Message);
         }

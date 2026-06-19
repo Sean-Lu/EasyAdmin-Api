@@ -3,6 +3,7 @@ using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Wrapper;
 using MapsterMapper;
 using Sean.Core.DbRepository;
 using Sean.Core.DbRepository.Extensions;
@@ -21,7 +22,7 @@ public class AppCodeService(
             entity => entity.Code == dto.Code && !entity.IsDelete);
         if (existing?.FirstOrDefault() != null)
         {
-            throw new InvalidOperationException($"应用标识 {dto.Code} 已存在");
+            throw new ExplicitException($"应用标识 {dto.Code} 已存在");
         }
 
         var entity = mapper.Map<AppCodeEntity>(dto);

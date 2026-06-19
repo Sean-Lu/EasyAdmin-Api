@@ -4,6 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace EasyAdmin.Web.Models;
 
+/// <summary>
+/// JWT配置模型
+/// </summary>
 public class JwtConfig
 {
     /// <summary>

@@ -1,11 +1,26 @@
-﻿namespace EasyAdmin.Web.Models;
+namespace EasyAdmin.Web.Models;
 
+/// <summary>
+/// API结果模型
+/// </summary>
 public class ApiResult
 {
+    /// <summary>
+    /// 是否成功
+    /// </summary>
     public bool Success { get; set; }
+    /// <summary>
+    /// 状态码
+    /// </summary>
     public int Code { get; set; }
+    /// <summary>
+    /// 消息
+    /// </summary>
     public string Msg { get; set; }
 
+    /// <summary>
+    /// 成功
+    /// </summary>
     public static ApiResult Ok()
     {
         return new ApiResult
@@ -15,6 +30,12 @@ public class ApiResult
             Msg = "success"
         };
     }
+    /// <summary>
+    /// 成功
+    /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <param name="data">数据</param>
+    /// <returns>包含结果的API结果</returns>
     public static ApiResult<T> Ok<T>(T data)
     {
         return new ApiResult<T>
@@ -26,10 +47,18 @@ public class ApiResult
         };
     }
 
+    /// <summary>
+    /// 失败
+    /// </summary>
     public static ApiResult Fail()
     {
         return Fail("系统异常");
     }
+    /// <summary>
+    /// 失败
+    /// </summary>
+    /// <param name="msg">消息</param>
+    /// <returns>包含结果的API结果</returns>
     public static ApiResult Fail(string msg)
     {
         return new ApiResult
@@ -39,10 +68,21 @@ public class ApiResult
             Msg = msg
         };
     }
+    /// <summary>
+    /// 失败
+    /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <returns>包含结果的API结果</returns>
     public static ApiResult<T> Fail<T>()
     {
         return Fail<T>("系统异常");
     }
+    /// <summary>
+    /// 失败
+    /// </summary>
+    /// <typeparam name="T">数据类型</typeparam>
+    /// <param name="msg">消息</param>
+    /// <returns>包含结果的API结果</returns>
     public static ApiResult<T> Fail<T>(string msg)
     {
         return new ApiResult<T>
@@ -54,7 +94,14 @@ public class ApiResult
     }
 }
 
+/// <summary>
+/// API结果模型（包含数据）
+/// </summary>
+/// <typeparam name="T">数据类型</typeparam>
 public class ApiResult<T> : ApiResult
 {
-    public T Data { get; set; }
+    /// <summary>
+    /// 数据
+    /// </summary>
+    public T? Data { get; set; }
 }

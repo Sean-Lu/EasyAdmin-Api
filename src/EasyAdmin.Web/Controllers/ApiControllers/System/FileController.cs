@@ -1,5 +1,7 @@
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
+using EasyAdmin.Application.Services;
+using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Storage;
 using EasyAdmin.Web.Models;
@@ -25,10 +27,11 @@ public class FileController(
     /// </summary>
     /// <param name="storeType">存储类型</param>
     /// <param name="description"></param>
+    /// <param name="bizType">业务分类</param>
     /// <param name="file"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<FileDto>> UploadFile([FromForm] FileStoreType storeType, [FromForm] string? description, IFormFile? file)
+    public async Task<ApiResult<FileDto>> UploadFile([FromForm] FileStoreType storeType, [FromForm] string? description, [FromForm] FileBizType bizType, IFormFile? file)
     {
         if (file == null || file.Length == 0)
         {
@@ -38,7 +41,9 @@ public class FileController(
         try
         {
             await using var stream = file.OpenReadStream();
-            var relativePath = $"UploadFiles/{TenantId}/{UserId}/{file.FileName}";
+            var extension = Path.GetExtension(file.FileName);
+            var storageFileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+            var relativePath = $"UploadFiles/{TenantId}/{UserId}/{storageFileName}";
             var filePath = await fileStorageFactory.GetFileStorage(storeType).UploadAsync(stream, relativePath);
 
             var fileDto = new FileDto
@@ -48,12 +53,15 @@ public class FileController(
                 Size = file.Length,
                 ContentType = file.ContentType,
                 StoreType = storeType,
+                BizType = bizType,
                 Description = description
             };
-            if (!await fileService.AddAsync(fileDto))
+            var id = await fileService.AddAndReturnIdAsync(fileDto);
+            if (id < 1)
             {
                 return Fail<FileDto>("保存文件失败");
             }
+            fileDto.Id = id;
 
             return Success(fileDto);
         }
@@ -73,7 +81,7 @@ public class FileController(
     public async Task<IActionResult> DownloadFile(long id)
     {
         var fileEntity = await fileService.GetByIdAsync(id);
-        if (fileEntity == null || fileEntity.Id < 1)
+        if (!IsCurrentTenantFile(fileEntity))
         {
             return NotFound("文件不存在");
         }
@@ -104,22 +112,30 @@ public class FileController(
     public async Task<ApiResult<bool>> DeleteFile(long id)
     {
         var fileEntity = await fileService.GetByIdAsync(id);
-        if (fileEntity == null || fileEntity.Id < 1)
+        if (!IsCurrentTenantFile(fileEntity))
         {
             return Fail<bool>("文件不存在");
         }
 
+        if (!FileService.CanDeleteFromFileManager(fileEntity.BizType))
+        {
+            return Fail<bool>("该文件被业务引用，不能在文件管理中删除");
+        }
+
         try
         {
-            var fileStorage = fileStorageFactory.GetFileStorage(fileEntity.StoreType);
-            await fileStorage.DeleteAsync(fileEntity.Path);
+            if (!await fileService.HasOtherActiveFileWithSamePathAsync(id, fileEntity.Path))
+            {
+                var fileStorage = fileStorageFactory.GetFileStorage(fileEntity.StoreType);
+                await fileStorage.DeleteAsync(fileEntity.Path);
+            }
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "删除存储文件失败");
         }
 
-        return Success(await fileService.DeleteByIdAsync(id));
+        return Success(await fileService.DeleteByIdFromFileManagerAsync(id));
     }
 
     /// <summary>
@@ -141,6 +157,16 @@ public class FileController(
     [HttpGet]
     public async Task<ApiResult<FileDto>> Detail(long id)
     {
-        return Success(mapper.Map<FileDto>(await fileService.GetByIdAsync(id)));
+        var fileEntity = await fileService.GetByIdAsync(id);
+        if (!IsCurrentTenantFile(fileEntity))
+        {
+            return Fail<FileDto>("文件不存在");
+        }
+        return Success(mapper.Map<FileDto>(fileEntity));
+    }
+
+    private bool IsCurrentTenantFile(FileEntity? fileEntity)
+    {
+        return fileEntity != null && fileEntity.Id > 0 && fileEntity.TenantId == TenantId;
     }
 }

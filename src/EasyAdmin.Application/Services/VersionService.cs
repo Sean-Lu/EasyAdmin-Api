@@ -6,6 +6,7 @@ using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Storage;
+using EasyAdmin.Infrastructure.Wrapper;
 using MapsterMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -121,7 +122,7 @@ public class VersionService(
 
         if (targetVersion == null)
         {
-            throw new InvalidOperationException($"目标版本不存在: {targetVersionCode}");
+            throw new ExplicitException($"目标版本不存在: {targetVersionCode}");
         }
 
         // 获取目标版本的全部文件
@@ -243,7 +244,7 @@ public class VersionService(
         var entity = await versionRepository.GetByIdAsync(versionId);
         if (entity == null || entity.IsDelete)
         {
-            throw new InvalidOperationException("版本不存在");
+            throw new ExplicitException("版本不存在");
         }
 
         var files = (await fileRepository.QueryAsync(
@@ -294,7 +295,7 @@ public class VersionService(
 
         if (existing != null)
         {
-            throw new InvalidOperationException($"版本 {dto.VersionName}({versionCode}) 在平台 {dto.Platform} 下已存在");
+            throw new ExplicitException($"版本 {dto.VersionName}({versionCode}) 在平台 {dto.Platform} 下已存在");
         }
 
         var storage = fileStorageFactory.GetFileStorage(GetStorageType());
@@ -471,7 +472,7 @@ public class VersionService(
         var entity = await versionRepository.GetByIdAsync(id);
         if (entity == null || entity.IsDelete)
         {
-            throw new InvalidOperationException("版本不存在");
+            throw new ExplicitException("版本不存在");
         }
 
         var dto = mapper.Map<UpdateVersionDetailDto>(entity);
@@ -516,7 +517,7 @@ public class VersionService(
         var entity = await versionRepository.GetByIdAsync(id);
         if (entity == null || entity.IsDelete)
         {
-            throw new InvalidOperationException("版本不存在");
+            throw new ExplicitException("版本不存在");
         }
 
         if (state == CommonState.Enable)
@@ -567,12 +568,12 @@ public class VersionService(
         var entity = await versionRepository.GetByIdAsync(id);
         if (entity == null || entity.IsDelete)
         {
-            throw new InvalidOperationException("版本不存在");
+            throw new ExplicitException("版本不存在");
         }
 
         if (entity.State == CommonState.Enable)
         {
-            throw new InvalidOperationException("不能删除已发布的版本，请先回滚");
+            throw new ExplicitException("不能删除已发布的版本，请先回滚");
         }
 
         // 清理文件存储中的物理文件

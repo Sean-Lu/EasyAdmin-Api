@@ -1,5 +1,8 @@
 ﻿namespace EasyAdmin.Web.Models;
 
+/// <summary>
+/// 登录响应模型
+/// </summary>
 public class LoginResponse
 {
     /// <summary>

@@ -9,7 +9,9 @@ public interface IFileService
     Task<bool> AddAsync(FileDto dto);
     Task<long> AddAndReturnIdAsync(FileDto dto);
     Task<bool> DeleteByIdAsync(long id);
+    Task<bool> DeleteByIdFromFileManagerAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);
+    Task<bool> HasOtherActiveFileWithSamePathAsync(long id, string path);
     Task<PageQueryResult<FileEntity>> PageAsync(FilePageReqDto request);
     Task<FileEntity> GetByIdAsync(long id);
 }

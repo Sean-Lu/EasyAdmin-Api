@@ -9,7 +9,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace EasyAdmin.Web.Helper;
 
 /// <summary>
-/// JWT
+/// JWT帮助类
+/// 生成、解析、验证JWT令牌
 /// </summary>
 public static class JwtHelper
 {

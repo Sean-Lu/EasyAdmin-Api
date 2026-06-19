@@ -3,6 +3,9 @@ using EasyAdmin.Web.Models;
 
 namespace EasyAdmin.Web.Middleware;
 
+/// <summary>
+/// 全局异常中间件
+/// </summary>
 public class GlobalExceptionMiddleware
 {
     private readonly RequestDelegate _next;

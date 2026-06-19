@@ -28,6 +28,10 @@ public class FileDto : TenantDtoBase
     /// </summary>
     public virtual FileStoreType StoreType { get; set; }
     /// <summary>
+    /// 业务分类
+    /// </summary>
+    public virtual FileBizType BizType { get; set; }
+    /// <summary>
     /// 描述
     /// </summary>
     public virtual string? Description { get; set; }

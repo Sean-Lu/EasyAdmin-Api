@@ -56,11 +56,12 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
 
             new MenuEntity{ Id = 8100000, PId = 0, Sort = 9, Icon = "UserOutlined", Title = "个人中心", Path = "/user", State = CommonState.Enable },
             new MenuEntity{ Id = 8100001, PId = 8100000, Sort = 1, Icon = "BellOutlined", Title = "我的消息", Path = "/user/message", State = CommonState.Enable },
-            new MenuEntity{ Id = 8100002, PId = 8100000, Sort = 2, Icon = "OrderedListOutlined", Title = "待办事项", Path = "/user/todoList", State = CommonState.Enable },// To-do List
-            new MenuEntity{ Id = 8100003, PId = 8100000, Sort = 3, Icon = "CheckCircleOutlined", Title = "签到", Path = "/user/checkIn", State = CommonState.Enable },
-            new MenuEntity{ Id = 8100004, PId = 8100000, Sort = 4, Icon = "FormOutlined", Title = "日报", Path = "/user/dayWorkReport", State = CommonState.Enable },
-            new MenuEntity{ Id = 8100005, PId = 8100000, Sort = 5, Icon = "FormOutlined", Title = "周报", Path = "/user/weekWorkReport", State = CommonState.Enable },
-            new MenuEntity{ Id = 8100006, PId = 8100000, Sort = 6, Icon = "FormOutlined", Title = "月报", Path = "/user/monthWorkReport", State = CommonState.Enable },
+            new MenuEntity{ Id = 8100002, PId = 8100000, Sort = 2, Icon = "BookOutlined", Title = "我的笔记", Path = "/user/note", State = CommonState.Enable },
+            new MenuEntity{ Id = 8100003, PId = 8100000, Sort = 3, Icon = "OrderedListOutlined", Title = "待办事项", Path = "/user/todoList", State = CommonState.Enable },// To-do List
+            new MenuEntity{ Id = 8100004, PId = 8100000, Sort = 4, Icon = "CheckCircleOutlined", Title = "签到", Path = "/user/checkIn", State = CommonState.Enable },
+            new MenuEntity{ Id = 8100005, PId = 8100000, Sort = 5, Icon = "FormOutlined", Title = "日报", Path = "/user/dayWorkReport", State = CommonState.Enable },
+            new MenuEntity{ Id = 8100006, PId = 8100000, Sort = 6, Icon = "FormOutlined", Title = "周报", Path = "/user/weekWorkReport", State = CommonState.Enable },
+            new MenuEntity{ Id = 8100007, PId = 8100000, Sort = 7, Icon = "FormOutlined", Title = "月报", Path = "/user/monthWorkReport", State = CommonState.Enable },
 
             new MenuEntity{ Id = 9000000, PId = 0, Sort = 10, Icon = "ExclamationCircleOutlined", Title = "错误页面", Path = "/error", State = CommonState.Disable },
             new MenuEntity{ Id = 9000001, PId = 9000000, Sort = 1, Icon = "AppstoreOutlined", Title = "404页面", Path = "/404", State = CommonState.Disable },

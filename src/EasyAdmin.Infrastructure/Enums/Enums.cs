@@ -76,6 +76,25 @@ public enum FileStoreType
 }
 
 /// <summary>
+/// 文件业务分类
+/// </summary>
+public enum FileBizType
+{
+    /// <summary>
+    /// 普通文件
+    /// </summary>
+    Normal = 0,
+    /// <summary>
+    /// 笔记图片
+    /// </summary>
+    NoteImage = 1,
+    /// <summary>
+    /// 用户头像
+    /// </summary>
+    UserAvatar = 2
+}
+
+/// <summary>
 /// 定时任务调度类型
 /// </summary>
 public enum ScheduleType

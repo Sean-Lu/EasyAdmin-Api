@@ -1,13 +1,16 @@
-﻿namespace EasyAdmin.Web.Models;
+namespace EasyAdmin.Web.Models;
 
+/// <summary>
+/// 登录请求模型
+/// </summary>
 public class LoginRequest
 {
     /// <summary>
     /// 用户名
     /// </summary>
-    public string Username { get; set; }
+    public required string Username { get; set; }
     /// <summary>
     /// 密码
     /// </summary>
-    public string Password { get; set; }
+    public required string Password { get; set; }
 }

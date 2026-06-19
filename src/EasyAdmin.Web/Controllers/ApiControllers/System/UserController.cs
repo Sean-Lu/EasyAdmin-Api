@@ -207,6 +207,7 @@ public class UserController(
             Size = file.Length,
             ContentType = file.ContentType,
             StoreType = storeType,
+            BizType = FileBizType.UserAvatar,
             Description = "用户头像"
         };
         var fileId = await fileService.AddAndReturnIdAsync(fileDto);
@@ -215,6 +216,35 @@ public class UserController(
             return Fail<long>("保存头像文件失败");
         }
         return Success(fileId);
+    }
+
+    /// <summary>
+    /// 删除当前用户头像文件
+    /// </summary>
+    /// <param name="id">头像文件ID</param>
+    /// <returns></returns>
+    [HttpDelete]
+    public async Task<ApiResult<bool>> DeleteAvatarFile(long id)
+    {
+        var fileEntity = await fileService.GetByIdAsync(id);
+        if (fileEntity == null || fileEntity.Id < 1)
+        {
+            return Success(true);
+        }
+        if (fileEntity.BizType != FileBizType.UserAvatar || fileEntity.TenantId != TenantId || fileEntity.CreateUserId != UserId)
+        {
+            return Fail<bool>("只能删除当前用户的头像文件");
+        }
+
+        try
+        {
+            await fileStorageFactory.GetFileStorage(fileEntity.StoreType).DeleteAsync(fileEntity.Path);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "删除头像文件失败");
+        }
+        return Success(await fileService.DeleteByIdAsync(id));
     }
 
     /// <summary>
