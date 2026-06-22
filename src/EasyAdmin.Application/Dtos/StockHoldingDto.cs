@@ -52,6 +52,11 @@ public class StockHoldingDto : TenantDtoBase
     public bool IsEnabled { get; set; }
 
     /// <summary>
+    /// 排序顺序
+    /// </summary>
+    public int SortOrder { get; set; }
+
+    /// <summary>
     /// 成本金额
     /// </summary>
     public decimal CostAmount { get; set; }
@@ -115,6 +120,11 @@ public class StockHoldingUpdateDto : DtoIdBase
     /// 是否启用
     /// </summary>
     public bool IsEnabled { get; set; } = true;
+
+    /// <summary>
+    /// 排序顺序
+    /// </summary>
+    public int SortOrder { get; set; }
 }
 
 /// <summary>

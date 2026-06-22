@@ -35,6 +35,11 @@ public class StockAccountDto : TenantDtoBase
     public string? Remark { get; set; }
 
     /// <summary>
+    /// 排序顺序
+    /// </summary>
+    public int SortOrder { get; set; }
+
+    /// <summary>
     /// 账户资产盈亏金额，公式：现资产 - 初始资产
     /// </summary>
     public decimal AssetProfitAmount { get; set; }
@@ -72,4 +77,9 @@ public class StockAccountUpdateDto : DtoIdBase
     /// </summary>
     [MaxLength(500)]
     public string? Remark { get; set; }
+
+    /// <summary>
+    /// 排序顺序
+    /// </summary>
+    public int SortOrder { get; set; }
 }

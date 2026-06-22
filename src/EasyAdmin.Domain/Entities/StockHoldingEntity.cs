@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Sean.Core.DbRepository;
 
@@ -50,4 +51,10 @@ public class StockHoldingEntity : TenantEntityBase
     /// 是否启用
     /// </summary>
     public virtual bool IsEnabled { get; set; } = true;
+
+    /// <summary>
+    /// 排序顺序
+    /// </summary>
+    [DefaultValue(0)]
+    public virtual int SortOrder { get; set; }
 }

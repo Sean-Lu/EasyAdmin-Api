@@ -61,8 +61,9 @@ public class StockHoldingService(
             CostPrice = dto.CostPrice,
             Quantity = dto.Quantity,
             CurrentPrice = dto.CurrentPrice,
-            IsEnabled = dto.IsEnabled
-          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.CostPrice, entity.Quantity, entity.CurrentPrice, entity.IsEnabled },
+            IsEnabled = dto.IsEnabled,
+            SortOrder = dto.SortOrder
+          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.CostPrice, entity.Quantity, entity.CurrentPrice, entity.IsEnabled, entity.SortOrder },
               entity => entity.Id == dto.Id &&
                         entity.AccountId == dto.AccountId &&
                         entity.UserId == TenantContextHolder.UserId &&
@@ -105,9 +106,8 @@ public class StockHoldingService(
     {
         await EnsureAccountAsync(accountId);
 
-        var orderBy = OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Desc, entity => entity.UpdateTime,
-            OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Desc, entity => entity.CreateTime,
-                OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Desc, entity => entity.Id)));
+        var orderBy = OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Asc, entity => entity.SortOrder,
+            OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Asc, entity => entity.CreateTime));
 
         var normalizedKeyword = keyword?.Trim();
         var hasKeyword = !string.IsNullOrEmpty(normalizedKeyword);

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Sean.Core.DbRepository;
 
@@ -35,4 +36,10 @@ public class StockAccountEntity : TenantEntityBase
     /// </summary>
     [MaxLength(500)]
     public virtual string? Remark { get; set; }
+
+    /// <summary>
+    /// 排序顺序
+    /// </summary>
+    [DefaultValue(0)]
+    public virtual int SortOrder { get; set; }
 }

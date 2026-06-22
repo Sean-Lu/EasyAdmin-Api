@@ -60,8 +60,9 @@ public class StockAccountService(
             BrokerName = normalized.BrokerName,
             InitialAsset = normalized.InitialAsset,
             CurrentAsset = normalized.CurrentAsset,
-            Remark = dto.Remark
-        }, entity => new { entity.BrokerName, entity.InitialAsset, entity.CurrentAsset, entity.Remark },
+            Remark = dto.Remark,
+            SortOrder = dto.SortOrder
+        }, entity => new { entity.BrokerName, entity.InitialAsset, entity.CurrentAsset, entity.Remark, entity.SortOrder },
             entity => entity.Id == dto.Id &&
                       entity.UserId == TenantContextHolder.UserId &&
                       entity.TenantId == TenantContextHolder.TenantId &&
@@ -70,9 +71,8 @@ public class StockAccountService(
 
     public async Task<List<StockAccountDto>> ListAsync()
     {
-        var orderBy = OrderByConditionBuilder<StockAccountEntity>.Build(OrderByType.Desc, entity => entity.UpdateTime,
-            OrderByConditionBuilder<StockAccountEntity>.Build(OrderByType.Desc, entity => entity.CreateTime,
-                OrderByConditionBuilder<StockAccountEntity>.Build(OrderByType.Desc, entity => entity.Id)));
+        var orderBy = OrderByConditionBuilder<StockAccountEntity>.Build(OrderByType.Asc, entity => entity.SortOrder,
+            OrderByConditionBuilder<StockAccountEntity>.Build(OrderByType.Asc, entity => entity.CreateTime));
 
         var entities = (await stockAccountRepository.QueryAsync(entity =>
                     entity.UserId == TenantContextHolder.UserId &&
