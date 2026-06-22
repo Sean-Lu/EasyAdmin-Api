@@ -15,6 +15,11 @@ public class StockHoldingEntity : TenantEntityBase
     public virtual long UserId { get; set; }
 
     /// <summary>
+    /// 账户ID
+    /// </summary>
+    public virtual long AccountId { get; set; }
+
+    /// <summary>
     /// 股票名称
     /// </summary>
     [MaxLength(100)]

@@ -25,6 +25,20 @@ public class StockHoldingCalculatorTests
     }
 
     [TestMethod]
+    public void BuildDto_Preserves_AccountId()
+    {
+        var dto = StockHoldingCalculator.BuildDto(new StockHoldingEntity
+        {
+            AccountId = 17,
+            CostPrice = 10,
+            Quantity = 100,
+            CurrentPrice = 12.5m
+        });
+
+        Assert.AreEqual(17, dto.AccountId);
+    }
+
+    [TestMethod]
     public void BuildSummary_Calculates_Total_Profit_Ratio_By_Total_Cost()
     {
         var holdings = new[]

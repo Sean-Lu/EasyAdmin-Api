@@ -13,6 +13,11 @@ public class StockHoldingDto : TenantDtoBase
     public long UserId { get; set; }
 
     /// <summary>
+    /// 账户ID
+    /// </summary>
+    public long AccountId { get; set; }
+
+    /// <summary>
     /// 股票名称
     /// </summary>
     [Required]
@@ -67,6 +72,11 @@ public class StockHoldingDto : TenantDtoBase
 /// </summary>
 public class StockHoldingUpdateDto : DtoIdBase
 {
+    /// <summary>
+    /// 账户ID
+    /// </summary>
+    public long AccountId { get; set; }
+
     /// <summary>
     /// 股票名称
     /// </summary>

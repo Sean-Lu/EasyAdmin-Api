@@ -22,6 +22,7 @@ public static class StockHoldingCalculator
             IsDelete = entity.IsDelete,
             TenantId = entity.TenantId,
             UserId = entity.UserId,
+            AccountId = entity.AccountId,
             Name = entity.Name,
             Code = entity.Code,
             CostPrice = entity.CostPrice,

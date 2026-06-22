@@ -15,7 +15,7 @@ public interface IStockHoldingService
     /// <summary>
     /// 删除持仓
     /// </summary>
-    Task<bool> DeleteByIdAsync(long id);
+    Task<bool> DeleteByIdAsync(long accountId, long id);
 
     /// <summary>
     /// 更新持仓
@@ -25,10 +25,10 @@ public interface IStockHoldingService
     /// <summary>
     /// 更新当前价格
     /// </summary>
-    Task<bool> UpdateCurrentPriceAsync(long id, decimal currentPrice);
+    Task<bool> UpdateCurrentPriceAsync(long accountId, long id, decimal currentPrice);
 
     /// <summary>
     /// 获取当前用户持仓
     /// </summary>
-    Task<StockHoldingListDto> ListAsync(string? keyword);
+    Task<StockHoldingListDto> ListAsync(long accountId, string? keyword);
 }

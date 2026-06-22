@@ -30,8 +30,9 @@ public class StockHoldingController(
     [HttpPost]
     public async Task<ApiResult<bool>> Delete([FromBody] JObject? data)
     {
+        var accountId = data?["accountId"]?.Value<long>() ?? default;
         var id = data?["id"]?.Value<long>() ?? default;
-        return Success(await stockHoldingService.DeleteByIdAsync(id));
+        return Success(await stockHoldingService.DeleteByIdAsync(accountId, id));
     }
 
     /// <summary>
@@ -49,17 +50,18 @@ public class StockHoldingController(
     [HttpPost]
     public async Task<ApiResult<bool>> UpdateCurrentPrice([FromBody] JObject? data)
     {
+        var accountId = data?["accountId"]?.Value<long>() ?? default;
         var id = data?["id"]?.Value<long>() ?? default;
         var currentPrice = data?["currentPrice"]?.Value<decimal>() ?? default;
-        return Success(await stockHoldingService.UpdateCurrentPriceAsync(id, currentPrice));
+        return Success(await stockHoldingService.UpdateCurrentPriceAsync(accountId, id, currentPrice));
     }
 
     /// <summary>
     /// 获取持仓列表
     /// </summary>
     [HttpGet]
-    public async Task<ApiResult<StockHoldingListDto>> List(string? keyword)
+    public async Task<ApiResult<StockHoldingListDto>> List(long accountId, string? keyword)
     {
-        return Success(await stockHoldingService.ListAsync(keyword));
+        return Success(await stockHoldingService.ListAsync(accountId, keyword));
     }
 }
