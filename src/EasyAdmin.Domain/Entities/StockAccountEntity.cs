@@ -29,4 +29,10 @@ public class StockAccountEntity : TenantEntityBase
     /// 现资产
     /// </summary>
     public virtual decimal CurrentAsset { get; set; }
+
+    /// <summary>
+    /// 备注
+    /// </summary>
+    [MaxLength(500)]
+    public virtual string? Remark { get; set; }
 }

@@ -57,6 +57,18 @@ public class StockHoldingController(
     }
 
     /// <summary>
+    /// 修改启用状态
+    /// </summary>
+    [HttpPost]
+    public async Task<ApiResult<bool>> UpdateIsEnabled([FromBody] JObject? data)
+    {
+        var accountId = data?["accountId"]?.Value<long>() ?? default;
+        var id = data?["id"]?.Value<long>() ?? default;
+        var isEnabled = data?["isEnabled"]?.Value<bool>() ?? default;
+        return Success(await stockHoldingService.UpdateIsEnabledAsync(accountId, id, isEnabled));
+    }
+
+    /// <summary>
     /// 获取持仓列表
     /// </summary>
     [HttpGet]

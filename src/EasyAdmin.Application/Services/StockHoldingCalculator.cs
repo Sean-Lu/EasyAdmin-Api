@@ -31,13 +31,14 @@ public static class StockHoldingCalculator
             CostAmount = Math.Round(costAmount, 2),
             MarketValue = Math.Round(marketValue, 2),
             ProfitAmount = Math.Round(profitAmount, 2),
-            ProfitRatio = Math.Round(profitRatio, 2)
+            ProfitRatio = Math.Round(profitRatio, 2),
+            IsEnabled = entity.IsEnabled
         };
     }
 
     public static StockHoldingSummaryDto BuildSummary(IEnumerable<StockHoldingDto> holdings)
     {
-        var items = holdings.ToList();
+        var items = holdings.Where(item => item.IsEnabled).ToList();
         var totalCostAmount = items.Sum(item => item.CostAmount);
         var totalProfitAmount = items.Sum(item => item.ProfitAmount);
         var totalProfitRatio = totalCostAmount == 0 ? 0 : totalProfitAmount / totalCostAmount * 100;

@@ -30,6 +30,11 @@ public class StockAccountDto : TenantDtoBase
     public decimal? CurrentAsset { get; set; }
 
     /// <summary>
+    /// 备注
+    /// </summary>
+    public string? Remark { get; set; }
+
+    /// <summary>
     /// 账户资产盈亏金额，公式：现资产 - 初始资产
     /// </summary>
     public decimal AssetProfitAmount { get; set; }
@@ -61,4 +66,10 @@ public class StockAccountUpdateDto : DtoIdBase
     /// 现资产
     /// </summary>
     public decimal? CurrentAsset { get; set; }
+
+    /// <summary>
+    /// 备注
+    /// </summary>
+    [MaxLength(500)]
+    public string? Remark { get; set; }
 }

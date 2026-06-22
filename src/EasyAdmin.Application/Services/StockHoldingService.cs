@@ -60,8 +60,9 @@ public class StockHoldingService(
             Code = dto.Code.Trim(),
             CostPrice = dto.CostPrice,
             Quantity = dto.Quantity,
-            CurrentPrice = dto.CurrentPrice
-          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.CostPrice, entity.Quantity, entity.CurrentPrice },
+            CurrentPrice = dto.CurrentPrice,
+            IsEnabled = dto.IsEnabled
+          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.CostPrice, entity.Quantity, entity.CurrentPrice, entity.IsEnabled },
               entity => entity.Id == dto.Id &&
                         entity.AccountId == dto.AccountId &&
                         entity.UserId == TenantContextHolder.UserId &&
@@ -80,6 +81,19 @@ public class StockHoldingService(
 
         return await stockHoldingRepository.UpdateAsync(new StockHoldingEntity { Id = id, CurrentPrice = currentPrice },
             entity => entity.CurrentPrice,
+            entity => entity.Id == id &&
+                      entity.AccountId == accountId &&
+                      entity.UserId == TenantContextHolder.UserId &&
+                      entity.TenantId == TenantContextHolder.TenantId &&
+                      !entity.IsDelete) > 0;
+    }
+
+    public async Task<bool> UpdateIsEnabledAsync(long accountId, long id, bool isEnabled)
+    {
+        await EnsureAccountAsync(accountId);
+
+        return await stockHoldingRepository.UpdateAsync(new StockHoldingEntity { Id = id, IsEnabled = isEnabled },
+            entity => entity.IsEnabled,
             entity => entity.Id == id &&
                       entity.AccountId == accountId &&
                       entity.UserId == TenantContextHolder.UserId &&

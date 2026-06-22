@@ -28,6 +28,11 @@ public interface IStockHoldingService
     Task<bool> UpdateCurrentPriceAsync(long accountId, long id, decimal currentPrice);
 
     /// <summary>
+    /// 更新启用状态
+    /// </summary>
+    Task<bool> UpdateIsEnabledAsync(long accountId, long id, bool isEnabled);
+
+    /// <summary>
     /// 获取当前用户持仓
     /// </summary>
     Task<StockHoldingListDto> ListAsync(long accountId, string? keyword);

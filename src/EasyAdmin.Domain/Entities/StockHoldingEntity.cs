@@ -45,4 +45,9 @@ public class StockHoldingEntity : TenantEntityBase
     /// 当前价格
     /// </summary>
     public virtual decimal CurrentPrice { get; set; }
+
+    /// <summary>
+    /// 是否启用
+    /// </summary>
+    public virtual bool IsEnabled { get; set; } = true;
 }

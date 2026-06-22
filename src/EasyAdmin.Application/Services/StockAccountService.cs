@@ -59,8 +59,9 @@ public class StockAccountService(
             Id = dto.Id,
             BrokerName = normalized.BrokerName,
             InitialAsset = normalized.InitialAsset,
-            CurrentAsset = normalized.CurrentAsset
-        }, entity => new { entity.BrokerName, entity.InitialAsset, entity.CurrentAsset },
+            CurrentAsset = normalized.CurrentAsset,
+            Remark = dto.Remark
+        }, entity => new { entity.BrokerName, entity.InitialAsset, entity.CurrentAsset, entity.Remark },
             entity => entity.Id == dto.Id &&
                       entity.UserId == TenantContextHolder.UserId &&
                       entity.TenantId == TenantContextHolder.TenantId &&

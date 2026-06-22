@@ -47,6 +47,11 @@ public class StockHoldingDto : TenantDtoBase
     public decimal CurrentPrice { get; set; }
 
     /// <summary>
+    /// 是否启用
+    /// </summary>
+    public bool IsEnabled { get; set; }
+
+    /// <summary>
     /// 成本金额
     /// </summary>
     public decimal CostAmount { get; set; }
@@ -105,6 +110,11 @@ public class StockHoldingUpdateDto : DtoIdBase
     /// 当前价格
     /// </summary>
     public decimal CurrentPrice { get; set; }
+
+    /// <summary>
+    /// 是否启用
+    /// </summary>
+    public bool IsEnabled { get; set; } = true;
 }
 
 /// <summary>
