@@ -61,6 +61,11 @@ public class NoteService(
         foreach (var dto in dtos)
         {
             dto.ContentHtml = null;
+            if (dto.IsProtected)
+            {
+                dto.Summary = null;
+                dto.ContentText = null;
+            }
         }
 
         return new PageQueryResult<NoteDto>
