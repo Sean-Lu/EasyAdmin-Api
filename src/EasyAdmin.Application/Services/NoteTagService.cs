@@ -41,6 +41,30 @@ public class NoteTagService(
         return mapper.Map<List<NoteTagDto>>(entities);
     }
 
+    public async Task<bool> DeleteByIdAsync(long id)
+    {
+        if (id < 1)
+        {
+            return false;
+        }
+
+        var result = await noteTagRepository.ExecuteAutoTransactionAsync(async transaction =>
+        {
+            await noteTagRelationRepository.DeleteAsync(entity =>
+                entity.TagId == id &&
+                entity.TenantId == TenantContextHolder.TenantId &&
+                !entity.IsDelete, transaction);
+            await noteTagRepository.DeleteAsync(entity =>
+                entity.Id == id &&
+                entity.UserId == TenantContextHolder.UserId &&
+                entity.TenantId == TenantContextHolder.TenantId &&
+                !entity.IsDelete, transaction);
+            return true;
+        });
+
+        return result;
+    }
+
     public async Task<bool> DeleteUnusedAsync()
     {
         var relations = (await noteTagRelationRepository.QueryAsync(entity =>

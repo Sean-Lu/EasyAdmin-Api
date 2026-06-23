@@ -24,6 +24,7 @@ public class NoteService(
     INoteCategoryRepository noteCategoryRepository,
     INoteTagRepository noteTagRepository,
     INoteTagRelationRepository noteTagRelationRepository,
+    INoteTagService noteTagService,
     INotePasswordService notePasswordService,
     IFileService fileService,
     IFileStorageFactory fileStorageFactory
@@ -139,6 +140,7 @@ public class NoteService(
         });
         await RefreshTagUseCountAsync();
         await DeleteUnusedNoteImagesAsync(oldImageIds.Except(nextImageIds));
+        await noteTagService.DeleteUnusedAsync();
         return result;
     }
 
@@ -154,6 +156,7 @@ public class NoteService(
         });
         await RefreshTagUseCountAsync();
         await DeleteUnusedNoteImagesAsync(imageIds);
+        await noteTagService.DeleteUnusedAsync();
         return result;
     }
 
@@ -178,6 +181,7 @@ public class NoteService(
         });
         await RefreshTagUseCountAsync();
         await DeleteUnusedNoteImagesAsync(imageIds);
+        await noteTagService.DeleteUnusedAsync();
         return result;
     }
 

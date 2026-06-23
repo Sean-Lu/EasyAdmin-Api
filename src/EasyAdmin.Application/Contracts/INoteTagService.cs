@@ -6,5 +6,6 @@ public interface INoteTagService
 {
     Task<List<NoteTagDto>> GetByUserIdAsync();
     Task<List<NoteTagDto>> SuggestAsync(string? keyword);
+    Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteUnusedAsync();
 }
