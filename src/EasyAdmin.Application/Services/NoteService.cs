@@ -40,7 +40,7 @@ public class NoteService(
 
         var keyword = request.Keyword?.Trim();
         var orderBy = OrderByConditionBuilder<NoteEntity>.Build(OrderByType.Desc, entity => entity.IsTop,
-            OrderByConditionBuilder<NoteEntity>.Build(OrderByType.Desc, entity => entity.LastEditTime,
+            OrderByConditionBuilder<NoteEntity>.Build(OrderByType.Desc, entity => entity.UpdateTime,
                 OrderByConditionBuilder<NoteEntity>.Build(OrderByType.Desc, entity => entity.Id)));
         var page = await noteRepository.PageQueryAsync(WhereExpressionUtil.Create<NoteEntity>(entity =>
                 entity.UserId == TenantContextHolder.UserId &&
@@ -103,7 +103,6 @@ public class NoteService(
             entity.ContentHtml = NoteContentHelper.SanitizeHtml(dto.ContentHtml);
             entity.ContentText = NoteContentHelper.ExtractText(entity.ContentHtml);
             entity.Summary = NoteContentHelper.CreateSummary(entity.ContentText);
-            entity.LastEditTime = now;
             await noteRepository.AddAsync(entity, transaction: transaction);
             await SaveTagsAsync(entity.Id, dto.Tags, transaction);
             return true;
@@ -130,9 +129,8 @@ public class NoteService(
             entity.ContentHtml = nextContentHtml;
             entity.ContentText = NoteContentHelper.ExtractText(entity.ContentHtml);
             entity.Summary = NoteContentHelper.CreateSummary(entity.ContentText);
-            entity.LastEditTime = DateTime.Now;
             await noteRepository.UpdateAsync(entity,
-                update => new { update.CategoryId, update.Title, update.ContentHtml, update.ContentText, update.Summary, update.IsTop, update.IsProtected, update.LastEditTime },
+                update => new { update.CategoryId, update.Title, update.ContentHtml, update.ContentText, update.Summary, update.IsTop, update.IsProtected },
                 noteEntity => noteEntity.Id == dto.Id && noteEntity.UserId == TenantContextHolder.UserId && noteEntity.TenantId == TenantContextHolder.TenantId,
                 transaction);
             await SaveTagsAsync(dto.Id, dto.Tags, transaction);

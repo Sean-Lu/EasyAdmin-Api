@@ -47,8 +47,4 @@ public class NoteEntity : TenantEntityBase
     /// </summary>
     [DefaultValue(false)]
     public virtual bool IsProtected { get; set; }
-    /// <summary>
-    /// 最后编辑时间
-    /// </summary>
-    public virtual DateTime? LastEditTime { get; set; }
 }

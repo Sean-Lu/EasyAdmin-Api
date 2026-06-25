@@ -42,10 +42,6 @@ public class NoteDto : TenantDtoBase
     /// </summary>
     public bool IsProtected { get; set; }
     /// <summary>
-    /// 最后编辑时间
-    /// </summary>
-    public DateTime? LastEditTime { get; set; }
-    /// <summary>
     /// 分类名称
     /// </summary>
     public string? CategoryName { get; set; }

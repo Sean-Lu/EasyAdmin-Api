@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Linq.Expressions;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
@@ -72,6 +72,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
                 entityBase.CreateUserId = TenantContextHolder.UserId;
             }
             entityBase.CreateTime = DateTime.Now;
+            entityBase.UpdateTime = DateTime.Now;
         }
 
         if (entity is TenantEntityBase { TenantId: < 1 } tenantEntityBase && TenantContextHolder.TenantId > 0)
