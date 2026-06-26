@@ -137,3 +137,22 @@ public class NoteExportReqDto
     /// </summary>
     public string? UnlockToken { get; set; }
 }
+
+/// <summary>
+/// 笔记批量导出请求DTO
+/// </summary>
+public class NoteBatchExportReqDto
+{
+    /// <summary>
+    /// 笔记ID集合
+    /// </summary>
+    public List<long> Ids { get; set; } = new();
+    /// <summary>
+    /// 导出类型
+    /// </summary>
+    public string ExportType { get; set; } = string.Empty;
+    /// <summary>
+    /// 解锁令牌
+    /// </summary>
+    public string? UnlockToken { get; set; }
+}

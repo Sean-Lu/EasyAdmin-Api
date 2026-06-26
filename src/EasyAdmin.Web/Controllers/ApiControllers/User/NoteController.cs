@@ -132,4 +132,29 @@ public class NoteController(
         var file = await noteExportService.ExportAsync(note, request.ExportType);
         return File(file.Content, file.ContentType, file.FileName);
     }
+
+    /// <summary>
+    /// 批量导出
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> BatchExport(NoteBatchExportReqDto request)
+    {
+        var notes = new List<NoteDto>();
+        foreach (var id in request.Ids.Distinct())
+        {
+            var note = await noteService.GetDetailAsync(id, request.UnlockToken);
+            if (note != null)
+            {
+                notes.Add(note);
+            }
+        }
+
+        if (notes.Count == 0)
+        {
+            return NotFound();
+        }
+
+        var file = await noteExportService.BatchExportAsync(notes, request.ExportType);
+        return File(file.Content, file.ContentType, file.FileName);
+    }
 }

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,7 +17,8 @@ namespace EasyAdmin.Application.Services;
 /// </summary>
 public partial class NoteExportService(
     IFileService fileService,
-    IFileStorageFactory fileStorageFactory
+    IFileStorageFactory fileStorageFactory,
+    INotePdfRenderer notePdfRenderer
     ) : INoteExportService
 {
     public async Task<(byte[] Content, string ContentType, string FileName)> ExportAsync(NoteDto note, string exportType)
@@ -26,9 +28,27 @@ public partial class NoteExportService(
         return type switch
         {
             "doc" or "word" => (Encoding.UTF8.GetBytes(html), "application/msword", $"{NormalizeFileName(note.Title)}.doc"),
-            "pdf" => throw new ExplicitException("暂不支持PDF导出"),
+            "pdf" => (await notePdfRenderer.RenderAsync(html), "application/pdf", $"{NormalizeFileName(note.Title)}.pdf"),
             _ => (Encoding.UTF8.GetBytes(html), "text/html", $"{NormalizeFileName(note.Title)}.html")
         };
+    }
+
+    public async Task<(byte[] Content, string ContentType, string FileName)> BatchExportAsync(IEnumerable<NoteDto> notes, string exportType)
+    {
+        await using var memoryStream = new MemoryStream();
+        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true, Encoding.UTF8))
+        {
+            var usedNames = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            foreach (var note in notes)
+            {
+                var file = await ExportAsync(note, exportType);
+                var entryName = GetUniqueEntryName(file.FileName, usedNames);
+                var entry = archive.CreateEntry(entryName, CompressionLevel.Fastest);
+                await using var entryStream = entry.Open();
+                await entryStream.WriteAsync(file.Content);
+            }
+        }
+        return (memoryStream.ToArray(), "application/zip", "我的笔记.zip");
     }
 
     private async Task<string> BuildHtmlAsync(NoteDto note)
@@ -165,6 +185,22 @@ public partial class NoteExportService(
             value = value.Replace(invalid, '_');
         }
         return value;
+    }
+
+    private static string GetUniqueEntryName(string fileName, Dictionary<string, int> usedNames)
+    {
+        var name = NormalizeFileName(Path.GetFileNameWithoutExtension(fileName));
+        var extension = Path.GetExtension(fileName);
+        var key = $"{name}{extension}";
+        if (!usedNames.TryGetValue(key, out var count))
+        {
+            usedNames[key] = 1;
+            return key;
+        }
+
+        count++;
+        usedNames[key] = count;
+        return $"{name}({count}){extension}";
     }
 
     [GeneratedRegex("<img\\b[^>]*data-file-id\\s*=\\s*(\"|')(?<id>\\d+)\\1[^>]*>", RegexOptions.IgnoreCase)]

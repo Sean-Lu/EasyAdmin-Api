@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddServiceByInterfaceSuffix(Assembly.GetExecutingAssembly(), "Service", ServiceLifetime.Transient);
 
         services.AddScoped<IExportService, ExportService>();
+        services.AddSingleton<INotePdfRenderer, WkHtmlNotePdfRenderer>();
         services.Configure<EmailOptions>(services.GetConfiguration().GetSection("Email"));
         services.Configure<SmsOptions>(services.GetConfiguration().GetSection("Sms"));
         services.AddTransient<INotificationChannelDispatcher, NotificationChannelDispatcher>();
