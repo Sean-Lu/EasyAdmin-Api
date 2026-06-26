@@ -108,8 +108,13 @@ public class NoteController(
     public async Task<ApiResult<bool>> MoveCategory([FromBody] JObject? data)
     {
         var id = data?["id"]?.Value<long>() ?? default;
+        var ids = data?["ids"]?.Values<long>().ToList() ?? new List<long>();
         var categoryId = data?["categoryId"]?.Value<long>() ?? default;
-        return Success(await noteService.MoveCategoryAsync(new List<long> { id }, categoryId));
+        if (ids.Count == 0 && id > 0)
+        {
+            ids.Add(id);
+        }
+        return Success(await noteService.MoveCategoryAsync(ids, categoryId));
     }
 
     /// <summary>
