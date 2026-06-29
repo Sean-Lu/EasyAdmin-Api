@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
@@ -81,13 +82,56 @@ public class UserService(
             throw new ExplicitException("昵称不能为空");
         }
 
+        var currentUser = await userRepository.GetAsync(entity => entity.Id == userId);
+        if (currentUser == null || currentUser.Id < 1)
+        {
+            throw new ExplicitException("用户不存在");
+        }
+
+        var phoneNumberChanged = !string.IsNullOrWhiteSpace(dto.PhoneNumber) && dto.PhoneNumber != currentUser.PhoneNumber;
+        var emailChanged = !string.IsNullOrWhiteSpace(dto.Email) && dto.Email != currentUser.Email;
+
+        if (phoneNumberChanged || emailChanged)
+        {
+            if (string.IsNullOrWhiteSpace(dto.CurrentPassword) || !await CheckPasswordAsync(userId, dto.CurrentPassword))
+            {
+                throw new ExplicitException("密码错误");
+            }
+        }
+
+        if (phoneNumberChanged)
+        {
+            if (!Regex.IsMatch(dto.PhoneNumber!, @"^1\d{10}$"))
+            {
+                throw new ExplicitException("手机号格式不正确");
+            }
+            if (await userRepository.ExistsAsync(entity => entity.PhoneNumber == dto.PhoneNumber && !entity.IsDelete && entity.TenantId == TenantContextHolder.TenantId && entity.Id != userId))
+            {
+                throw new ExplicitException("手机号已存在");
+            }
+        }
+
+        if (emailChanged)
+        {
+            if (!Regex.IsMatch(dto.Email!, @"^[^\s@]+@[^\s@]+\.[^\s@]+$"))
+            {
+                throw new ExplicitException("邮箱格式不正确");
+            }
+            if (await userRepository.ExistsAsync(entity => entity.Email == dto.Email && !entity.IsDelete && entity.TenantId == TenantContextHolder.TenantId && entity.Id != userId))
+            {
+                throw new ExplicitException("邮箱已存在");
+            }
+        }
+
         return await userRepository.UpdateAsync(
             new UserEntity
             {
                 NickName = dto.NickName.Trim(),
-                AvatarFileId = dto.AvatarFileId
+                AvatarFileId = dto.AvatarFileId,
+                PhoneNumber = phoneNumberChanged ? dto.PhoneNumber : currentUser.PhoneNumber,
+                Email = emailChanged ? dto.Email : currentUser.Email
             },
-            entity => new { entity.NickName, entity.AvatarFileId },
+            entity => new { entity.NickName, entity.AvatarFileId, entity.PhoneNumber, entity.Email },
             entity => entity.Id == userId) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
