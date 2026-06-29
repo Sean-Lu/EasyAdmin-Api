@@ -127,6 +127,12 @@ if (enableNacos)
 // 配置 Redis 缓存
 builder.Services.AddRedis(builder.Configuration);
 
+// 配置登录验证码
+builder.Services.Configure<CaptchaOptions>(builder.Configuration.GetSection("Captcha"));
+builder.Services.AddSingleton<ICaptchaCodeGenerator, SvgCaptchaCodeGenerator>();
+builder.Services.AddSingleton<ICaptchaStore, RedisCaptchaStore>();
+builder.Services.AddSingleton<ICaptchaService, CaptchaService>();
+
 // 注册 TokenService
 builder.Services.AddSingleton(jwtConfig);
 builder.Services.AddSingleton<ITokenService, TokenService>();

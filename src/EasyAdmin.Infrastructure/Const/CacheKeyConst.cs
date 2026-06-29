@@ -13,4 +13,7 @@ public class CacheKeyConst
     public const string UserRefreshTokensPrefix = $"{TopPrefix}UserRefreshTokens:";
 
     public const string ApiRepeatRequestLimitPrefix = $"{TopPrefix}RepeatRequestLimit:";
+
+    public const string CaptchaPrefix = $"{TopPrefix}Captcha:";
+    public const string CaptchaLockPrefix = $"{TopPrefix}CaptchaLock:";
 }

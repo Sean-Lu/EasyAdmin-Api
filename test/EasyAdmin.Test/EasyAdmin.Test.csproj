@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\EasyAdmin.Application\EasyAdmin.Application.csproj" />
+    <ProjectReference Include="..\..\src\EasyAdmin.Web\EasyAdmin.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

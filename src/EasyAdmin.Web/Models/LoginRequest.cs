@@ -13,4 +13,12 @@ public class LoginRequest
     /// 密码
     /// </summary>
     public required string Password { get; set; }
+    /// <summary>
+    /// 验证码标识
+    /// </summary>
+    public string? CaptchaKey { get; set; }
+    /// <summary>
+    /// 验证码
+    /// </summary>
+    public string? CaptchaCode { get; set; }
 }

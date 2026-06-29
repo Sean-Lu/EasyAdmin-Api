@@ -21,9 +21,20 @@ public class AuthController(
     IConfiguration configuration,
     IUserService userService,
     ILoginLogService loginLogService,
-    ITokenService tokenService
+    ITokenService tokenService,
+    ICaptchaService captchaService
     ) : BaseApiController
 {
+    /// <summary>
+    /// 获取登录验证码
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<ApiResult<CaptchaResponse>> Captcha()
+    {
+        return Success(await captchaService.GenerateAsync());
+    }
+
     /// <summary>
     /// 登录
     /// </summary>
@@ -33,6 +44,11 @@ public class AuthController(
     [HttpPost]
     public async Task<ApiResult<LoginResponse>> Login(LoginRequest data)
     {
+        if (!await captchaService.ValidateAsync(data.CaptchaKey, data.CaptchaCode))
+        {
+            return Fail<LoginResponse>("验证码错误或已过期");
+        }
+
         var user = await userService.GetAsync(data.Username, data.Password);
         if (user == null || user.Id < 1)
         {
