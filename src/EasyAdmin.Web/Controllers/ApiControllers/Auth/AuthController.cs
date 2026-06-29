@@ -49,10 +49,22 @@ public class AuthController(
             return Fail<LoginResponse>("验证码错误或已过期");
         }
 
-        var user = await userService.GetAsync(data.Username, data.Password);
+        if (string.IsNullOrWhiteSpace(data.Account))
+        {
+            return Fail<LoginResponse>("账号不能为空！");
+        }
+
+        if (data.LoginType == LoginType.Password && string.IsNullOrWhiteSpace(data.Password))
+        {
+            return Fail<LoginResponse>("密码不能为空！");
+        }
+
+        var password = data.Password ?? string.Empty;
+        var user = await userService.GetByAccountAsync(data.Account, password, data.LoginType);
+        // 统一错误提示，避免账号枚举
         if (user == null || user.Id < 1)
         {
-            return Fail<LoginResponse>("用户名或密码错误！");
+            return Fail<LoginResponse>("账号或密码错误！");
         }
 
         if (user.State == CommonState.Disable)
@@ -66,6 +78,7 @@ public class AuthController(
         {
             UserId = user.Id,
             TenantId = user.TenantId,
+            LoginType = data.LoginType,
             LoginTime = lastLoginTime,
             IP = HttpContext.GetClientIp()
         });// 新增用户登录历史记录

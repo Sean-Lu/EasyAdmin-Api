@@ -1,3 +1,5 @@
+using EasyAdmin.Infrastructure.Enums;
+
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
@@ -13,6 +15,10 @@ public class LoginLogDto : TenantDtoBase
     /// 用户昵称
     /// </summary>
     public virtual string UserNickName { get; set; }
+    /// <summary>
+    /// 登录方式
+    /// </summary>
+    public virtual LoginType LoginType { get; set; } = LoginType.Password;
     /// <summary>
     /// 登录时间
     /// </summary>

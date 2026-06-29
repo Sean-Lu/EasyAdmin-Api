@@ -25,6 +25,14 @@ public interface IUserService
     Task<UserEntity> GetByIdAsync(long id);
     Task<UserEntity?> GetAsync(string username, string password);
     /// <summary>
+    /// 按账号（用户名/手机号/邮箱） + 密码 查询用户
+    /// </summary>
+    /// <param name="account">账号</param>
+    /// <param name="password">MD5加密后的密码</param>
+    /// <param name="loginType">登录方式</param>
+    /// <returns></returns>
+    Task<UserEntity?> GetByAccountAsync(string account, string password, LoginType loginType);
+    /// <summary>
     /// 校验密码
     /// </summary>
     /// <param name="userId"></param>

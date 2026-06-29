@@ -1,3 +1,5 @@
+using EasyAdmin.Infrastructure.Enums;
+
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
@@ -13,4 +15,8 @@ public class LoginLogPageReqDto : PageRequestBase
     /// IP地址
     /// </summary>
     public string? IP { get; set; }
+    /// <summary>
+    /// 登录方式
+    /// </summary>
+    public LoginType? LoginType { get; set; }
 }

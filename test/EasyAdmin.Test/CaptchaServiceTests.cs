@@ -63,7 +63,7 @@ public class CaptchaServiceTests
     [TestMethod]
     public void LoginRequest_ProvidesOptionalCaptchaFields()
     {
-        var request = new LoginRequest { Username = "admin", Password = "password" };
+        var request = new LoginRequest { Account = "admin", Password = "password" };
 
         Assert.IsNull(request.CaptchaKey);
         Assert.IsNull(request.CaptchaCode);

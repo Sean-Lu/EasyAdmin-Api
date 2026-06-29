@@ -3,6 +3,7 @@ using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Infrastructure.Helper;
 using EasyAdmin.Infrastructure.Tenant;
 using EasyAdmin.Infrastructure.Wrapper;
 using Microsoft.Extensions.Logging;
@@ -121,6 +122,38 @@ public class UserService(
     public async Task<UserEntity?> GetAsync(string username, string password)
     {
         return await userRepository.GetAsync(entity => entity.UserName == username && entity.Password == password && !entity.IsDelete && entity.TenantId == TenantContextHolder.TenantId);
+    }
+
+    public async Task<UserEntity?> GetByAccountAsync(string account, string password, LoginType loginType)
+    {
+        if (string.IsNullOrWhiteSpace(account))
+        {
+            return null;
+        }
+
+        var trimmedAccount = account.Trim();
+        // 根据登录方式选择对应字段；Password 模式下根据账号格式自动识别为用户名/手机号/邮箱
+        if (loginType == LoginType.PhoneCode || AccountFormatHelper.IsPhoneNumber(trimmedAccount))
+        {
+            return await userRepository.GetAsync(entity =>
+                entity.PhoneNumber == trimmedAccount
+                && entity.Password == password
+                && !entity.IsDelete
+                && entity.TenantId == TenantContextHolder.TenantId);
+        }
+        if (loginType == LoginType.EmailCode || AccountFormatHelper.IsEmail(trimmedAccount))
+        {
+            return await userRepository.GetAsync(entity =>
+                entity.Email == trimmedAccount
+                && entity.Password == password
+                && !entity.IsDelete
+                && entity.TenantId == TenantContextHolder.TenantId);
+        }
+        return await userRepository.GetAsync(entity =>
+            entity.UserName == trimmedAccount
+            && entity.Password == password
+            && !entity.IsDelete
+            && entity.TenantId == TenantContextHolder.TenantId);
     }
 
     public async Task<bool> CheckPasswordAsync(long userId, string password)

@@ -211,3 +211,22 @@ public enum TokenMode
     /// </summary>
     Refresh
 }
+
+/// <summary>
+/// 登录方式
+/// </summary>
+public enum LoginType
+{
+    /// <summary>
+    /// 账号密码登录（用户名/手机号/邮箱 + 密码）
+    /// </summary>
+    Password = 1,
+    /// <summary>
+    /// 手机短信验证码登录
+    /// </summary>
+    PhoneCode = 2,
+    /// <summary>
+    /// 邮箱验证码登录
+    /// </summary>
+    EmailCode = 3
+}

@@ -1,3 +1,5 @@
+using EasyAdmin.Infrastructure.Enums;
+
 namespace EasyAdmin.Web.Models;
 
 /// <summary>
@@ -6,13 +8,17 @@ namespace EasyAdmin.Web.Models;
 public class LoginRequest
 {
     /// <summary>
-    /// 用户名
+    /// 账号（用户名 / 手机号 / 邮箱）
     /// </summary>
-    public required string Username { get; set; }
+    public required string Account { get; set; }
     /// <summary>
-    /// 密码
+    /// 密码（LoginType=Password 时必填）
     /// </summary>
-    public required string Password { get; set; }
+    public string? Password { get; set; }
+    /// <summary>
+    /// 登录方式（默认 Password）
+    /// </summary>
+    public LoginType LoginType { get; set; } = LoginType.Password;
     /// <summary>
     /// 验证码标识
     /// </summary>

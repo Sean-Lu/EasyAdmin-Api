@@ -1,4 +1,6 @@
-﻿using Sean.Core.DbRepository;
+﻿using EasyAdmin.Infrastructure.Enums;
+using Sean.Core.DbRepository;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -23,6 +25,11 @@ public class LoginLogEntity : TenantEntityBase
     [NotMapped]
     [LeftJoinField("u", nameof(UserEntity.NickName))]
     public virtual string UserNickName { get; set; }
+    /// <summary>
+    /// 登录方式
+    /// </summary>
+    [DefaultValue(LoginType.Password)]
+    public virtual LoginType LoginType { get; set; }
     /// <summary>
     /// 登录时间
     /// </summary>

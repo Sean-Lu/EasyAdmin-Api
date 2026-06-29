@@ -38,7 +38,8 @@ public class LoginLogService(
         orderBy.Next = OrderByConditionBuilder<LoginLogEntity>.Build(OrderByType.Desc, entity => entity.Id);
         return await loginLogRepository.PageQueryAsync(WhereExpressionUtil.Create<LoginLogEntity>(entity => entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
             .AndAlsoIF(request.UserId.HasValue && request.UserId.Value > 0, entity => entity.UserId == request.UserId.GetValueOrDefault())
-            .AndAlsoIF(!string.IsNullOrWhiteSpace(request.IP), entity => entity.IP.Contains(request.IP)), orderBy, request.PageNumber, request.PageSize);
+            .AndAlsoIF(!string.IsNullOrWhiteSpace(request.IP), entity => entity.IP.Contains(request.IP))
+            .AndAlsoIF(request.LoginType.HasValue, entity => entity.LoginType == request.LoginType.GetValueOrDefault()), orderBy, request.PageNumber, request.PageSize);
     }
 
     public async Task<LoginLogEntity> GetByIdAsync(long id)
