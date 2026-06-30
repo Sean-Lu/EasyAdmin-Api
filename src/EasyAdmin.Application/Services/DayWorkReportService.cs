@@ -42,7 +42,7 @@ public class DayWorkReportService(
     {
         var orderBy = OrderByConditionBuilder<DayWorkReportEntity>.Build(OrderByType.Desc, entity => entity.RecordTime);
         orderBy.Next = OrderByConditionBuilder<DayWorkReportEntity>.Build(OrderByType.Desc, entity => entity.Id);
-        return await dayWorkReportRepository.PageQueryAsync(WhereExpressionUtil.Create<DayWorkReportEntity>(entity => entity.UserId == TenantContextHolder.UserId && !entity.IsDelete)
+        return await dayWorkReportRepository.PageQueryAsync(WhereExpressionUtil.Create<DayWorkReportEntity>(entity => entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
             .AndAlsoIF(request.StartTime.HasValue, entity => entity.RecordTime >= request.StartTime)
             .AndAlsoIF(request.EndTime.HasValue, entity => entity.RecordTime <= request.EndTime), orderBy, request.PageNumber, request.PageSize);
     }

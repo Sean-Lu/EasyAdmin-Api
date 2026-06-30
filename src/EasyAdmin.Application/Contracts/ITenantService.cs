@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Application.Dtos;
+using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 using Sean.Core.DbRepository;
@@ -15,4 +15,5 @@ public interface ITenantService
     Task<PageQueryResult<TenantEntity>> PageAsync(TenantPageReqDto request);
     Task<TenantEntity> GetByIdAsync(long id);
     Task<TenantEntity> GetByNameAsync(string name);
+    Task<TenantEntity?> GetEnabledByCodeAsync(string code);
 }

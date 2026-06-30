@@ -1,4 +1,4 @@
-﻿namespace EasyAdmin.Infrastructure.Const;
+namespace EasyAdmin.Infrastructure.Const;
 
 /// <summary>
 /// 系统常量
@@ -9,6 +9,10 @@ public class SysConst
     /// 系统默认内置租户ID
     /// </summary>
     public const long DefaultTenantId = 1;
+    /// <summary>
+    /// 系统默认内置租户编码
+    /// </summary>
+    public const string DefaultTenantCode = "default";
 
     /// <summary>
     /// 超级管理员用户ID

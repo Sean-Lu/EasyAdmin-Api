@@ -43,7 +43,7 @@ public class DepartmentService(
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {
-        return await departmentRepository.UpdateAsync(new DepartmentEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id) > 0;
+        return await departmentRepository.UpdateAsync(new DepartmentEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
 
     public async Task<List<DepartmentEntity>> GetDepartmentTreeAsync(DepartmentListReqDto request)

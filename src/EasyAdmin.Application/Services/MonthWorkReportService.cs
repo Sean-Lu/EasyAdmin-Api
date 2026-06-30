@@ -42,7 +42,7 @@ public class MonthWorkReportService(
     {
         var orderBy = OrderByConditionBuilder<MonthWorkReportEntity>.Build(OrderByType.Desc, entity => entity.StartTime);
         orderBy.Next = OrderByConditionBuilder<MonthWorkReportEntity>.Build(OrderByType.Desc, entity => entity.Id);
-        return await monthWorkReportRepository.PageQueryAsync(WhereExpressionUtil.Create<MonthWorkReportEntity>(entity => entity.UserId == TenantContextHolder.UserId && !entity.IsDelete)
+        return await monthWorkReportRepository.PageQueryAsync(WhereExpressionUtil.Create<MonthWorkReportEntity>(entity => entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
             .AndAlsoIF(request.StartTime.HasValue, entity => entity.StartTime >= request.StartTime)
             .AndAlsoIF(request.EndTime.HasValue, entity => entity.EndTime <= request.EndTime), orderBy, request.PageNumber, request.PageSize);
     }

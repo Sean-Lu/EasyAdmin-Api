@@ -42,7 +42,7 @@ public class WeekWorkReportService(
     {
         var orderBy = OrderByConditionBuilder<WeekWorkReportEntity>.Build(OrderByType.Desc, entity => entity.StartTime);
         orderBy.Next = OrderByConditionBuilder<WeekWorkReportEntity>.Build(OrderByType.Desc, entity => entity.Id);
-        return await weekWorkReportRepository.PageQueryAsync(WhereExpressionUtil.Create<WeekWorkReportEntity>(entity => entity.UserId == TenantContextHolder.UserId && !entity.IsDelete)
+        return await weekWorkReportRepository.PageQueryAsync(WhereExpressionUtil.Create<WeekWorkReportEntity>(entity => entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
             .AndAlsoIF(request.StartTime.HasValue, entity => entity.StartTime >= request.StartTime)
             .AndAlsoIF(request.EndTime.HasValue, entity => entity.EndTime <= request.EndTime), orderBy, request.PageNumber, request.PageSize);
     }

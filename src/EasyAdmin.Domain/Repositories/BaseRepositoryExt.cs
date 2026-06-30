@@ -127,35 +127,37 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
     #region 扩展方法
     public virtual bool DeleteById(long id, IDbTransaction? transaction = null)
     {
+        var predicate = TenantScope.Apply<TEntity>(entity => entity.Id == id);
         if (IsLogicallyDelete)
         {
             return Update(new TEntity
             {
                 Id = id,
                 IsDelete = true
-            }, entity => entity.IsDelete, transaction: transaction) > 0;
+            }, entity => entity.IsDelete, predicate, transaction) > 0;
         }
-        return Delete(entity => entity.Id == id, transaction) > 0;
+        return Delete(predicate, transaction) > 0;
     }
     public virtual bool DeleteByIds(IEnumerable<long> ids, IDbTransaction? transaction = null)
     {
+        var predicate = TenantScope.Apply<TEntity>(entity => ids.Contains(entity.Id));
         if (IsLogicallyDelete)
         {
             return Update(new TEntity
             {
                 IsDelete = true
-            }, entity => entity.IsDelete, entity => ids.Contains(entity.Id), transaction) > 0;
+            }, entity => entity.IsDelete, predicate, transaction) > 0;
         }
-        return Delete(entity => ids.Contains(entity.Id), transaction) > 0;
+        return Delete(predicate, transaction) > 0;
     }
 
     public virtual TEntity GetById(long id)
     {
-        return Get(entity => entity.Id == id);
+        return Get(TenantScope.Apply<TEntity>(entity => entity.Id == id));
     }
     public virtual List<TEntity>? GetByIds(IEnumerable<long> ids)
     {
-        return Query(entity => ids.Contains(entity.Id))?.ToList();
+        return Query(TenantScope.Apply<TEntity>(entity => ids.Contains(entity.Id)))?.ToList();
     }
 
     public virtual DateTime? GetLastUpdateTime(Expression<Func<TEntity, bool>>? whereExpression = null)
@@ -169,35 +171,37 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
 
     public virtual async Task<bool> DeleteByIdAsync(long id, IDbTransaction? transaction = null)
     {
+        var predicate = TenantScope.Apply<TEntity>(entity => entity.Id == id);
         if (IsLogicallyDelete)
         {
             return await UpdateAsync(new TEntity
             {
                 Id = id,
                 IsDelete = true
-            }, entity => entity.IsDelete, transaction: transaction) > 0;
+            }, entity => entity.IsDelete, predicate, transaction) > 0;
         }
-        return await DeleteAsync(entity => entity.Id == id, transaction) > 0;
+        return await DeleteAsync(predicate, transaction) > 0;
     }
     public virtual async Task<bool> DeleteByIdsAsync(IEnumerable<long> ids, IDbTransaction? transaction = null)
     {
+        var predicate = TenantScope.Apply<TEntity>(entity => ids.Contains(entity.Id));
         if (IsLogicallyDelete)
         {
             return await UpdateAsync(new TEntity
             {
                 IsDelete = true
-            }, entity => entity.IsDelete, entity => ids.Contains(entity.Id), transaction) > 0;
+            }, entity => entity.IsDelete, predicate, transaction) > 0;
         }
-        return await DeleteAsync(entity => ids.Contains(entity.Id), transaction) > 0;
+        return await DeleteAsync(predicate, transaction) > 0;
     }
 
     public virtual async Task<TEntity> GetByIdAsync(long id)
     {
-        return await GetAsync(entity => entity.Id == id);
+        return await GetAsync(TenantScope.Apply<TEntity>(entity => entity.Id == id));
     }
     public virtual async Task<List<TEntity>?> GetByIdsAsync(IEnumerable<long> ids)
     {
-        return (await QueryAsync(entity => ids.Contains(entity.Id)))?.ToList();
+        return (await QueryAsync(TenantScope.Apply<TEntity>(entity => ids.Contains(entity.Id))))?.ToList();
     }
 
     public virtual async Task<DateTime?> GetLastUpdateTimeAsync(Expression<Func<TEntity, bool>>? whereExpression = null)

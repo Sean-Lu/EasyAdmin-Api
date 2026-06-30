@@ -82,7 +82,7 @@ public class UserService(
             throw new ExplicitException("昵称不能为空");
         }
 
-        var currentUser = await userRepository.GetAsync(entity => entity.Id == userId);
+        var currentUser = await userRepository.GetAsync(entity => entity.Id == userId && entity.TenantId == TenantContextHolder.TenantId);
         if (currentUser == null || currentUser.Id < 1)
         {
             throw new ExplicitException("用户不存在");
@@ -132,15 +132,15 @@ public class UserService(
                 Email = emailChanged ? dto.Email : currentUser.Email
             },
             entity => new { entity.NickName, entity.AvatarFileId, entity.PhoneNumber, entity.Email },
-            entity => entity.Id == userId) > 0;
+            entity => entity.Id == userId && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {
-        return await userRepository.UpdateAsync(new UserEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id) > 0;
+        return await userRepository.UpdateAsync(new UserEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
-    public async Task<bool> UpdateLastLoginTimeAsync(long id, DateTime lastLoginTime)
+    public async Task<bool> UpdateLastLoginTimeAsync(long id, long tenantId, DateTime lastLoginTime)
     {
-        return await userRepository.UpdateAsync(new UserEntity { LastLoginTime = lastLoginTime }, entity => new { entity.LastLoginTime }, entity => entity.Id == id) > 0;
+        return await userRepository.UpdateAsync(new UserEntity { LastLoginTime = lastLoginTime }, entity => new { entity.LastLoginTime }, entity => entity.Id == id && entity.TenantId == tenantId) > 0;
     }
 
     public async Task<PageQueryResult<UserEntity>> PageAsync(UserPageReqDto request)
@@ -168,7 +168,7 @@ public class UserService(
         return await userRepository.GetAsync(entity => entity.UserName == username && entity.Password == password && !entity.IsDelete && entity.TenantId == TenantContextHolder.TenantId);
     }
 
-    public async Task<UserEntity?> GetByAccountAsync(string account, string password, LoginType loginType)
+    public async Task<UserEntity?> GetByAccountAsync(string account, string password, LoginType loginType, long tenantId)
     {
         if (string.IsNullOrWhiteSpace(account))
         {
@@ -183,7 +183,7 @@ public class UserService(
                 entity.PhoneNumber == trimmedAccount
                 && entity.Password == password
                 && !entity.IsDelete
-                && entity.TenantId == TenantContextHolder.TenantId);
+                && entity.TenantId == tenantId);
         }
         if (loginType == LoginType.EmailCode || AccountFormatHelper.IsEmail(trimmedAccount))
         {
@@ -191,18 +191,18 @@ public class UserService(
                 entity.Email == trimmedAccount
                 && entity.Password == password
                 && !entity.IsDelete
-                && entity.TenantId == TenantContextHolder.TenantId);
+                && entity.TenantId == tenantId);
         }
         return await userRepository.GetAsync(entity =>
             entity.UserName == trimmedAccount
             && entity.Password == password
             && !entity.IsDelete
-            && entity.TenantId == TenantContextHolder.TenantId);
+            && entity.TenantId == tenantId);
     }
 
     public async Task<bool> CheckPasswordAsync(long userId, string password)
     {
-        var user = await userRepository.GetAsync(entity => entity.Id == userId && entity.Password == password);
+        var user = await userRepository.GetAsync(entity => entity.Id == userId && entity.Password == password && entity.TenantId == TenantContextHolder.TenantId);
         return user != null && user.Id > 0;
     }
 
@@ -216,7 +216,7 @@ public class UserService(
         {
             throw new ExplicitException("新密码不能和旧密码相同");
         }
-        return await userRepository.UpdateAsync(new UserEntity { Password = newPassword }, entity => entity.Password, entity => entity.Id == userId) > 0;
+        return await userRepository.UpdateAsync(new UserEntity { Password = newPassword }, entity => entity.Password, entity => entity.Id == userId && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
 
     public async Task<bool> ResetPasswordAsync(long userId, string? newPassword = null)
@@ -237,6 +237,6 @@ public class UserService(
             var hash = new HashCryptoProvider();
             updateUser.Password = hash.MD5(updateUser.Password).ToLower();
         }
-        return await userRepository.UpdateAsync(updateUser, entity => entity.Password, entity => entity.Id == userId) > 0;
+        return await userRepository.UpdateAsync(updateUser, entity => entity.Password, entity => entity.Id == userId && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
 }

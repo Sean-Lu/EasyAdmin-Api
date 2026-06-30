@@ -136,6 +136,7 @@ builder.Services.AddSingleton<ICaptchaService, CaptchaService>();
 // 注册 TokenService
 builder.Services.AddSingleton(jwtConfig);
 builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddScoped<IAccountAccessService, AccountAccessService>();
 
 // 配置Quartz
 builder.Services.AddQuartz(config =>
@@ -191,6 +192,7 @@ app.UseMiddleware<SlidingExpirationJwtMiddleware>();// JWT滑动过期中间件�
 //app.UseHttpsRedirection();
 
 app.UseAuthentication();//要在授权之前认证，这个和[Authorize]特性有关
+app.UseMiddleware<AccountAccessMiddleware>();
 app.UseAuthorization();
 
 app.UseStaticFiles();

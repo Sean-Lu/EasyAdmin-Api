@@ -210,12 +210,12 @@ public static class JwtHelper
         var user = request.HttpContext.User;
         if (user.Identity == null || !user.Identity.IsAuthenticated)
         {
-            var tenantId = request.Headers.TryGetValue(WebConst.RequestHeaderTenantIdKey, out var tenantIdStr)
-                ? Convert.ToInt64(tenantIdStr) // 设置为请求头中携带的租户
-                : SysConst.DefaultTenantId;// 设置为默认租户
+            //var tenantId = request.Headers.TryGetValue(WebConst.RequestHeaderTenantIdKey, out var tenantIdStr)
+            //    ? Convert.ToInt64(tenantIdStr) // 设置为请求头中携带的租户
+            //    : SysConst.DefaultTenantId;// 设置为默认租户
             return new JwtUserModel
             {
-                TenantId = tenantId
+                TenantId = SysConst.DefaultTenantId
             };
         }
         var claims = user.Claims;

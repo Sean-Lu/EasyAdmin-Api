@@ -55,4 +55,15 @@ public class ParamService(
     {
         return await paramRepository.GetByIdAsync(id);
     }
+
+    public async Task<string?> GetValueAsync(string key)
+    {
+        var entity = await paramRepository.GetAsync(item => item.ParamKey == key && item.State == CommonState.Enable && !item.IsDelete);
+        return entity?.ParamValue;
+    }
+
+    public async Task<bool> GetBooleanValueAsync(string key, bool defaultValue = false)
+    {
+        return bool.TryParse(await GetValueAsync(key), out var value) ? value : defaultValue;
+    }
 }

@@ -2,6 +2,7 @@ using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Storage;
+using EasyAdmin.Web.Contracts;
 using EasyAdmin.Web.Filter;
 using EasyAdmin.Web.Models;
 using MapsterMapper;
@@ -20,7 +21,9 @@ public class UserController(
     IUserService userService,
     IUserRoleService userRoleService,
     IFileService fileService,
-    IFileStorageFactory fileStorageFactory
+    IFileStorageFactory fileStorageFactory,
+    IAccountAccessService accountAccessService,
+    ITenantService tenantService
     ) : BaseApiController
 {
     private const long AvatarMaxSize = 2 * 1024 * 1024;
@@ -98,7 +101,12 @@ public class UserController(
     {
         var id = data["id"]?.Value<long>() ?? default;
         var state = (CommonState)(data["state"]?.Value<int>() ?? default);
-        return Success(await userService.UpdateStateAsync(id, state));
+        var result = await userService.UpdateStateAsync(id, state);
+        if (result)
+        {
+            await accountAccessService.InvalidateUserAsync(TenantId, id);
+        }
+        return Success(result);
     }
 
     /// <summary>
@@ -142,7 +150,11 @@ public class UserController(
     [HttpGet]
     public async Task<ApiResult<UserDto>> GetUserInfo()
     {
-        return Success(mapper.Map<UserDto>(await userService.GetByIdAsync(UserId)));
+        var dto = mapper.Map<UserDto>(await userService.GetByIdAsync(UserId));
+        var tenant = await tenantService.GetByIdAsync(TenantId);
+        dto.TenantCode = tenant?.Code;
+        dto.TenantName = tenant?.Name;
+        return Success(dto);
     }
 
     /// <summary>

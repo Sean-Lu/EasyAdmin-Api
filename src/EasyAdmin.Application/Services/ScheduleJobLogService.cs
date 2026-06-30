@@ -34,7 +34,7 @@ public class ScheduleJobLogService(
 
     public async Task<bool> DeleteByJobIdAsync(long jobId)
     {
-        await scheduleJobLogRepository.DeleteAsync(x => x.JobId == jobId);
+        await scheduleJobLogRepository.DeleteAsync(x => x.JobId == jobId && x.TenantId == TenantContextHolder.TenantId);
         return true;
     }
 

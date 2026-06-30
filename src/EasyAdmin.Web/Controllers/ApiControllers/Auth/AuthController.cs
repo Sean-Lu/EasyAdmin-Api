@@ -1,5 +1,7 @@
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
+using EasyAdmin.Application.Services;
+using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Models;
 using EasyAdmin.Web.Contracts;
@@ -22,9 +24,25 @@ public class AuthController(
     IUserService userService,
     ILoginLogService loginLogService,
     ITokenService tokenService,
-    ICaptchaService captchaService
+    ICaptchaService captchaService,
+    IParamService paramService,
+    ITenantService tenantService,
+    IAccountAccessService accountAccessService
     ) : BaseApiController
 {
+    /// <summary>
+    /// 获取登录配置
+    /// </summary>
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<ApiResult<LoginConfigResponse>> LoginConfig()
+    {
+        return Success(new LoginConfigResponse
+        {
+            TenantEnabled = await paramService.GetBooleanValueAsync(ConfigConst.TenantEnable)
+        });
+    }
+
     /// <summary>
     /// 获取登录验证码
     /// </summary>
@@ -59,12 +77,27 @@ public class AuthController(
             return Fail<LoginResponse>("密码不能为空！");
         }
 
+        var tenantEnabled = await paramService.GetBooleanValueAsync(ConfigConst.TenantEnable);
+        var tenantSelection = TenantLoginPolicy.ResolveTenantCode(tenantEnabled, data.TenantCode);
+        if (tenantSelection.TenantCode == null)
+        {
+            return Fail<LoginResponse>("租户、账号或密码错误！");
+        }
+
+        var tenant = tenantEnabled
+            ? await tenantService.GetEnabledByCodeAsync(tenantSelection.TenantCode)
+            : await tenantService.GetByIdAsync(SysConst.DefaultTenantId);
+        if (tenant == null || tenant.Id < 1 || tenant.State == CommonState.Disable)
+        {
+            return Fail<LoginResponse>("租户、账号或密码错误！");
+        }
+
         var password = data.Password ?? string.Empty;
-        var user = await userService.GetByAccountAsync(data.Account, password, data.LoginType);
+        var user = await userService.GetByAccountAsync(data.Account, password, data.LoginType, tenant.Id);
         // 统一错误提示，避免账号枚举
         if (user == null || user.Id < 1)
         {
-            return Fail<LoginResponse>("账号或密码错误！");
+            return Fail<LoginResponse>("租户、账号或密码错误！");
         }
 
         if (user.State == CommonState.Disable)
@@ -73,7 +106,7 @@ public class AuthController(
         }
 
         var lastLoginTime = DateTime.Now;
-        await userService.UpdateLastLoginTimeAsync(user.Id, lastLoginTime);// 更新用户最后登录时间
+        await userService.UpdateLastLoginTimeAsync(user.Id, user.TenantId, lastLoginTime);// 更新用户最后登录时间
         await loginLogService.AddAsync(new LoginLogDto
         {
             UserId = user.Id,
@@ -144,6 +177,12 @@ public class AuthController(
         }
 
         var ipAddress = HttpContext.GetClientIp();
+        var refreshTokenModel = await tokenService.GetRefreshTokenAsync(request.RefreshToken);
+        if (refreshTokenModel == null || !await accountAccessService.IsAllowedAsync(refreshTokenModel.TenantId, refreshTokenModel.UserId))
+        {
+            await tokenService.RevokeRefreshTokenAsync(request.RefreshToken);
+            return Fail<LoginResponse>("当前租户或用户已被禁用");
+        }
         var (success, accessToken, newRefreshToken, message) = await tokenService.RefreshTokenAsync(request.RefreshToken, ipAddress);
 
         if (!success)

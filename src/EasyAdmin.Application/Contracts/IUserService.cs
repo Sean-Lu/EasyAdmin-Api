@@ -17,9 +17,10 @@ public interface IUserService
     /// 更新用户最后登录时间
     /// </summary>
     /// <param name="id">用户ID</param>
+    /// <param name="tenantId">租户ID</param>
     /// <param name="lastLoginTime">最后登录时间</param>
     /// <returns></returns>
-    Task<bool> UpdateLastLoginTimeAsync(long id, DateTime lastLoginTime);
+    Task<bool> UpdateLastLoginTimeAsync(long id, long tenantId, DateTime lastLoginTime);
     Task<PageQueryResult<UserEntity>> PageAsync(UserPageReqDto request);
     Task<List<UserEntity>> GetAllUserAsync();
     Task<UserEntity> GetByIdAsync(long id);
@@ -30,8 +31,9 @@ public interface IUserService
     /// <param name="account">账号</param>
     /// <param name="password">MD5加密后的密码</param>
     /// <param name="loginType">登录方式</param>
+    /// <param name="tenantId">租户ID</param>
     /// <returns></returns>
-    Task<UserEntity?> GetByAccountAsync(string account, string password, LoginType loginType);
+    Task<UserEntity?> GetByAccountAsync(string account, string password, LoginType loginType, long tenantId);
     /// <summary>
     /// 校验密码
     /// </summary>

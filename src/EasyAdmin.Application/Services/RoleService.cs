@@ -72,7 +72,7 @@ public class RoleService(
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {
-        return await roleRepository.UpdateAsync(new RoleEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id) > 0;
+        return await roleRepository.UpdateAsync(new RoleEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
 
     public async Task<PageQueryResult<RoleEntity>> PageAsync(RolePageReqDto request)

@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Domain.Contracts;
+using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
@@ -14,7 +14,7 @@ public class TenantSeedData : IEntitySeedData<TenantEntity>
     {
         return new[]
         {
-            new TenantEntity { Id = SysConst.DefaultTenantId, Name = "系统默认", AdminUserId = SysConst.DefaultTenantAdminUserId, Remark = "系统默认内置租户", State = CommonState.Enable }
+            new TenantEntity { Id = SysConst.DefaultTenantId, Code = SysConst.DefaultTenantCode, Name = "系统默认", AdminUserId = SysConst.DefaultTenantAdminUserId, Remark = "系统默认内置租户", State = CommonState.Enable }
         };
     }
 }

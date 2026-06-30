@@ -10,11 +10,18 @@ namespace EasyAdmin.Application.Services;
 public class UserRoleService(
     ILogger<UserRoleService> logger,
     IUserRoleRepository userRoleRepository,
-    IRoleRepository roleRepository
+    IRoleRepository roleRepository,
+    IUserRepository userRepository
     ) : IUserRoleService
 {
     public async Task<bool> AssignRolesToUserAsync(UserRoleAssignmentDto dto)
     {
+        if (!await userRepository.ExistsAsync(entity => entity.Id == dto.UserId && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete))
+            return false;
+        var validRoleIds = (await roleRepository.QueryAsync(entity => dto.RoleIds.Contains(entity.Id) && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete))?.Select(entity => entity.Id).ToHashSet() ?? [];
+        if (validRoleIds.Count != dto.RoleIds.Distinct().Count())
+            return false;
+
         // 使用自动事务（自动提交或回滚）
         return await userRoleRepository.ExecuteAutoTransactionAsync(async transaction =>
         {

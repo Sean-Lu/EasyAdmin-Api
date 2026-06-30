@@ -41,7 +41,7 @@ public class SysDictTypeService(
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {
-        return await sysDictTypeRepository.UpdateAsync(new SysDictTypeEntity { Id = id, State = state }, entity => entity.State, entity => entity.Id == id) > 0;
+        return await sysDictTypeRepository.UpdateAsync(new SysDictTypeEntity { Id = id, State = state }, entity => entity.State, entity => entity.Id == id && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
 
     public async Task<PageQueryResult<SysDictTypeEntity>> PageAsync(SysDictTypePageReqDto request)

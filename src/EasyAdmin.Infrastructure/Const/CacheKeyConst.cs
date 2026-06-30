@@ -16,4 +16,7 @@ public class CacheKeyConst
 
     public const string CaptchaPrefix = $"{TopPrefix}Captcha:";
     public const string CaptchaLockPrefix = $"{TopPrefix}CaptchaLock:";
+
+    public const string TenantAccessStatusPrefix = $"{TopPrefix}TenantAccessStatus:";
+    public const string UserAccessStatusPrefix = $"{TopPrefix}UserAccessStatus:";
 }

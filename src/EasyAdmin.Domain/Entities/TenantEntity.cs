@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Sean.Core.DbRepository;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -14,6 +14,11 @@ namespace EasyAdmin.Domain.Entities;
 [LeftJoin(typeof(UserEntity), nameof(AdminUserId), nameof(UserEntity.Id), "u")]
 public class TenantEntity : EntityBase
 {
+    /// <summary>
+    /// 租户编码
+    /// </summary>
+    [MaxLength(50)]
+    public virtual string Code { get; set; }
     /// <summary>
     /// 租户名称
     /// </summary>

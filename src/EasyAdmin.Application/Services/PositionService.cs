@@ -60,7 +60,7 @@ public class PositionService(
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {
-        return await positionRepository.UpdateAsync(new PositionEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id) > 0;
+        return await positionRepository.UpdateAsync(new PositionEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
 
     public async Task<PageQueryResult<PositionEntity>> PageAsync(PositionPageReqDto request)
@@ -74,7 +74,7 @@ public class PositionService(
 
     public async Task<List<PositionEntity>> GetListAsync()
     {
-        return (await positionRepository.QueryAsync(WhereExpressionUtil.Create<PositionEntity>(entity => !entity.IsDelete)
+        return (await positionRepository.QueryAsync(WhereExpressionUtil.Create<PositionEntity>(entity => entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
             .AndAlso(entity => entity.State == CommonState.Enable)))?.ToList() ?? new List<PositionEntity>();
     }
 

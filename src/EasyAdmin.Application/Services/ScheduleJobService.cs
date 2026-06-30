@@ -74,7 +74,7 @@ public class ScheduleJobService(
                 State = state
             },
             x => new { x.State },
-            x => x.Id == id) > 0;
+            x => x.Id == id && x.TenantId == TenantContextHolder.TenantId) > 0;
         if (result)
         {
             // 同步到 Quartz

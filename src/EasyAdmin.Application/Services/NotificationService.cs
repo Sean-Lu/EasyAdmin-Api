@@ -89,7 +89,7 @@ public class NotificationService(
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {
-        return await notificationRepository.UpdateAsync(new NotificationEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id) > 0;
+        return await notificationRepository.UpdateAsync(new NotificationEntity { State = state }, entity => new { entity.State }, entity => entity.Id == id && entity.TenantId == TenantContextHolder.TenantId) > 0;
     }
 
     public async Task<PageQueryResult<NotificationEntity>> PageAsync(NotificationPageReqDto request)

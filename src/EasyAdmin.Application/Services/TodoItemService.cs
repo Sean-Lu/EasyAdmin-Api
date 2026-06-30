@@ -48,7 +48,7 @@ public class TodoItemService(
 
     public async Task<bool> UpdateStatusAsync(long id, bool done)
     {
-        await todoItemRepository.UpdateAsync(new TodoItemEntity { Done = done }, entity => entity.Done, entity => entity.Id == id);
+        await todoItemRepository.UpdateAsync(new TodoItemEntity { Done = done }, entity => entity.Done, entity => entity.Id == id && entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId);
         return true;
     }
 
@@ -60,25 +60,25 @@ public class TodoItemService(
 
     public async Task<bool> UpdatePriorityAsync(long id, int priority)
     {
-        await todoItemRepository.UpdateAsync(new TodoItemEntity { Priority = priority }, entity => entity.Priority, entity => entity.Id == id);
+        await todoItemRepository.UpdateAsync(new TodoItemEntity { Priority = priority }, entity => entity.Priority, entity => entity.Id == id && entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId);
         return true;
     }
 
     public async Task<bool> UpdateNameAsync(long id, string name)
     {
-        await todoItemRepository.UpdateAsync(new TodoItemEntity { Name = name }, entity => entity.Name, entity => entity.Id == id);
+        await todoItemRepository.UpdateAsync(new TodoItemEntity { Name = name }, entity => entity.Name, entity => entity.Id == id && entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId);
         return true;
     }
 
     public async Task<bool> UpdateSortOrderAsync(long id, int sortOrder)
     {
-        await todoItemRepository.UpdateAsync(new TodoItemEntity { SortOrder = sortOrder }, entity => entity.SortOrder, entity => entity.Id == id);
+        await todoItemRepository.UpdateAsync(new TodoItemEntity { SortOrder = sortOrder }, entity => entity.SortOrder, entity => entity.Id == id && entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId);
         return true;
     }
 
     public async Task<bool> UpdateCategoryAsync(long id, long categoryId)
     {
-        await todoItemRepository.UpdateAsync(new TodoItemEntity { CategoryId = categoryId }, entity => entity.CategoryId, entity => entity.Id == id);
+        await todoItemRepository.UpdateAsync(new TodoItemEntity { CategoryId = categoryId }, entity => entity.CategoryId, entity => entity.Id == id && entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId);
         return true;
     }
 

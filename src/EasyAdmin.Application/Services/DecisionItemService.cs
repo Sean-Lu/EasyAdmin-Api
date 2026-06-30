@@ -36,7 +36,7 @@ public class DecisionItemService(
 
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
     {
-        return await decisionItemRepository.UpdateAsync(new DecisionItemEntity { State = state }, item => new { item.State }, item => item.Id == id) > 0;
+        return await decisionItemRepository.UpdateAsync(new DecisionItemEntity { State = state }, item => new { item.State }, item => item.Id == id && item.UserId == TenantContextHolder.UserId && item.TenantId == TenantContextHolder.TenantId) > 0;
     }
 
     public async Task<List<DecisionItemDto>> GetByUserIdAsync(DecisionItemType type)

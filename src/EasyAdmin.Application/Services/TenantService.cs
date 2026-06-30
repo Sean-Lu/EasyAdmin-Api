@@ -26,24 +26,28 @@ public class TenantService(
 {
     public async Task<bool> AddAsync(TenantDto dto)
     {
+        dto.Code = dto.Code?.Trim();
+        if (string.IsNullOrEmpty(dto.Code) || dto.Code.Length > TenantLoginPolicy.MaxTenantCodeLength)
+        {
+            throw new ExplicitException("租户编码长度必须为1到50个字符");
+        }
         if (string.IsNullOrEmpty(dto.AdminUserName))
         {
             throw new ExplicitException("租管账号名称不能为空");
         }
 
-        // 1. 新增租户
-        var tenantEntity = mapper.Map<TenantEntity>(dto);
-        if (!await tenantRepository.AddAsync(tenantEntity))
+        var existingTenants = (await tenantRepository.QueryAsync(entity => !entity.IsDelete))?.ToList() ?? [];
+        if (existingTenants.Any(entity => string.Equals(entity.Code, dto.Code, StringComparison.Ordinal)))
         {
-            throw new ExplicitException("新增租户失败");
+            throw new ExplicitException("租户编码已存在");
         }
 
-        // 2. 为新租户创建租管账号(租户管理员)
+        var tenantEntity = mapper.Map<TenantEntity>(dto);
         var adminUserEntity = new UserEntity
         {
             UserName = dto.AdminUserName,
             NickName = "管理员",
-            TenantId = tenantEntity.Id
+            State = CommonState.Enable
         };
         var paramEntity = await paramRepository.GetAsync(c => c.ParamKey == ConfigConst.TenantAdminInitPassword && c.State == CommonState.Enable);
         var tenantAdminInitPassword = paramEntity?.ParamValue;
@@ -52,46 +56,42 @@ public class TenantService(
             var hash = new HashCryptoProvider();
             adminUserEntity.Password = hash.MD5(tenantAdminInitPassword).ToLower();
         }
-        if (!await userRepository.AddAsync(adminUserEntity))
-        {
-            throw new ExplicitException("创建租管账号失败");
-        }
-
-        // 3. 关联租管账号
-        tenantEntity.AdminUserId = adminUserEntity.Id;
-        if (!(await tenantRepository.UpdateAsync(tenantEntity, c => c.AdminUserId) > 0))
-        {
-            throw new ExplicitException("关联租管账号失败");
-        }
-
-        // 4. 为新租户创建系统管理员角色
         var adminRole = new RoleEntity
         {
-            TenantId = tenantEntity.Id,
             Name = "系统管理员",
             Code = SysConst.SystemAdminRoleCode,
             Description = "系统管理员角色，拥有租户内所有系统权限",
             Sort = 0,
             State = CommonState.Enable
         };
-        if (!await roleRepository.AddAsync(adminRole))
+        return await tenantRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
-            throw new ExplicitException("创建系统管理员角色失败");
-        }
+            if (!await tenantRepository.AddAsync(tenantEntity, transaction: transaction))
+                throw new ExplicitException("新增租户失败");
 
-        // 5. 关联租管账号到管理员角色
-        var userRole = new UserRoleEntity
-        {
-            UserId = adminUserEntity.Id,
-            RoleId = adminRole.Id,
-            TenantId = tenantEntity.Id
-        };
-        if (!await userRoleRepository.AddAsync(userRole))
-        {
-            throw new ExplicitException("关联管理员角色失败");
-        }
+            adminUserEntity.TenantId = tenantEntity.Id;
+            if (!await userRepository.AddAsync(adminUserEntity, transaction: transaction))
+                throw new ExplicitException("创建租管账号失败");
 
-        return true;
+            tenantEntity.AdminUserId = adminUserEntity.Id;
+            if (await tenantRepository.UpdateAsync(tenantEntity, entity => entity.AdminUserId, transaction: transaction) < 1)
+                throw new ExplicitException("关联租管账号失败");
+
+            adminRole.TenantId = tenantEntity.Id;
+            if (!await roleRepository.AddAsync(adminRole, transaction: transaction))
+                throw new ExplicitException("创建系统管理员角色失败");
+
+            var userRole = new UserRoleEntity
+            {
+                UserId = adminUserEntity.Id,
+                RoleId = adminRole.Id,
+                TenantId = tenantEntity.Id
+            };
+            if (!await userRoleRepository.AddAsync(userRole, transaction: transaction))
+                throw new ExplicitException("关联管理员角色失败");
+
+            return true;
+        });
     }
 
     public async Task<bool> DeleteByIdAsync(long id)
@@ -140,5 +140,11 @@ public class TenantService(
     public async Task<TenantEntity> GetByNameAsync(string name)
     {
         return await tenantRepository.GetAsync(entity => entity.Name == name);
+    }
+
+    public async Task<TenantEntity?> GetEnabledByCodeAsync(string code)
+    {
+        var candidates = (await tenantRepository.QueryAsync(entity => entity.Code == code && entity.State == CommonState.Enable && !entity.IsDelete))?.ToList() ?? [];
+        return candidates.FirstOrDefault(entity => string.Equals(entity.Code, code, StringComparison.Ordinal));
     }
 }

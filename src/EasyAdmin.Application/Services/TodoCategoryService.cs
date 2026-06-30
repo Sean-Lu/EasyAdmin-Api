@@ -29,7 +29,7 @@ public class TodoCategoryService(
         return await todoCategoryRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
             // 先删除该分类下的所有待办事项
-            await todoItemRepository.DeleteAsync(entity => entity.CategoryId == id && entity.UserId == TenantContextHolder.UserId, transaction);
+            await todoItemRepository.DeleteAsync(entity => entity.CategoryId == id && entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId, transaction);
             // 再删除分类
             await todoCategoryRepository.DeleteByIdAsync(id, transaction);
             return true;

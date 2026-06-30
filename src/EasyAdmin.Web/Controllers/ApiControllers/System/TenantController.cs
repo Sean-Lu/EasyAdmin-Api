@@ -1,6 +1,7 @@
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Web.Contracts;
 using EasyAdmin.Web.Filter;
 using EasyAdmin.Web.Models;
 using MapsterMapper;
@@ -12,10 +13,12 @@ namespace EasyAdmin.Web.Controllers;
 /// <summary>
 /// 租户管理
 /// </summary>
+[SuperAdminOnly]
 public class TenantController(
     ILogger<TenantController> logger,
     IMapper mapper,
-    ITenantService tenantService
+    ITenantService tenantService,
+    IAccountAccessService accountAccessService
     ) : BaseApiController
 {
     /// <summary>
@@ -80,7 +83,12 @@ public class TenantController(
     {
         var id = data["id"]?.Value<long>() ?? default;
         var state = (CommonState)(data["state"]?.Value<int>() ?? default);
-        return Success(await tenantService.UpdateStateAsync(id, state));
+        var result = await tenantService.UpdateStateAsync(id, state);
+        if (result)
+        {
+            await accountAccessService.InvalidateTenantAsync(id);
+        }
+        return Success(result);
     }
 
     /// <summary>

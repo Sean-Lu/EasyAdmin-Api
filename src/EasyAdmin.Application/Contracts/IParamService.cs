@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Application.Dtos;
+using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 using Sean.Core.DbRepository;
@@ -14,4 +14,6 @@ public interface IParamService
     Task<bool> UpdateStateAsync(long id, CommonState state);
     Task<PageQueryResult<ParamEntity>> PageAsync(ParamPageReqDto request);
     Task<ParamEntity> GetByIdAsync(long id);
+    Task<string?> GetValueAsync(string key);
+    Task<bool> GetBooleanValueAsync(string key, bool defaultValue = false);
 }

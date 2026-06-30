@@ -8,6 +8,10 @@ namespace EasyAdmin.Web.Models;
 public class LoginRequest
 {
     /// <summary>
+    /// 租户编码
+    /// </summary>
+    public string? TenantCode { get; set; }
+    /// <summary>
     /// 账号（用户名 / 手机号 / 邮箱）
     /// </summary>
     public required string Account { get; set; }

@@ -8,6 +8,14 @@ namespace EasyAdmin.Application.Dtos;
 public class UserDto : TenantDtoBase
 {
     /// <summary>
+    /// 租户编码
+    /// </summary>
+    public virtual string? TenantCode { get; set; }
+    /// <summary>
+    /// 租户名称
+    /// </summary>
+    public virtual string? TenantName { get; set; }
+    /// <summary>
     /// 用户名称
     /// </summary>
     public virtual string UserName { get; set; }
