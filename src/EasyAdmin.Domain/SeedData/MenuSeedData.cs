@@ -73,9 +73,8 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Id = 10000003, PId = 10000000, Sort = 3, Icon = "SearchOutlined", Title = "百度搜索", Path = "/link/baidu", OutLink = "https://www.baidu.com", OutLinkOpenType = OutLinkOpenType.Inline, State = CommonState.Enable },
 
             new MenuEntity{ Id = 11000000, PId = 0, Sort = 12, Icon = "ToolOutlined", Title = "工具", Path = "/tool", State = CommonState.Enable },
-            new MenuEntity{ Id = 11000001, PId = 11000000, Sort = 1, Icon = "KeyOutlined", Title = "加解密", Path = "/tool/crypto", State = CommonState.Enable },
-            new MenuEntity{ Id = 11000002, PId = 11000000, Sort = 2, Icon = "CodeOutlined", Title = "代码生成", Path = "/tool/codeGen", State = CommonState.Enable },
-            new MenuEntity{ Id = 11000003, PId = 11000000, Sort = 3, Icon = "GiftOutlined", Title = "百宝箱", Path = "/tool/commonTools", State = CommonState.Enable },
+            new MenuEntity{ Id = 11000002, PId = 11000000, Sort = 1, Icon = "CodeOutlined", Title = "代码生成", Path = "/tool/codeGen", State = CommonState.Enable },
+            new MenuEntity{ Id = 11000003, PId = 11000000, Sort = 2, Icon = "GiftOutlined", Title = "百宝箱", Path = "/tool/commonTools", State = CommonState.Enable },
 
             new MenuEntity{ Id = 12000000, PId = 0, Sort = 13, Icon = "ProfileOutlined", Title = "日志管理", Path = "/log", State = CommonState.Enable },
             new MenuEntity{ Id = 12000001, PId = 12000000, Sort = 1, Icon = "AppstoreOutlined", Title = "登录日志", Path = "/log/loginLog", State = CommonState.Enable },
