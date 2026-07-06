@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using Sean.Core.DbRepository;
 using Sean.Core.DbRepository.Extensions;
 using Sean.Core.DbRepository.Util;
+using System.IO.Compression;
+using System.Text;
 
 namespace EasyAdmin.Application.Services;
 
@@ -26,6 +28,7 @@ public class NoteService(
     INoteTagRelationRepository noteTagRelationRepository,
     INoteTagService noteTagService,
     INotePasswordService notePasswordService,
+    INoteMarkdownService noteMarkdownService,
     IFileService fileService,
     IFileStorageFactory fileStorageFactory
     ) : INoteService
@@ -62,6 +65,7 @@ public class NoteService(
         foreach (var dto in dtos)
         {
             dto.ContentHtml = null;
+            dto.ContentMarkdown = null;
             if (dto.IsProtected)
             {
                 dto.Summary = null;
@@ -94,14 +98,17 @@ public class NoteService(
 
     public async Task<bool> AddAsync(NoteUpdateDto dto)
     {
+        var content = BuildContent(dto);
+        await ValidateImageIdsAsync(content.ImageIds);
         var result = await noteRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
             var now = DateTime.Now;
             var entity = mapper.Map<NoteEntity>(dto);
             entity.UserId = TenantContextHolder.UserId;
             entity.CategoryId = await NormalizeCategoryIdAsync(dto.CategoryId);
-            entity.ContentHtml = NoteContentHelper.SanitizeHtml(dto.ContentHtml);
-            entity.ContentText = NoteContentHelper.ExtractText(entity.ContentHtml);
+            entity.ContentMarkdown = content.ContentMarkdown;
+            entity.ContentHtml = content.ContentHtml;
+            entity.ContentText = NoteContentHelper.ExtractText(content.ContentHtml);
             entity.Summary = NoteContentHelper.CreateSummary(entity.ContentText);
             await noteRepository.AddAsync(entity, transaction: transaction);
             await SaveTagsAsync(entity.Id, dto.Tags, transaction);
@@ -119,25 +126,30 @@ public class NoteService(
             return false;
         }
 
-        var oldImageIds = NoteContentHelper.ExtractImageFileIds(note.ContentHtml);
-        var nextContentHtml = NoteContentHelper.SanitizeHtml(dto.ContentHtml);
-        var nextImageIds = NoteContentHelper.ExtractImageFileIds(nextContentHtml);
+        if (note.ContentType != dto.ContentType)
+        {
+            throw new ExplicitException("笔记正文格式不能修改");
+        }
+        var oldImageIds = GetImageIds(note);
+        var content = BuildContent(dto);
+        await ValidateImageIdsAsync(content.ImageIds);
         var result = await noteRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
             var entity = mapper.Map<NoteEntity>(dto);
             entity.CategoryId = await NormalizeCategoryIdAsync(dto.CategoryId);
-            entity.ContentHtml = nextContentHtml;
+            entity.ContentMarkdown = content.ContentMarkdown;
+            entity.ContentHtml = content.ContentHtml;
             entity.ContentText = NoteContentHelper.ExtractText(entity.ContentHtml);
             entity.Summary = NoteContentHelper.CreateSummary(entity.ContentText);
             await noteRepository.UpdateAsync(entity,
-                update => new { update.CategoryId, update.Title, update.ContentHtml, update.ContentText, update.Summary, update.IsTop, update.IsProtected },
+                update => new { update.CategoryId, update.Title, update.ContentType, update.ContentMarkdown, update.ContentHtml, update.ContentText, update.Summary, update.IsTop, update.IsProtected },
                 noteEntity => noteEntity.Id == dto.Id && noteEntity.UserId == TenantContextHolder.UserId && noteEntity.TenantId == TenantContextHolder.TenantId,
                 transaction);
             await SaveTagsAsync(dto.Id, dto.Tags, transaction);
             return true;
         });
         await RefreshTagUseCountAsync();
-        await DeleteUnusedNoteImagesAsync(oldImageIds.Except(nextImageIds));
+        await DeleteUnusedNoteImagesAsync(oldImageIds.Except(content.ImageIds));
         await noteTagService.DeleteUnusedAsync();
         return result;
     }
@@ -145,7 +157,7 @@ public class NoteService(
     public async Task<bool> DeleteByIdAsync(long id)
     {
         var note = await GetCurrentUserNoteAsync(id);
-        var imageIds = NoteContentHelper.ExtractImageFileIds(note?.ContentHtml);
+        var imageIds = note == null ? new List<long>() : GetImageIds(note);
         var result = await noteRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
             await noteTagRelationRepository.DeleteAsync(entity => entity.NoteId == id && entity.TenantId == TenantContextHolder.TenantId, transaction);
@@ -170,7 +182,7 @@ public class NoteService(
             entity.UserId == TenantContextHolder.UserId &&
             entity.TenantId == TenantContextHolder.TenantId &&
             !entity.IsDelete))?.ToList() ?? new List<NoteEntity>();
-        var imageIds = notes.SelectMany(entity => NoteContentHelper.ExtractImageFileIds(entity.ContentHtml)).Distinct().ToList();
+        var imageIds = notes.SelectMany(GetImageIds).Distinct().ToList();
         var result = await noteRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
             await noteTagRelationRepository.DeleteAsync(entity => ids.Contains(entity.NoteId) && entity.TenantId == TenantContextHolder.TenantId, transaction);
@@ -389,7 +401,7 @@ public class NoteService(
             entity.TenantId == TenantContextHolder.TenantId &&
             !entity.IsDelete))?.ToList() ?? new List<NoteEntity>();
         var referencedIds = activeNotes
-            .SelectMany(entity => NoteContentHelper.ExtractImageFileIds(entity.ContentHtml))
+            .SelectMany(GetImageIds)
             .Distinct()
             .ToHashSet();
 
@@ -405,7 +417,7 @@ public class NoteService(
             entity.UserId == TenantContextHolder.UserId &&
             entity.TenantId == TenantContextHolder.TenantId &&
             !entity.IsDelete))?.ToList() ?? new List<NoteEntity>();
-        return activeNotes.Any(entity => NoteContentHelper.ExtractImageFileIds(entity.ContentHtml).Contains(id));
+        return activeNotes.Any(entity => GetImageIds(entity).Contains(id));
     }
 
     private async Task<bool> DeleteNoteImageFileAsync(long id)
@@ -433,4 +445,197 @@ public class NoteService(
         }
         return await fileService.DeleteByIdAsync(id);
     }
+
+    public async Task<(byte[] Content, string ContentType, string FileName)> ExportMarkdownAsync(long id, string? unlockToken, bool includeImages)
+    {
+        var note = await GetDetailAsync(id, unlockToken);
+        if (note == null || note.ContentType != NoteContentType.Markdown)
+        {
+            throw new ExplicitException("仅Markdown笔记支持此导出");
+        }
+        var title = NormalizeFileName(note.Title);
+        var markdown = note.ContentMarkdown ?? string.Empty;
+        if (!includeImages)
+        {
+            return (new UTF8Encoding(false).GetBytes(markdown), "text/markdown; charset=utf-8", $"{title}.md");
+        }
+
+        var replacements = new Dictionary<long, string>();
+        using var output = new MemoryStream();
+        using (var archive = new ZipArchive(output, ZipArchiveMode.Create, true, Encoding.UTF8))
+        {
+            foreach (var idValue in noteMarkdownService.ExtractImageFileIds(markdown))
+            {
+                var file = await fileService.GetByIdAsync(idValue);
+                if (file == null || file.BizType != FileBizType.NoteImage || file.TenantId != TenantContextHolder.TenantId || file.CreateUserId != TenantContextHolder.UserId)
+                {
+                    throw new ExplicitException("笔记包含无权访问的图片");
+                }
+                var extension = Path.GetExtension(file.Name).ToLowerInvariant();
+                var entryName = $"images/image-{idValue}{extension}";
+                replacements[idValue] = entryName;
+                var entry = archive.CreateEntry(entryName, CompressionLevel.Fastest);
+                await using var source = await fileStorageFactory.GetFileStorage(file.StoreType).DownloadAsync(file.Path);
+                await using var target = entry.Open();
+                await source.CopyToAsync(target);
+            }
+            var markdownEntry = archive.CreateEntry($"{title}.md", CompressionLevel.Fastest);
+            await using var writer = new StreamWriter(markdownEntry.Open(), new UTF8Encoding(false));
+            await writer.WriteAsync(noteMarkdownService.RewriteImageReferences(markdown, replacements));
+        }
+        return (output.ToArray(), "application/zip", $"{title}.zip");
+    }
+
+    public async Task<(byte[] Content, string ContentType, string FileName)> BatchExportMarkdownAsync(
+        IEnumerable<long> ids,
+        string? unlockToken,
+        bool includeImages)
+    {
+        var files = new List<(byte[] Content, string FileName)>();
+        foreach (var id in ids.Distinct())
+        {
+            var file = await ExportMarkdownAsync(id, unlockToken, includeImages);
+            files.Add((file.Content, file.FileName));
+        }
+        return (NoteBatchMarkdownArchiveHelper.Build(files, includeImages), "application/zip", "我的笔记.zip");
+    }
+
+    public async Task<NoteMarkdownImportDto> ImportMarkdownPackageAsync(Stream stream, string fileName)
+    {
+        if (stream.Length > 20 * 1024 * 1024)
+        {
+            throw new ExplicitException("Markdown资源包不能超过20MB");
+        }
+        var uploadedIds = new List<long>();
+        try
+        {
+            using var archive = new ZipArchive(stream, ZipArchiveMode.Read, true, Encoding.UTF8);
+            if (archive.Entries.Count > 100 || archive.Entries.Any(entry =>
+                !NoteMarkdownPackageHelper.IsSafeEntryPath(entry.FullName) || ((entry.ExternalAttributes >> 16) & 0xF000) == 0xA000))
+            {
+                throw new ExplicitException("Markdown资源包包含非法路径或文件过多");
+            }
+            if (archive.Entries.Sum(entry => entry.Length) > 100L * 1024 * 1024)
+            {
+                throw new ExplicitException("Markdown资源包解压后内容过大");
+            }
+            var markdownEntries = archive.Entries.Where(entry => !entry.FullName.Contains('/') && entry.Name.EndsWith(".md", StringComparison.OrdinalIgnoreCase)).ToList();
+            if (markdownEntries.Count != 1 || markdownEntries[0].Length > 1024 * 1024)
+            {
+                throw new ExplicitException("资源包根目录必须包含一个不超过1MB的Markdown文件");
+            }
+            string markdown;
+            await using (var markdownStream = markdownEntries[0].Open())
+            using (var reader = new StreamReader(markdownStream, new UTF8Encoding(false, true), true))
+            {
+                markdown = await reader.ReadToEndAsync();
+            }
+            var entries = archive.Entries.ToDictionary(entry => entry.FullName.Replace('\\', '/'), StringComparer.OrdinalIgnoreCase);
+            var replacements = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+            foreach (var imagePath in NoteMarkdownPackageHelper.ExtractRelativeImagePaths(markdown))
+            {
+                if (!entries.TryGetValue(imagePath, out var imageEntry)) continue;
+                var extension = Path.GetExtension(imageEntry.Name).ToLowerInvariant();
+                if (!new[] { ".png", ".jpg", ".jpeg", ".gif", ".webp" }.Contains(extension) || imageEntry.Length > 10 * 1024 * 1024)
+                {
+                    throw new ExplicitException("资源包包含不支持的图片");
+                }
+                var storagePath = $"UploadFiles/{TenantContextHolder.TenantId}/{TenantContextHolder.UserId}/{Guid.NewGuid():N}{extension}";
+                await using var imageStream = imageEntry.Open();
+                using var imageContent = new MemoryStream();
+                await imageStream.CopyToAsync(imageContent);
+                if (!NoteMarkdownPackageHelper.IsSupportedImageContent(extension, imageContent.ToArray()))
+                {
+                    throw new ExplicitException("资源包图片内容与扩展名不匹配");
+                }
+                imageContent.Position = 0;
+                var storage = fileStorageFactory.GetFileStorage(FileStoreType.LocalFile);
+                var savedPath = await storage.UploadAsync(imageContent, storagePath);
+                var imageId = await fileService.AddAndReturnIdAsync(new FileDto
+                {
+                    Name = imageEntry.Name,
+                    Path = savedPath,
+                    Size = imageEntry.Length,
+                    ContentType = GetImageContentType(extension),
+                    StoreType = FileStoreType.LocalFile,
+                    BizType = FileBizType.NoteImage,
+                    Description = "Markdown资源包图片"
+                });
+                if (imageId < 1)
+                {
+                    await storage.DeleteAsync(savedPath);
+                    throw new ExplicitException("保存资源包图片失败");
+                }
+                uploadedIds.Add(imageId);
+                replacements[imagePath] = imageId;
+            }
+            return new NoteMarkdownImportDto
+            {
+                Title = Path.GetFileNameWithoutExtension(markdownEntries[0].Name),
+                ContentMarkdown = NoteMarkdownPackageHelper.RewriteRelativeImages(markdown, replacements),
+                UploadedImageIds = uploadedIds
+            };
+        }
+        catch
+        {
+            foreach (var uploadedId in uploadedIds) await DeleteNoteImageFileAsync(uploadedId);
+            throw;
+        }
+    }
+
+    private NoteContentResult BuildContent(NoteUpdateDto dto)
+    {
+        if (!Enum.IsDefined(dto.ContentType))
+        {
+            throw new ExplicitException("不支持的笔记正文格式");
+        }
+        if (dto.ContentType == NoteContentType.Markdown)
+        {
+            var markdown = dto.ContentMarkdown ?? string.Empty;
+            if (markdown.Length > 1_000_000)
+            {
+                throw new ExplicitException("Markdown正文过长");
+            }
+            return new NoteContentResult(markdown, noteMarkdownService.Render(markdown), noteMarkdownService.ExtractImageFileIds(markdown));
+        }
+        var html = NoteContentHelper.SanitizeHtml(dto.ContentHtml);
+        return new NoteContentResult(null, html, NoteContentHelper.ExtractImageFileIds(html));
+    }
+
+    private List<long> GetImageIds(NoteEntity note)
+    {
+        return note.ContentType == NoteContentType.Markdown
+            ? noteMarkdownService.ExtractImageFileIds(note.ContentMarkdown).ToList()
+            : NoteContentHelper.ExtractImageFileIds(note.ContentHtml);
+    }
+
+    private async Task ValidateImageIdsAsync(IEnumerable<long> imageIds)
+    {
+        foreach (var id in imageIds.Distinct())
+        {
+            var file = await fileService.GetByIdAsync(id);
+            if (file == null || file.Id < 1 || file.BizType != FileBizType.NoteImage ||
+                file.TenantId != TenantContextHolder.TenantId || file.CreateUserId != TenantContextHolder.UserId)
+            {
+                throw new ExplicitException("笔记包含无权访问的图片");
+            }
+        }
+    }
+
+    private sealed record NoteContentResult(string? ContentMarkdown, string ContentHtml, IReadOnlyList<long> ImageIds);
+
+    private static string NormalizeFileName(string fileName)
+    {
+        var value = string.IsNullOrWhiteSpace(fileName) ? "我的笔记" : fileName.Trim();
+        foreach (var invalidChar in Path.GetInvalidFileNameChars()) value = value.Replace(invalidChar, '_');
+        return value;
+    }
+
+    private static string GetImageContentType(string extension) => extension switch
+    {
+        ".png" => "image/png",
+        ".gif" => "image/gif",
+        ".webp" => "image/webp",
+        _ => "image/jpeg"
+    };
 }

@@ -1,3 +1,4 @@
+using EasyAdmin.Infrastructure.Enums;
 using Sean.Core.DbRepository;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -24,6 +25,15 @@ public class NoteEntity : TenantEntityBase
     [Required]
     [MaxLength(200)]
     public virtual string Title { get; set; }
+    /// <summary>
+    /// 正文格式
+    /// </summary>
+    [DefaultValue(NoteContentType.RichText)]
+    public virtual NoteContentType ContentType { get; set; }
+    /// <summary>
+    /// Markdown正文
+    /// </summary>
+    public virtual string? ContentMarkdown { get; set; }
     /// <summary>
     /// 富文本内容
     /// </summary>

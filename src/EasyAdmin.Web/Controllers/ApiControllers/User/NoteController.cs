@@ -139,6 +139,16 @@ public class NoteController(
     [HttpPost]
     public async Task<IActionResult> BatchExport(NoteBatchExportReqDto request)
     {
+        var exportType = request.ExportType.Trim().ToLowerInvariant();
+        if (exportType is "markdown" or "markdownpackage")
+        {
+            var markdownFile = await noteService.BatchExportMarkdownAsync(
+                request.Ids,
+                request.UnlockToken,
+                exportType == "markdownpackage");
+            return File(markdownFile.Content, markdownFile.ContentType, markdownFile.FileName);
+        }
+
         var notes = new List<NoteDto>();
         foreach (var id in request.Ids.Distinct())
         {
@@ -156,5 +166,39 @@ public class NoteController(
 
         var file = await noteExportService.BatchExportAsync(notes, request.ExportType);
         return File(file.Content, file.ContentType, file.FileName);
+    }
+
+    /// <summary>
+    /// 导出Markdown
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> ExportMarkdown(NoteMarkdownExportReqDto request)
+    {
+        var file = await noteService.ExportMarkdownAsync(request.Id, request.UnlockToken, false);
+        return File(file.Content, file.ContentType, file.FileName);
+    }
+
+    /// <summary>
+    /// 导出Markdown资源包
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> ExportMarkdownPackage(NoteMarkdownExportReqDto request)
+    {
+        var file = await noteService.ExportMarkdownAsync(request.Id, request.UnlockToken, true);
+        return File(file.Content, file.ContentType, file.FileName);
+    }
+
+    /// <summary>
+    /// 导入Markdown资源包
+    /// </summary>
+    [HttpPost]
+    public async Task<ApiResult<NoteMarkdownImportDto>> ImportMarkdownPackage(IFormFile? file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return Fail<NoteMarkdownImportDto>("请选择Markdown资源包");
+        }
+        await using var stream = file.OpenReadStream();
+        return Success(await noteService.ImportMarkdownPackageAsync(stream, file.FileName));
     }
 }

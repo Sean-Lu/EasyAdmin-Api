@@ -1,3 +1,4 @@
+using EasyAdmin.Infrastructure.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace EasyAdmin.Application.Dtos;
@@ -21,6 +22,14 @@ public class NoteDto : TenantDtoBase
     [Required]
     [MaxLength(200)]
     public string Title { get; set; }
+    /// <summary>
+    /// 正文格式
+    /// </summary>
+    public NoteContentType ContentType { get; set; }
+    /// <summary>
+    /// Markdown正文
+    /// </summary>
+    public string? ContentMarkdown { get; set; }
     /// <summary>
     /// 富文本内容
     /// </summary>
@@ -102,6 +111,14 @@ public class NoteUpdateDto : DtoIdBase
     [MaxLength(200)]
     public string Title { get; set; }
     /// <summary>
+    /// 正文格式
+    /// </summary>
+    public NoteContentType ContentType { get; set; }
+    /// <summary>
+    /// Markdown正文
+    /// </summary>
+    public string? ContentMarkdown { get; set; }
+    /// <summary>
     /// 富文本内容
     /// </summary>
     public string? ContentHtml { get; set; }
@@ -132,6 +149,21 @@ public class NoteExportReqDto
     /// 导出类型
     /// </summary>
     public string ExportType { get; set; }
+    /// <summary>
+    /// 解锁令牌
+    /// </summary>
+    public string? UnlockToken { get; set; }
+}
+
+/// <summary>
+/// Markdown导出请求DTO
+/// </summary>
+public class NoteMarkdownExportReqDto
+{
+    /// <summary>
+    /// 笔记ID
+    /// </summary>
+    public long Id { get; set; }
     /// <summary>
     /// 解锁令牌
     /// </summary>

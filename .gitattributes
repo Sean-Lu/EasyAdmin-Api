@@ -3,6 +3,13 @@
 ###############################################################################
 * text=auto
 
+# Keep .NET source and project files consistent with the repository's Windows convention.
+*.cs      text eol=crlf
+*.csproj  text eol=crlf
+*.sln     text eol=crlf
+*.props   text eol=crlf
+*.targets text eol=crlf
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #

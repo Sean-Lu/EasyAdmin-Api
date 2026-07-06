@@ -230,3 +230,18 @@ public enum LoginType
     /// </summary>
     EmailCode = 3
 }
+
+/// <summary>
+/// 笔记正文格式
+/// </summary>
+public enum NoteContentType
+{
+    /// <summary>
+    /// 富文本
+    /// </summary>
+    RichText = 0,
+    /// <summary>
+    /// Markdown
+    /// </summary>
+    Markdown = 1
+}

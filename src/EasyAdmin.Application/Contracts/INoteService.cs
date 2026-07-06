@@ -15,4 +15,7 @@ public interface INoteService
     Task<bool> UpdateTopAsync(long id, bool isTop);
     Task<bool> MoveCategoryAsync(long id, long categoryId);
     Task<bool> MoveCategoryAsync(List<long> ids, long categoryId);
+    Task<(byte[] Content, string ContentType, string FileName)> ExportMarkdownAsync(long id, string? unlockToken, bool includeImages);
+    Task<(byte[] Content, string ContentType, string FileName)> BatchExportMarkdownAsync(IEnumerable<long> ids, string? unlockToken, bool includeImages);
+    Task<NoteMarkdownImportDto> ImportMarkdownPackageAsync(Stream stream, string fileName);
 }
