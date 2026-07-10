@@ -111,7 +111,7 @@ public static class ServiceCollectionExtensions
                     var instance = Activator.CreateInstance(seedDataType);
                     var interfaceType = seedDataType.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntitySeedData<>));
                     var entityType = interfaceType.GenericTypeArguments[0];
-                    var method = typeof(IEntitySeedData<>).MakeGenericType(entityType).GetMethod(nameof(IEntitySeedData<UserEntity>.SeedData));
+                    var method = typeof(IEntitySeedData<>).MakeGenericType(entityType).GetMethod("SeedData");
                     var seedData = method.Invoke(instance, null) as IEnumerable<EntityBase>;
                     foreach (var data in seedData)
                     {
@@ -122,18 +122,30 @@ public static class ServiceCollectionExtensions
                         data.CreateTime ??= DateTime.Now;
                     }
 
-                    var sqlBuilderType = typeof(InsertableSqlBuilder<>);
-                    var constructedType = sqlBuilderType.MakeGenericType(entityType);
-                    var createMethod = constructedType.GetMethod(nameof(InsertableSqlBuilder<UserEntity>.Create), new[] { typeof(DatabaseType) });
-                    var sqlBuilderInstance = createMethod.Invoke(null, new object[] { db.DbType });
-                    var setParameterMethod = constructedType.GetMethod(nameof(InsertableSqlBuilder<UserEntity>.SetParameter));
-                    var sqlBuilderWithParameter = setParameterMethod.Invoke(sqlBuilderInstance, new object[] { seedData });
-                    var buildMethod = constructedType.GetMethod(nameof(InsertableSqlBuilder<UserEntity>.Build));
-                    var sqlCommand = buildMethod.Invoke(sqlBuilderWithParameter, null) as ISqlCommand;
-
-                    db.ExecuteNonQuery(sqlCommand);
+                    var insertMethod = typeof(ServiceCollectionExtensions)
+                        .GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+                        .First(m => m.Name == nameof(InsertSeedDataBatch));
+                    var genericInsertMethod = insertMethod.MakeGenericMethod(entityType);
+                    genericInsertMethod.Invoke(null, new object[] { db, seedData });
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// 分批插入种子数据，避免超出数据库参数上限（如 SQLite 默认 999）
+    /// </summary>
+    private static void InsertSeedDataBatch<T>(DbFactory db, IEnumerable<EntityBase> seedData) where T : EntityBase
+    {
+        var dataList = seedData.ToList();
+        const int batchSize = 100;
+        for (var i = 0; i < dataList.Count; i += batchSize)
+        {
+            var batch = dataList.Skip(i).Take(batchSize).Cast<T>().ToList();
+            var sqlBuilderInstance = InsertableSqlBuilder<T>.Create(db.DbType);
+            var sqlBuilderWithParameter = sqlBuilderInstance.SetParameter(batch);
+            var sqlCommand = sqlBuilderWithParameter.Build();
+            db.ExecuteNonQuery(sqlCommand);
         }
     }
 }
