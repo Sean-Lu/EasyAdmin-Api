@@ -70,7 +70,12 @@ public class TenantController(
     [HttpPost]
     public async Task<ApiResult<bool>> Update(TenantUpdateDto data)
     {
-        return Success(await tenantService.UpdateAsync(data));
+        var result = await tenantService.UpdateAsync(data);
+        if (result)
+        {
+            await accountAccessService.InvalidateTenantAsync(data.Id);
+        }
+        return Success(result);
     }
 
     /// <summary>

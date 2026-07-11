@@ -88,7 +88,7 @@ public class AuthController(
         var tenant = tenantEnabled
             ? await tenantService.GetEnabledByCodeAsync(tenantSelection.TenantCode)
             : await tenantService.GetByIdAsync(SysConst.DefaultTenantId);
-        if (tenant == null || tenant.Id < 1 || tenant.State == CommonState.Disable)
+        if (tenant == null || tenant.Id < 1 || !TenantAccessPolicy.IsTenantValid(tenant.State, tenant.StartTime, tenant.ExpireTime, DateTime.UtcNow))
         {
             return Fail<LoginResponse>("租户、账号或密码错误！");
         }

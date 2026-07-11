@@ -31,6 +31,14 @@ public class TenantEntity : EntityBase
     [Required]
     public virtual long AdminUserId { get; set; }
     /// <summary>
+    /// 生效时间
+    /// </summary>
+    public virtual DateTime? StartTime { get; set; }
+    /// <summary>
+    /// 到期时间
+    /// </summary>
+    public virtual DateTime? ExpireTime { get; set; }
+    /// <summary>
     /// 租管账号名称
     /// </summary>
     [NotMapped]

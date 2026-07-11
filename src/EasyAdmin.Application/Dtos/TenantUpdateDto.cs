@@ -5,6 +5,8 @@ namespace EasyAdmin.Application.Dtos;
 public class TenantUpdateDto : DtoIdBase
 {
     public string Name { get; set; }
+    public DateTime? StartTime { get; set; }
+    public DateTime? ExpireTime { get; set; }
     public CommonState State { get; set; }
     public string? Remark { get; set; }
 }

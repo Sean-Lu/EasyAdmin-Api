@@ -1,6 +1,7 @@
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
+using EasyAdmin.Application.Services;
 using EasyAdmin.Web.Contracts;
 using Sean.Core.Redis;
 
@@ -31,8 +32,13 @@ public class AccountAccessService(
             return cached.Allowed;
 
         var tenant = await tenantRepository.GetAsync(entity => entity.Id == tenantId && !entity.IsDelete);
-        var allowed = tenant?.State == CommonState.Enable;
-        await RedisHelper.StringSetAsync(key, new AccessStatusCache { Allowed = allowed }, CacheDuration);
+        var now = DateTime.UtcNow;
+        var allowed = tenant != null && TenantAccessPolicy.IsTenantValid(tenant.State, tenant.StartTime, tenant.ExpireTime, now);
+        var nextBoundary = tenant == null || tenant.StartTime > now
+            ? tenant?.StartTime
+            : tenant?.ExpireTime;
+        var cacheDuration = TenantAccessPolicy.GetCacheDuration(now, nextBoundary);
+        await RedisHelper.StringSetAsync(key, new AccessStatusCache { Allowed = allowed }, cacheDuration);
         return allowed;
     }
 

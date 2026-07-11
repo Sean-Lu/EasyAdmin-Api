@@ -26,6 +26,7 @@ public class TenantService(
 {
     public async Task<bool> AddAsync(TenantDto dto)
     {
+        TenantValidityValidator.Validate(dto.StartTime, dto.ExpireTime);
         dto.Code = dto.Code?.Trim();
         if (string.IsNullOrEmpty(dto.Code) || dto.Code.Length > TenantLoginPolicy.MaxTenantCodeLength)
         {
@@ -113,6 +114,7 @@ public class TenantService(
 
     public async Task<bool> UpdateAsync(TenantUpdateDto dto)
     {
+        TenantValidityValidator.Validate(dto.StartTime, dto.ExpireTime);
         return await tenantRepository.UpdateByDtoAsync(dto, mapper.Map<TenantEntity>) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
