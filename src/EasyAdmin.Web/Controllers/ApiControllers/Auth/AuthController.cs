@@ -27,7 +27,8 @@ public class AuthController(
     ICaptchaService captchaService,
     IParamService paramService,
     ITenantService tenantService,
-    IAccountAccessService accountAccessService
+    IAccountAccessService accountAccessService,
+    AuthPasswordVerifier authPasswordVerifier
     ) : BaseApiController
 {
     /// <summary>
@@ -225,6 +226,15 @@ public class AuthController(
         }
 
         return Success<object>("登出成功！");
+    }
+
+    /// <summary>
+    /// 验证当前密码
+    /// </summary>
+    [HttpPost]
+    public async Task<ApiResult<bool>> VerifyPassword(VerifyPasswordRequest request)
+    {
+        return Success(await authPasswordVerifier.VerifyAsync(UserId, request.Password, HttpContext.GetClientIp()));
     }
 
     /// <summary>

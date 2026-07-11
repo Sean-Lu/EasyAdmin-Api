@@ -158,6 +158,7 @@ builder.Services.AddQuartzHostedService(options =>
 builder.Services.AddScoped<EasyAdmin.Application.Services.QuartzSchedulerService>();
 
 builder.Services.AddApplicationDI();
+builder.Services.AddScoped<EasyAdmin.Application.Services.AuthPasswordVerifier>();
 
 // 注册定时任务管理服务
 builder.Services.AddHostedService<ScheduleJobHostService>();
