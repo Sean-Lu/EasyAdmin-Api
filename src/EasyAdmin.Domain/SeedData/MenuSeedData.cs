@@ -80,6 +80,9 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Id = 12000000, PId = 0, Sort = 13, Icon = "ProfileOutlined", Title = "日志管理", Path = "/log", State = CommonState.Enable },
             new MenuEntity{ Id = 12000001, PId = 12000000, Sort = 1, Icon = "AppstoreOutlined", Title = "登录日志", Path = "/log/loginLog", State = CommonState.Enable },
             new MenuEntity{ Id = 12000002, PId = 12000000, Sort = 2, Icon = "AppstoreOutlined", Title = "操作日志", Path = "/log/operateLog", State = CommonState.Enable },
+
+            new MenuEntity{ Id = 13000000, PId = 0, Sort = 14, Icon = "MonitorOutlined", Title = "运行监控", Path = "/monitor", State = CommonState.Enable },
+            new MenuEntity{ Id = 13000001, PId = 13000000, Sort = 1, Icon = "DashboardOutlined", Title = "服务器监控", Path = "/monitor/server", State = CommonState.Enable },
         };
     }
 }
