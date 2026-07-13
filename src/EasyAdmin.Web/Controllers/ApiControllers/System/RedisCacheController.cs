@@ -20,9 +20,9 @@ public class RedisCacheController(
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ApiResult<RedisServerInfoDto>> ServerInfo()
+    public async Task<ApiResult<RedisServerInfoDto>> ServerInfo([FromQuery] int database = 0)
     {
-        return Success(await redisCacheService.GetServerInfoAsync());
+        return Success(await redisCacheService.GetServerInfoAsync(database));
     }
 
     /// <summary>
@@ -42,9 +42,9 @@ public class RedisCacheController(
     /// <param name="key"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ApiResult<RedisCacheDetailDto>> Detail(string key)
+    public async Task<ApiResult<RedisCacheDetailDto>> Detail(string key, [FromQuery] int database = 0)
     {
-        var detail = await redisCacheService.GetDetailAsync(key);
+        var detail = await redisCacheService.GetDetailAsync(key, database);
         return detail == null ? Fail<RedisCacheDetailDto>("缓存Key不存在") : Success(detail);
     }
 
@@ -57,9 +57,10 @@ public class RedisCacheController(
     public async Task<ApiResult<bool>> Delete([FromBody] JObject? data)
     {
         var key = data?["key"]?.Value<string>();
+        var database = data?["database"]?.Value<int>() ?? 0;
         if (string.IsNullOrWhiteSpace(key)) throw new ExplicitException("缓存Key不能为空");
 
-        var result = await redisCacheService.DeleteAsync(key);
+        var result = await redisCacheService.DeleteAsync(key, database);
         logger.LogWarning("删除Redis缓存，用户ID：{UserId}，Key：{Key}，结果：{Result}", UserId, key, result);
         return Success(result);
     }
@@ -73,9 +74,10 @@ public class RedisCacheController(
     public async Task<ApiResult<long>> DeleteByPattern([FromBody] JObject? data)
     {
         var pattern = data?["pattern"]?.Value<string>();
+        var database = data?["database"]?.Value<int>() ?? 0;
         if (string.IsNullOrWhiteSpace(pattern)) throw new ExplicitException("缓存匹配模式不能为空");
 
-        var result = await redisCacheService.DeleteByPatternAsync(pattern);
+        var result = await redisCacheService.DeleteByPatternAsync(pattern, database);
         logger.LogWarning("批量删除Redis缓存，用户ID：{UserId}，匹配模式：{Pattern}，数量：{Count}", UserId, pattern, result);
         return Success(result);
     }
@@ -85,9 +87,10 @@ public class RedisCacheController(
     /// </summary>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ApiResult<bool>> ClearDatabase()
+    public async Task<ApiResult<bool>> ClearDatabase([FromBody] JObject? data)
     {
-        await redisCacheService.ClearDatabaseAsync();
+        var database = data?["database"]?.Value<int>() ?? 0;
+        await redisCacheService.ClearDatabaseAsync(database);
         logger.LogWarning("清空Redis当前数据库，用户ID：{UserId}", UserId);
         return Success(true);
     }

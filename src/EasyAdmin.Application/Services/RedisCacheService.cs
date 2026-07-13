@@ -3,6 +3,7 @@ using EasyAdmin.Application.Dtos;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Sean.Core.Redis;
+using EasyAdmin.Infrastructure.Wrapper;
 using StackExchange.Redis;
 
 namespace EasyAdmin.Application.Services;
@@ -12,13 +13,14 @@ namespace EasyAdmin.Application.Services;
 /// </summary>
 public class RedisCacheService(IConfiguration configuration) : IRedisCacheService
 {
-    private const int DatabaseIndex = 0;
+    private const int DefaultDatabaseCount = 16;
     private const int MaxPageSize = 200;
 
-    public async Task<RedisServerInfoDto> GetServerInfoAsync()
+    public async Task<RedisServerInfoDto> GetServerInfoAsync(int database = 0)
     {
-        var keyCount = await RedisHelper.ExecuteAsync(database => database.ExecuteAsync("DBSIZE"), DatabaseIndex);
-        var memoryInfo = await RedisHelper.ExecuteAsync(database => database.ExecuteAsync("INFO", "memory"), DatabaseIndex);
+        var databaseIndex = ValidateDatabase(database);
+        var keyCount = await RedisHelper.ExecuteAsync(database => database.ExecuteAsync("DBSIZE"), databaseIndex);
+        var memoryInfo = await RedisHelper.ExecuteAsync(database => database.ExecuteAsync("INFO", "memory"), databaseIndex);
         var memory = memoryInfo.ToString().Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .FirstOrDefault(item => item.StartsWith("used_memory_human:", StringComparison.OrdinalIgnoreCase))?
             .Split(':', 2).ElementAtOrDefault(1)?.Trim();
@@ -27,7 +29,8 @@ public class RedisCacheService(IConfiguration configuration) : IRedisCacheServic
         {
             Connected = true,
             EndPoints = configuration["Redis:EndPoints"],
-            Database = DatabaseIndex,
+            Database = databaseIndex,
+            DatabaseCount = GetDatabaseCount(),
             KeyCount = (long)keyCount,
             UsedMemory = memory
         };
@@ -35,15 +38,16 @@ public class RedisCacheService(IConfiguration configuration) : IRedisCacheServic
 
     public async Task<ApiResultPageData<RedisCacheKeyDto>> PageKeysAsync(RedisCachePageReqDto request)
     {
+        var databaseIndex = ValidateDatabase(request.Database);
         var pageNumber = Math.Max(1, request.PageNumber);
         var pageSize = Math.Clamp(request.PageSize, 1, MaxPageSize);
-        var keys = await ScanKeysAsync(string.IsNullOrWhiteSpace(request.Pattern) ? "*" : request.Pattern.Trim());
+        var keys = SortKeys(await ScanKeysAsync(string.IsNullOrWhiteSpace(request.Pattern) ? "*" : request.Pattern.Trim(), databaseIndex));
         var pageKeys = keys.Skip((pageNumber - 1) * pageSize).Take(pageSize);
         var list = new List<RedisCacheKeyDto>();
 
         foreach (var key in pageKeys)
         {
-            list.Add(await GetKeyInfoAsync(key));
+            list.Add(await GetKeyInfoAsync(key, databaseIndex));
         }
 
         return new ApiResultPageData<RedisCacheKeyDto>
@@ -55,12 +59,22 @@ public class RedisCacheService(IConfiguration configuration) : IRedisCacheServic
         };
     }
 
-    public async Task<RedisCacheDetailDto?> GetDetailAsync(string key)
-    {
-        if (!await RedisHelper.KeyExistsAsync(key)) return null;
+    internal static List<string> SortKeys(IEnumerable<string> keys) =>
+        keys.Order(StringComparer.Ordinal).ToList();
 
-        var info = await GetKeyInfoAsync(key);
-        var value = await RedisHelper.ExecuteAsync(database => ReadValueAsync(database, key, info.Type), DatabaseIndex);
+    internal static int NormalizeDatabase(int database, int databaseCount)
+    {
+        if (database < 0 || database >= databaseCount) throw new ArgumentOutOfRangeException(nameof(database));
+        return database;
+    }
+
+    public async Task<RedisCacheDetailDto?> GetDetailAsync(string key, int database = 0)
+    {
+        var databaseIndex = ValidateDatabase(database);
+        if (!await RedisHelper.ExecuteAsync(db => db.KeyExistsAsync(key), databaseIndex)) return null;
+
+        var info = await GetKeyInfoAsync(key, databaseIndex);
+        var value = await RedisHelper.ExecuteAsync(db => ReadValueAsync(db, key, info.Type), databaseIndex);
         return new RedisCacheDetailDto
         {
             Key = info.Key,
@@ -70,29 +84,30 @@ public class RedisCacheService(IConfiguration configuration) : IRedisCacheServic
         };
     }
 
-    public Task<bool> DeleteAsync(string key)
+    public Task<bool> DeleteAsync(string key, int database = 0)
     {
-        return RedisHelper.KeyDeleteAsync(key);
+        return RedisHelper.ExecuteAsync(db => db.KeyDeleteAsync(key), ValidateDatabase(database));
     }
 
-    public async Task<long> DeleteByPatternAsync(string pattern)
+    public async Task<long> DeleteByPatternAsync(string pattern, int database = 0)
     {
-        var keys = await ScanKeysAsync(pattern);
-        return keys.Count == 0 ? 0 : await RedisHelper.KeyDeleteAsync(keys);
+        var databaseIndex = ValidateDatabase(database);
+        var keys = await ScanKeysAsync(pattern, databaseIndex);
+        return keys.Count == 0 ? 0 : await RedisHelper.ExecuteAsync(db => db.KeyDeleteAsync(keys.Select(key => (RedisKey)key).ToArray()), databaseIndex);
     }
 
-    public async Task ClearDatabaseAsync()
+    public async Task ClearDatabaseAsync(int database = 0)
     {
-        await RedisHelper.ExecuteAsync(database => database.ExecuteAsync("FLUSHDB"), DatabaseIndex);
+        await RedisHelper.ExecuteAsync(db => db.ExecuteAsync("FLUSHDB"), ValidateDatabase(database));
     }
 
-    private static async Task<List<string>> ScanKeysAsync(string pattern)
+    private async Task<List<string>> ScanKeysAsync(string pattern, int databaseIndex)
     {
         var keys = new List<string>();
         long cursor = 0;
         do
         {
-            var result = await RedisHelper.ExecuteAsync(database => database.ExecuteAsync("SCAN", cursor, "MATCH", pattern, "COUNT", 200), DatabaseIndex);
+            var result = await RedisHelper.ExecuteAsync(database => database.ExecuteAsync("SCAN", cursor, "MATCH", pattern, "COUNT", 200), databaseIndex);
             var parts = (RedisResult[])result;
             cursor = (long)parts[0];
             keys.AddRange(((RedisResult[])parts[1]).Select(item => (string)item));
@@ -101,16 +116,30 @@ public class RedisCacheService(IConfiguration configuration) : IRedisCacheServic
         return keys;
     }
 
-    private static async Task<RedisCacheKeyDto> GetKeyInfoAsync(string key)
+    private static async Task<RedisCacheKeyDto> GetKeyInfoAsync(string key, int databaseIndex)
     {
-        var type = await RedisHelper.ExecuteAsync(database => database.KeyTypeAsync(key), DatabaseIndex);
-        var ttl = await RedisHelper.KeyTimeToLiveAsync(key);
+        var type = await RedisHelper.ExecuteAsync(database => database.KeyTypeAsync(key), databaseIndex);
+        var ttl = await RedisHelper.ExecuteAsync(database => database.KeyTimeToLiveAsync(key), databaseIndex);
         return new RedisCacheKeyDto
         {
             Key = key,
             Type = type.ToString().ToLowerInvariant(),
             TtlSeconds = ttl.HasValue ? (long)ttl.Value.TotalSeconds : -1
         };
+    }
+
+    private int GetDatabaseCount() => Math.Max(1, configuration.GetValue("Redis:DatabaseCount", DefaultDatabaseCount));
+
+    private int ValidateDatabase(int database)
+    {
+        try
+        {
+            return NormalizeDatabase(database, GetDatabaseCount());
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            throw new ExplicitException($"Redis数据库索引必须在 0 到 {GetDatabaseCount() - 1} 之间");
+        }
     }
 
     private static async Task<string> ReadValueAsync(IDatabase database, string key, string type)

@@ -8,6 +8,11 @@ namespace EasyAdmin.Application.Dtos;
 /// </summary>
 public class RedisCachePageReqDto : PageRequestBase
 {
+	/// <summary>
+	/// Redis数据库索引
+	/// </summary>
+	public int Database { get; set; }
+
     /// <summary>
     /// Key匹配模式
     /// </summary>
@@ -66,6 +71,11 @@ public class RedisServerInfoDto
     /// 当前数据库
     /// </summary>
     public int Database { get; set; }
+
+    /// <summary>
+    /// Redis数据库数量
+    /// </summary>
+    public int DatabaseCount { get; set; }
 
     /// <summary>
     /// Key数量
