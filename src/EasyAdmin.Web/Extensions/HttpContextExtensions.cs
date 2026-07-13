@@ -9,7 +9,7 @@
         /// <returns></returns>
         public static string? GetClientIp(this HttpContext httpContext)
         {
-            return httpContext.Connection.RemoteIpAddress?.ToString();
+            return httpContext?.Connection.RemoteIpAddress?.ToString();
         }
     }
 }

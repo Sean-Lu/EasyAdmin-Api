@@ -45,6 +45,17 @@ public interface ITokenService
     /// <param name="userId">用户ID</param>
     Task RevokeAllUserTokensAsync(long userId);
     /// <summary>
+    /// 获取在线会话记录
+    /// </summary>
+    /// <param name="tenantId">租户ID</param>
+    Task<IReadOnlyList<OnlineUserSessionRecord>> GetOnlineSessionRecordsAsync(long tenantId);
+    /// <summary>
+    /// 强制撤销用户会话
+    /// </summary>
+    /// <param name="userId">用户ID</param>
+    /// <param name="reason">撤销原因</param>
+    Task RevokeUserSessionsAsync(long userId, string reason);
+    /// <summary>
     /// 检查令牌是否在黑名单中
     /// </summary>
     /// <param name="token">令牌</param>

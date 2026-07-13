@@ -83,6 +83,7 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
 
             new MenuEntity{ Id = 13000000, PId = 0, Sort = 14, Icon = "MonitorOutlined", Title = "运行监控", Path = "/monitor", State = CommonState.Enable },
             new MenuEntity{ Id = 13000001, PId = 13000000, Sort = 1, Icon = "DashboardOutlined", Title = "服务器监控", Path = "/monitor/server", State = CommonState.Enable },
+            new MenuEntity{ Id = 13000002, PId = 13000000, Sort = 2, Icon = "UserOutlined", Title = "在线用户", Path = "/monitor/onlineUsers", State = CommonState.Enable },
         };
     }
 }

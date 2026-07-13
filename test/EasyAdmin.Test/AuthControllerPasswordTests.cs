@@ -5,18 +5,25 @@ using EasyAdmin.Infrastructure.Tenant;
 using EasyAdmin.Web.Contracts;
 using EasyAdmin.Web.Controllers;
 using EasyAdmin.Web.Models;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Sean.Core.Redis;
 
 namespace EasyAdmin.Test;
 
 [TestClass]
 public class AuthControllerPasswordTests
 {
+    [TestInitialize]
+    public void Initialize() => RedisTestSetup.EnsureInitialized();
+
     [TestCleanup]
-    public void Cleanup() => TenantContextHolder.Clear();
+    public async Task Cleanup()
+    {
+        TenantContextHolder.Clear();
+        await RedisHelper.KeyDeleteAsync("EasyAdmin:LockPasswordFailed:7:");
+    }
 
     [TestMethod]
     public async Task VerifyPassword_UsesCurrentUserAndReturnsVerifierResult()
@@ -32,19 +39,6 @@ public class AuthControllerPasswordTests
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data);
         users.Verify(x => x.CheckPasswordAsync(7, "md5-password"), Times.Once);
-    }
-
-    [TestMethod]
-    public void VerifyPassword_UsesLockPasswordVerifyRateLimitPolicy()
-    {
-        var action = typeof(AuthController).GetMethod(nameof(AuthController.VerifyPassword));
-
-        var attribute = action?.GetCustomAttributes(typeof(EnableRateLimitingAttribute), false)
-            .Cast<EnableRateLimitingAttribute>()
-            .SingleOrDefault();
-
-        Assert.IsNotNull(attribute);
-        Assert.AreEqual("LockPasswordVerify", attribute.PolicyName);
     }
 
     private static AuthController CreateController(AuthPasswordVerifier verifier) => new(

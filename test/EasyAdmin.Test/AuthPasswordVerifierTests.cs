@@ -4,12 +4,19 @@ using EasyAdmin.Infrastructure.Wrapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Sean.Core.Redis;
 
 namespace EasyAdmin.Test;
 
 [TestClass]
 public class AuthPasswordVerifierTests
 {
+    [TestInitialize]
+    public void Initialize() => RedisTestSetup.EnsureInitialized();
+
+    [TestCleanup]
+    public async Task Cleanup() => await RedisHelper.KeyDeleteAsync("EasyAdmin:LockPasswordFailed:7:");
+
     [TestMethod]
     public async Task VerifyAsync_WithCorrectPassword_ReturnsTrue()
     {

@@ -7,6 +7,7 @@ using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Models;
 using EasyAdmin.Web.Contracts;
 using EasyAdmin.Web.Helper;
+using EasyAdmin.Web.Middleware;
 using EasyAdmin.Web.Models;
 using Sean.Core.Redis;
 
@@ -147,6 +148,42 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         await RedisHelper.KeyDeleteAsync(userTokensKey);
     }
 
+    /// <summary>
+    /// 读取指定租户的在线会话记录
+    /// </summary>
+    /// <param name="tenantId">租户编号</param>
+    /// <returns>未过期的在线会话记录</returns>
+    public async Task<IReadOnlyList<OnlineUserSessionRecord>> GetOnlineSessionRecordsAsync(long tenantId)
+    {
+        var now = DateTime.UtcNow;
+        return jwtConfig.TokenMode == TokenMode.Refresh
+            ? await GetRefreshSessionRecordsAsync(tenantId, now)
+            : await GetSingleSessionRecordsAsync(tenantId, now);
+    }
+
+    /// <summary>
+    /// 注销用户的全部在线会话
+    /// </summary>
+    /// <param name="userId">用户编号</param>
+    /// <param name="reason">注销原因</param>
+    public async Task RevokeUserSessionsAsync(long userId, string reason)
+    {
+        if (jwtConfig.TokenMode == TokenMode.Refresh)
+        {
+            await RevokeAllUserTokensAsync(userId);
+            return;
+        }
+
+        var tokenKey = SlidingExpirationJwtMiddleware.GetTokenKey(userId);
+        var token = await RedisHelper.StringGetAsync<string>(tokenKey);
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            await AddTokenToBlacklistAsync(token, reason);
+        }
+
+        await RedisHelper.KeyDeleteAsync(tokenKey);
+    }
+
     public async Task<bool> IsTokenBlacklistedAsync(string token)
     {
         if (string.IsNullOrEmpty(token))
@@ -196,5 +233,92 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         using var sha256 = SHA256.Create();
         var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(token));
         return Convert.ToBase64String(bytes);
+    }
+
+    private static async Task<IReadOnlyList<OnlineUserSessionRecord>> GetRefreshSessionRecordsAsync(long tenantId, DateTime now)
+    {
+        var records = new List<OnlineUserSessionRecord>();
+        foreach (var key in await ScanKeysAsync(CacheKeyConst.RefreshTokenPrefix + "*"))
+        {
+            try
+            {
+                var session = await RedisHelper.StringGetAsync<RefreshTokenModel>(key);
+                if (session is null || session.TenantId != tenantId || session.ExpiresAt <= now)
+                {
+                    continue;
+                }
+
+                records.Add(new OnlineUserSessionRecord(
+                    session.UserId,
+                    session.TenantId,
+                    session.IpAddress ?? string.Empty,
+                    session.CreatedAt,
+                    session.UserAgent ?? string.Empty,
+                    session.ExpiresAt));
+            }
+            catch
+            {
+                // 跳过单条无效会话
+            }
+        }
+
+        return records;
+    }
+
+    private static async Task<IReadOnlyList<OnlineUserSessionRecord>> GetSingleSessionRecordsAsync(long tenantId, DateTime now)
+    {
+        var records = new List<OnlineUserSessionRecord>();
+        foreach (var key in await ScanKeysAsync(CacheKeyConst.TokenPrefix + "*"))
+        {
+            try
+            {
+                var token = await RedisHelper.StringGetAsync<string>(key);
+                var session = ParseSingleTokenSession(token, tenantId, now);
+                if (session is not null)
+                {
+                    records.Add(session);
+                }
+            }
+            catch
+            {
+                // 跳过单条无效会话
+            }
+        }
+
+        return records;
+    }
+
+    private static OnlineUserSessionRecord? ParseSingleTokenSession(string? token, long tenantId, DateTime now)
+    {
+        if (string.IsNullOrWhiteSpace(token)) return null;
+
+        var expiry = JwtHelper.GetTokenExpiredTime(token);
+        if (expiry is null || expiry <= now) return null;
+
+        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
+        var tenantClaim = jwt.Claims.FirstOrDefault(claim => claim.Type == nameof(JwtUserModel.TenantId));
+        var userClaim = jwt.Claims.FirstOrDefault(claim => claim.Type == nameof(JwtUserModel.UserId));
+        if (!long.TryParse(tenantClaim?.Value, out var tokenTenantId) || tokenTenantId != tenantId ||
+            !long.TryParse(userClaim?.Value, out var userId))
+        {
+            return null;
+        }
+
+        return new OnlineUserSessionRecord(userId, tokenTenantId, string.Empty, jwt.ValidFrom, string.Empty, expiry.Value);
+    }
+
+    private static async Task<List<string>> ScanKeysAsync(string pattern)
+    {
+        var keys = new List<string>();
+        long cursor = 0;
+        do
+        {
+            var result = await RedisHelper.ExecuteAsync(database => database.ExecuteAsync("SCAN", cursor, "MATCH", pattern, "COUNT", 200), 0);
+            var parts = (StackExchange.Redis.RedisResult[])result;
+            cursor = (long)parts[0];
+            keys.AddRange(((StackExchange.Redis.RedisResult[])parts[1]).Select(item => (string)item));
+        } while (cursor != 0);
+
+        return keys;
     }
 }

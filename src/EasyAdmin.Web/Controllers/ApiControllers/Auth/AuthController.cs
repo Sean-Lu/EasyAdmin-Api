@@ -144,11 +144,9 @@ public class AuthController(
                 UserId = user.Id
             });
 
-            if (JwtHelper.JwtConfig.UseSlidingExpiration)
-            {
-                var tokenKey = SlidingExpirationJwtMiddleware.GetTokenKey(user.Id);
-                await RedisHelper.StringSetAsync(tokenKey, token.Replace("Bearer ", string.Empty), TimeSpan.FromMinutes(JwtHelper.JwtConfig.Expired));
-            }
+            // 单Token模式需要登记在线会话，强踢下线和在线用户列表都依赖该记录
+            var tokenKey = SlidingExpirationJwtMiddleware.GetTokenKey(user.Id);
+            await RedisHelper.StringSetAsync(tokenKey, token.Replace("Bearer ", string.Empty), TimeSpan.FromMinutes(JwtHelper.JwtConfig.Expired));
 
             return Success(new LoginResponse
             {

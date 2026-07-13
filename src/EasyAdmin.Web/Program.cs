@@ -137,6 +137,7 @@ builder.Services.AddSingleton<ICaptchaService, CaptchaService>();
 builder.Services.AddSingleton(jwtConfig);
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddScoped<IAccountAccessService, AccountAccessService>();
+builder.Services.AddScoped<IOnlineUserService, OnlineUserService>();
 
 // 配置Quartz
 builder.Services.AddQuartz(config =>
