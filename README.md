@@ -150,6 +150,9 @@ http | | 8080 | * | 前端：通过IP+端口访问
         location /api/ {
             proxy_pass http://127.0.0.1:8081;#后端
             proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
         }
     }
 ```
@@ -175,7 +178,16 @@ http | | 8080 | * | 前端：通过IP+端口访问
 ```
 
 4. 将 `nginx-service.exe` 和 `nginx-service.xml` 文件移动到 `Nginx` 目录下，然后执行安装服务命令：`nginx-service.exe install`
-5. 浏览器访问前端页面： http://127.0.0.1:9090 或 http://sean.easyadmin.com:9090
+5. 修改 `Nginx` 配置后，以管理员身份打开 `PowerShell`，在 `Nginx` 安装目录依次执行以下命令。只有配置检查成功后才重启服务：
+
+```powershell
+.\nginx.exe -t
+.\nginx-service.exe restart
+```
+
+> `nginx-service.exe` 默认以 `LocalSystem` 账号运行 Nginx。普通终端执行 `nginx -s reload` 可能因无权访问服务进程创建的全局事件而出现 `OpenEvent(...) failed (5: Access is denied)`。通过管理员 PowerShell 重启 WinSW 服务可使新配置生效
+
+6. 浏览器访问前端页面： http://127.0.0.1:9090 或 http://sean.easyadmin.com:9090
 
 ### ☕ Docker部署
 

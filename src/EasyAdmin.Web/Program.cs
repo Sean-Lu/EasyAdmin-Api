@@ -51,6 +51,8 @@ if (enableNacos)
 //Console.WriteLine("配置 ASPNETCORE_URLS: " + builder.Configuration.GetValue<string>("ASPNETCORE_URLS"));
 
 #region [ConfigureServices] Add services to the container.
+// 配置反向代理转发头
+builder.Services.Configure<ForwardedHeadersOptions>(options => options.ConfigureForLocalProxy());
 // 配置 IIS 服务器选项
 builder.Services.Configure<IISServerOptions>(options =>
 {
@@ -173,16 +175,12 @@ var app = builder.Build();
 //builder.Configuration.AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(config)));
 
 #region Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
+
 app.UseCors("AllowAll");
 
 app.UseMiddleware<GlobalExceptionMiddleware>();// 全局异常捕获中间件
 app.UseMiddleware<SlidingExpirationJwtMiddleware>();// JWT滑动过期中间件：需要在客户端（例如JavaScript）中处理返回的新令牌，并在后续的请求中使用它。这通常涉及到监听响应头中的变化，并在需要时更新存储在客户端的令牌。
-
-//// 解决Nginx代理不能获取IP问题
-//app.UseForwardedHeaders(new ForwardedHeadersOptions
-//{
-//    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-//});
 
 //if (app.Environment.IsDevelopment())
 {
