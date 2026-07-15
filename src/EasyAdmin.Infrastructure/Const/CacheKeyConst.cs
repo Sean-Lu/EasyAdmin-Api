@@ -14,6 +14,8 @@ public class CacheKeyConst
 
     public const string ApiRepeatRequestLimitPrefix = $"{TopPrefix}RepeatRequestLimit:";
     public const string LockPasswordFailedPrefix = $"{TopPrefix}LockPasswordFailed:";
+    public const string SharePasswordFailedPrefix = $"{TopPrefix}SharePasswordFailed:";
+    public const string ShareAccessTokenPrefix = $"{TopPrefix}ShareAccessToken:";
 
     public const string CaptchaPrefix = $"{TopPrefix}Captcha:";
     public const string CaptchaLockPrefix = $"{TopPrefix}CaptchaLock:";

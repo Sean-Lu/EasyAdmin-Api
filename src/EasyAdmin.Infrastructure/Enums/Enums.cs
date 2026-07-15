@@ -95,6 +95,21 @@ public enum FileBizType
 }
 
 /// <summary>
+/// 分享目标类型
+/// </summary>
+public enum ShareTargetType
+{
+    /// <summary>
+    /// 文件
+    /// </summary>
+    File = 0,
+    /// <summary>
+    /// 笔记
+    /// </summary>
+    Note = 1
+}
+
+/// <summary>
 /// 定时任务调度类型
 /// </summary>
 public enum ScheduleType

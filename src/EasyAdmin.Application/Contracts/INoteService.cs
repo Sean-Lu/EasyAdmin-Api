@@ -7,6 +7,8 @@ public interface INoteService
 {
     Task<PageQueryResult<NoteDto>> PageAsync(NotePageReqDto request);
     Task<NoteDto?> GetDetailAsync(long id, string? unlockToken);
+    Task<NoteDto?> GetSharedDetailAsync(long id, long tenantId, long userId);
+    Task<IReadOnlySet<long>> GetSharedImageIdsAsync(long id, long tenantId, long userId);
     Task<bool> AddAsync(NoteUpdateDto dto);
     Task<bool> UpdateAsync(NoteUpdateDto dto);
     Task<bool> DeleteByIdAsync(long id);

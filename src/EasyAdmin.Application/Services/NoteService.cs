@@ -1,3 +1,4 @@
+using System.Data;
 using EasyAdmin.Application.Contracts;
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
@@ -96,6 +97,18 @@ public class NoteService(
         return (await BuildNoteDtosAsync(new List<NoteEntity> { note })).FirstOrDefault();
     }
 
+    public async Task<NoteDto?> GetSharedDetailAsync(long id, long tenantId, long userId)
+    {
+        var note = await GetSharedNoteAsync(id, tenantId, userId);
+        return note == null ? null : (await BuildNoteDtosAsync(new List<NoteEntity> { note }, tenantId)).FirstOrDefault();
+    }
+
+    public async Task<IReadOnlySet<long>> GetSharedImageIdsAsync(long id, long tenantId, long userId)
+    {
+        var note = await GetSharedNoteAsync(id, tenantId, userId);
+        return note == null ? new HashSet<long>() : GetImageIds(note).ToHashSet();
+    }
+
     public async Task<bool> AddAsync(NoteUpdateDto dto)
     {
         var content = BuildContent(dto);
@@ -105,7 +118,7 @@ public class NoteService(
             var now = DateTime.Now;
             var entity = mapper.Map<NoteEntity>(dto);
             entity.UserId = TenantContextHolder.UserId;
-            entity.CategoryId = await NormalizeCategoryIdAsync(dto.CategoryId);
+            entity.CategoryId = await NormalizeCategoryIdAsync(dto.CategoryId, transaction);
             entity.ContentMarkdown = content.ContentMarkdown;
             entity.ContentHtml = content.ContentHtml;
             entity.ContentText = NoteContentHelper.ExtractText(content.ContentHtml);
@@ -136,7 +149,7 @@ public class NoteService(
         var result = await noteRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
             var entity = mapper.Map<NoteEntity>(dto);
-            entity.CategoryId = await NormalizeCategoryIdAsync(dto.CategoryId);
+            entity.CategoryId = await NormalizeCategoryIdAsync(dto.CategoryId, transaction);
             entity.ContentMarkdown = content.ContentMarkdown;
             entity.ContentHtml = content.ContentHtml;
             entity.ContentText = NoteContentHelper.ExtractText(entity.ContentHtml);
@@ -240,28 +253,35 @@ public class NoteService(
             !entity.IsDelete);
     }
 
-    private async Task<List<NoteDto>> BuildNoteDtosAsync(List<NoteEntity> notes)
+    private Task<NoteEntity?> GetSharedNoteAsync(long id, long tenantId, long userId)
+    {
+        return noteRepository.GetAsync(entity =>
+            entity.Id == id && entity.TenantId == tenantId && entity.UserId == userId && !entity.IsDelete);
+    }
+
+    private async Task<List<NoteDto>> BuildNoteDtosAsync(List<NoteEntity> notes, long? tenantId = null)
     {
         if (notes.Count == 0)
         {
             return new List<NoteDto>();
         }
 
+        var ownerTenantId = tenantId ?? TenantContextHolder.TenantId;
         var categoryIds = notes.Select(entity => entity.CategoryId).Where(id => id > 0).Distinct().ToList();
         var categories = categoryIds.Count == 0
             ? new List<NoteCategoryEntity>()
-            : (await noteCategoryRepository.QueryAsync(entity => categoryIds.Contains(entity.Id) && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete))?.ToList() ?? new List<NoteCategoryEntity>();
+            : (await noteCategoryRepository.QueryAsync(entity => categoryIds.Contains(entity.Id) && entity.TenantId == ownerTenantId && !entity.IsDelete))?.ToList() ?? new List<NoteCategoryEntity>();
         var categoryDict = categories.ToDictionary(entity => entity.Id, entity => entity.Name);
 
         var noteIds = notes.Select(entity => entity.Id).ToList();
         var relations = (await noteTagRelationRepository.QueryAsync(entity =>
             noteIds.Contains(entity.NoteId) &&
-            entity.TenantId == TenantContextHolder.TenantId &&
+            entity.TenantId == ownerTenantId &&
             !entity.IsDelete))?.ToList() ?? new List<NoteTagRelationEntity>();
         var tagIds = relations.Select(entity => entity.TagId).Distinct().ToList();
         var tags = tagIds.Count == 0
             ? new List<NoteTagEntity>()
-            : (await noteTagRepository.QueryAsync(entity => tagIds.Contains(entity.Id) && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete))?.ToList() ?? new List<NoteTagEntity>();
+            : (await noteTagRepository.QueryAsync(entity => tagIds.Contains(entity.Id) && entity.TenantId == ownerTenantId && !entity.IsDelete))?.ToList() ?? new List<NoteTagEntity>();
         var tagDict = tags.ToDictionary(entity => entity.Id, mapper.Map<NoteTagDto>);
 
         var dtos = mapper.Map<List<NoteDto>>(notes);
@@ -276,7 +296,7 @@ public class NoteService(
         return dtos;
     }
 
-    private async Task<long> NormalizeCategoryIdAsync(long categoryId)
+    private async Task<long> NormalizeCategoryIdAsync(long categoryId, IDbTransaction? transaction = null)
     {
         if (categoryId > 0)
         {
@@ -306,11 +326,11 @@ public class NoteService(
             Name = "默认分类",
             SortOrder = 0
         };
-        await noteCategoryRepository.AddAsync(entity);
+        await noteCategoryRepository.AddAsync(entity, transaction: transaction);
         return entity.Id;
     }
 
-    private async Task SaveTagsAsync(long noteId, List<string>? tagNames, System.Data.IDbTransaction transaction)
+    private async Task SaveTagsAsync(long noteId, List<string>? tagNames, IDbTransaction transaction)
     {
         var names = (tagNames ?? new List<string>())
             .Select(name => name.Trim())
