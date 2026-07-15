@@ -88,8 +88,10 @@ public class SlidingExpirationJwtMiddleware
                             UserId = userId
                         });
 
-                        var tokenKey = GetTokenKey(userId);
-                        await RedisHelper.StringSetAsync(tokenKey, newToken.Replace("Bearer ", string.Empty), TimeSpan.FromMinutes(_jwtConfig.Expired));
+                        await _tokenService.RenewSingleTokenSessionAsync(
+                            userId,
+                            newToken.Replace("Bearer ", string.Empty),
+                            JwtHelper.GetTokenExpiredTime(newToken) ?? DateTime.UtcNow.AddMinutes(_jwtConfig.Expired));
 
                         context.Response.Headers["X-New-Token"] = newToken;
                     }

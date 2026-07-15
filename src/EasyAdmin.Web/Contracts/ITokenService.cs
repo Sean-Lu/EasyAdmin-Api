@@ -17,6 +17,18 @@ public interface ITokenService
     /// <returns>包含访问令牌和刷新令牌的元组</returns>
     Task<(string AccessToken, string RefreshToken)> GenerateTokens(JwtUserModel user, string ipAddress, string userAgent);
     /// <summary>
+    /// 保存单 Token 会话
+    /// </summary>
+    Task StoreSingleTokenSessionAsync(JwtUserModel user, string token, string ipAddress, string userAgent);
+    /// <summary>
+    /// 获取单 Token 会话
+    /// </summary>
+    Task<SingleTokenSessionModel?> GetSingleTokenSessionAsync(long userId);
+    /// <summary>
+    /// 更新单 Token 会话令牌
+    /// </summary>
+    Task RenewSingleTokenSessionAsync(long userId, string token, DateTime expiresAt);
+    /// <summary>
     /// 生成访问令牌
     /// </summary>
     /// <param name="user">用户模型</param>

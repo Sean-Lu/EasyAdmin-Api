@@ -57,6 +57,41 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         return Convert.ToBase64String(randomNumber);
     }
 
+    public async Task StoreSingleTokenSessionAsync(JwtUserModel user, string token, string ipAddress, string userAgent)
+    {
+        var session = new SingleTokenSessionModel
+        {
+            Token = token,
+            UserId = user.UserId,
+            TenantId = user.TenantId,
+            IpAddress = ipAddress ?? string.Empty,
+            UserAgent = userAgent ?? string.Empty,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = JwtHelper.GetTokenExpiredTime(token) ?? DateTime.UtcNow.AddMinutes(jwtConfig.Expired)
+        };
+
+        await RedisHelper.StringSetAsync(
+            SlidingExpirationJwtMiddleware.GetTokenKey(user.UserId),
+            session,
+            session.ExpiresAt - DateTime.UtcNow);
+    }
+
+    public async Task<SingleTokenSessionModel?> GetSingleTokenSessionAsync(long userId) =>
+        await RedisHelper.StringGetAsync<SingleTokenSessionModel>(SlidingExpirationJwtMiddleware.GetTokenKey(userId));
+
+    public async Task RenewSingleTokenSessionAsync(long userId, string token, DateTime expiresAt)
+    {
+        var session = await GetSingleTokenSessionAsync(userId);
+        if (session is null) return;
+
+        session.Token = token;
+        session.ExpiresAt = expiresAt;
+        await RedisHelper.StringSetAsync(
+            SlidingExpirationJwtMiddleware.GetTokenKey(userId),
+            session,
+            expiresAt - DateTime.UtcNow);
+    }
+
     private async Task StoreRefreshToken(string refreshToken, JwtUserModel user, string ipAddress, string userAgent)
     {
         var refreshTokenModel = new RefreshTokenModel
@@ -272,11 +307,10 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         {
             try
             {
-                var token = await RedisHelper.StringGetAsync<string>(key);
-                var session = ParseSingleTokenSession(token, tenantId, now);
-                if (session is not null)
+                var session = await RedisHelper.StringGetAsync<SingleTokenSessionModel>(key);
+                if (session is not null && session.TenantId == tenantId && session.ExpiresAt > now)
                 {
-                    records.Add(session);
+                    records.Add(SingleTokenSessionMapper.ToOnlineSessionRecord(session));
                 }
             }
             catch
@@ -286,25 +320,6 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         }
 
         return records;
-    }
-
-    private static OnlineUserSessionRecord? ParseSingleTokenSession(string? token, long tenantId, DateTime now)
-    {
-        if (string.IsNullOrWhiteSpace(token)) return null;
-
-        var expiry = JwtHelper.GetTokenExpiredTime(token);
-        if (expiry is null || expiry <= now) return null;
-
-        var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        var tenantClaim = jwt.Claims.FirstOrDefault(claim => claim.Type == nameof(JwtUserModel.TenantId));
-        var userClaim = jwt.Claims.FirstOrDefault(claim => claim.Type == nameof(JwtUserModel.UserId));
-        if (!long.TryParse(tenantClaim?.Value, out var tokenTenantId) || tokenTenantId != tenantId ||
-            !long.TryParse(userClaim?.Value, out var userId))
-        {
-            return null;
-        }
-
-        return new OnlineUserSessionRecord(userId, tokenTenantId, string.Empty, jwt.ValidFrom, string.Empty, expiry.Value);
     }
 
     private static async Task<List<string>> ScanKeysAsync(string pattern)

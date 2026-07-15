@@ -145,8 +145,11 @@ public class AuthController(
             });
 
             // 单Token模式需要登记在线会话，强踢下线和在线用户列表都依赖该记录
-            var tokenKey = SlidingExpirationJwtMiddleware.GetTokenKey(user.Id);
-            await RedisHelper.StringSetAsync(tokenKey, token.Replace("Bearer ", string.Empty), TimeSpan.FromMinutes(JwtHelper.JwtConfig.Expired));
+            await tokenService.StoreSingleTokenSessionAsync(new JwtUserModel
+            {
+                TenantId = user.TenantId,
+                UserId = user.Id
+            }, token.Replace("Bearer ", string.Empty), HttpContext.GetClientIp() ?? string.Empty, HttpContext.Request.Headers["User-Agent"].ToString());
 
             return Success(new LoginResponse
             {
@@ -255,7 +258,7 @@ public class AuthController(
         }
 
         var (isExpired, expiredTime) = JwtHelper.IsTokenExpired(token);
-        
+
         if (JwtHelper.JwtConfig.TokenMode == TokenMode.Refresh)
         {
             var refreshToken = Request.Headers["X-Refresh-Token"].FirstOrDefault();
@@ -264,9 +267,9 @@ public class AuthController(
                 var refreshTokenModel = await tokenService.GetRefreshTokenAsync(refreshToken);
                 if (refreshTokenModel != null && refreshTokenModel.ExpiresAt > DateTime.UtcNow)
                 {
-                    return Success<object>(new 
-                    { 
-                        Expired = false, 
+                    return Success<object>(new
+                    {
+                        Expired = false,
                         AccessTokenExpired = isExpired,
                         Message = isExpired ? "AccessToken已过期，可使用RefreshToken刷新" : "Token有效"
                     });
@@ -274,10 +277,10 @@ public class AuthController(
             }
         }
 
-        return Success<object>(new 
-        { 
-            Expired = isExpired, 
-            Message = isExpired ? "Token已过期" : "Token有效" 
+        return Success<object>(new
+        {
+            Expired = isExpired,
+            Message = isExpired ? "Token已过期" : "Token有效"
         });
     }
 

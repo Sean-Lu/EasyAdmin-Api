@@ -21,8 +21,13 @@ public sealed class OnlineUserService(IUserService userService, ITokenService to
         {
             var user = await userService.GetByIdAsync(item.UserId);
             if (user is null || user.IsDelete || user.TenantId != tenantId) continue;
-            if (!string.IsNullOrWhiteSpace(request.UserName) &&
-                !user.UserName.Contains(request.UserName.Trim(), StringComparison.OrdinalIgnoreCase)) continue;
+            if (!string.IsNullOrWhiteSpace(request.UserName))
+            {
+                var keyword = request.UserName.Trim();
+                var matched = user.UserName.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                    (user.NickName?.Contains(keyword, StringComparison.OrdinalIgnoreCase) ?? false);
+                if (!matched) continue;
+            }
             if (!string.IsNullOrWhiteSpace(request.IpAddress) &&
                 !item.IpAddress.Contains(request.IpAddress.Trim(), StringComparison.OrdinalIgnoreCase)) continue;
 
