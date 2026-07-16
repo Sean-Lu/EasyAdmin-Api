@@ -6,6 +6,7 @@ using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Infrastructure.Storage;
 using EasyAdmin.Infrastructure.Tenant;
 using EasyAdmin.Infrastructure.Wrapper;
+using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Services;
 
@@ -14,6 +15,7 @@ namespace EasyAdmin.Application.Services;
 /// </summary>
 public class ShareService(
     IShareRepository shareRepository,
+    IFileRepository fileRepository,
     IFileService fileService,
     INoteRepository noteRepository,
     IUserRepository userRepository,
@@ -21,6 +23,88 @@ public class ShareService(
     IFileStorageFactory fileStorageFactory,
     SharePasswordProtector passwordProtector) : IShareService
 {
+    /// <summary>
+    /// 获取我的分享
+    /// </summary>
+    public async Task<PageQueryResult<ShareListItemDto>> ListAsync(ShareListReqDto request)
+    {
+        var tenantId = TenantContextHolder.TenantId;
+        var userId = TenantContextHolder.UserId;
+        var shares = (await shareRepository.QueryAsync(entity =>
+            entity.TenantId == tenantId &&
+            entity.CreateUserId == userId &&
+            !entity.IsDelete))?.ToList() ?? new List<ShareEntity>();
+
+        var fileIds = shares.Where(entity => entity.TargetType == ShareTargetType.File)
+            .Select(entity => entity.TargetId).Distinct().ToList();
+        var noteIds = shares.Where(entity => entity.TargetType == ShareTargetType.Note)
+            .Select(entity => entity.TargetId).Distinct().ToList();
+        var files = fileIds.Count == 0
+            ? new List<FileEntity>()
+            : (await fileRepository.QueryAsync(entity => fileIds.Contains(entity.Id) && entity.TenantId == tenantId))?.ToList() ?? new List<FileEntity>();
+        var notes = noteIds.Count == 0
+            ? new List<NoteEntity>()
+            : (await noteRepository.QueryAsync(entity => noteIds.Contains(entity.Id) && entity.TenantId == tenantId))?.ToList() ?? new List<NoteEntity>();
+        var fileMap = files.ToDictionary(entity => entity.Id);
+        var noteMap = notes.ToDictionary(entity => entity.Id);
+        var now = DateTime.UtcNow;
+
+        var items = shares.Select(share =>
+        {
+            var targetAvailable = share.TargetType switch
+            {
+                ShareTargetType.File => fileMap.TryGetValue(share.TargetId, out var file) &&
+                                        ShareTargetPolicy.CanShareFile(file, tenantId, userId),
+                ShareTargetType.Note => noteMap.TryGetValue(share.TargetId, out var note) &&
+                                        ShareTargetPolicy.CanShareNote(note, tenantId, userId),
+                _ => false
+            };
+            var targetName = share.TargetType switch
+            {
+                ShareTargetType.File when fileMap.TryGetValue(share.TargetId, out var file) => file.Name,
+                ShareTargetType.Note when noteMap.TryGetValue(share.TargetId, out var note) => note.Title,
+                _ => string.Empty
+            };
+            return new ShareListItemDto
+            {
+                Id = share.Id,
+                TargetType = share.TargetType,
+                TargetId = share.TargetId,
+                TargetName = targetAvailable ? targetName : "内容已删除",
+                ShareCode = share.ShareCode,
+                IsEnabled = share.IsEnabled,
+                HasPassword = HasPassword(share),
+                CreateTime = share.CreateTime,
+                ExpiresAt = share.ExpiresAt,
+                Status = ShareLifecycle.GetListStatus(share.IsEnabled, share.ExpiresAt, targetAvailable, now),
+                TargetAvailable = targetAvailable
+            };
+        }).ToList();
+
+        var keyword = request.Keyword?.Trim();
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            items = items.Where(item => item.TargetName.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        if (request.TargetType.HasValue)
+        {
+            items = items.Where(item => item.TargetType == request.TargetType.Value).ToList();
+        }
+        if (request.Status.HasValue)
+        {
+            items = items.Where(item => item.Status == request.Status.Value).ToList();
+        }
+
+        items = items.OrderByDescending(item => item.CreateTime).ThenByDescending(item => item.Id).ToList();
+        var pageNumber = Math.Max(request.PageNumber, 1);
+        var pageSize = Math.Clamp(request.PageSize, 1, 200);
+        return new PageQueryResult<ShareListItemDto>
+        {
+            Total = items.Count(),
+            List = items.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList()
+        };
+    }
+
     public async Task<ShareConfigDto> GetConfigAsync(ShareTargetType targetType, long targetId)
     {
         await ValidateTargetAsync(targetType, targetId, TenantContextHolder.TenantId, TenantContextHolder.UserId);

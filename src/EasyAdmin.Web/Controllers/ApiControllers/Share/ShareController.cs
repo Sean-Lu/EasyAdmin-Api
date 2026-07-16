@@ -3,6 +3,7 @@ using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
 using EasyAdmin.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Web.Controllers;
 
@@ -11,6 +12,15 @@ namespace EasyAdmin.Web.Controllers;
 /// </summary>
 public class ShareController(IShareService shareService) : BaseApiController
 {
+    /// <summary>
+    /// 获取我的分享
+    /// </summary>
+    [HttpGet]
+    public async Task<ApiResult<PageQueryResult<ShareListItemDto>>> List([FromQuery] ShareListReqDto request)
+    {
+        return Success(await shareService.ListAsync(request));
+    }
+
     /// <summary>
     /// 获取配置
     /// </summary>

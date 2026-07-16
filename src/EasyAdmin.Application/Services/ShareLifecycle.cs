@@ -9,6 +9,24 @@ namespace EasyAdmin.Application.Services;
 /// </summary>
 public static class ShareLifecycle
 {
+    /// <summary>
+    /// 获取列表状态
+    /// </summary>
+    public static ShareListStatus GetListStatus(bool isEnabled, DateTime? expiresAt, bool targetAvailable, DateTime now)
+    {
+        if (!targetAvailable)
+        {
+            return ShareListStatus.TargetDeleted;
+        }
+        if (!isEnabled)
+        {
+            return ShareListStatus.Disabled;
+        }
+        return expiresAt.HasValue && expiresAt.Value <= now
+            ? ShareListStatus.Expired
+            : ShareListStatus.Normal;
+    }
+
     public static void ValidateExpiry(DateTime? expiresAt, DateTime now)
     {
         if (expiresAt.HasValue && expiresAt.Value <= now)

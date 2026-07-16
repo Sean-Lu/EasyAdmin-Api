@@ -3,6 +3,89 @@ using EasyAdmin.Infrastructure.Enums;
 namespace EasyAdmin.Application.Dtos;
 
 /// <summary>
+/// 分享列表状态
+/// </summary>
+public enum ShareListStatus
+{
+    Normal = 0,
+    Disabled = 1,
+    Expired = 2,
+    TargetDeleted = 3
+}
+
+/// <summary>
+/// 分享列表查询
+/// </summary>
+public class ShareListReqDto : PageRequestBase
+{
+    /// <summary>
+    /// 名称关键字
+    /// </summary>
+    public string? Keyword { get; set; }
+
+    /// <summary>
+    /// 分享目标类型
+    /// </summary>
+    public ShareTargetType? TargetType { get; set; }
+
+    /// <summary>
+    /// 分享状态
+    /// </summary>
+    public ShareListStatus? Status { get; set; }
+}
+
+/// <summary>
+/// 分享列表项
+/// </summary>
+public class ShareListItemDto
+{
+    /// <summary>
+    /// 分享ID
+    /// </summary>
+    public long Id { get; set; }
+    /// <summary>
+    /// 目标类型
+    /// </summary>
+    public ShareTargetType TargetType { get; set; }
+    /// <summary>
+    /// 目标ID
+    /// </summary>
+    public long TargetId { get; set; }
+    /// <summary>
+    /// 目标名称
+    /// </summary>
+    public string TargetName { get; set; } = string.Empty;
+    /// <summary>
+    /// 分享码
+    /// </summary>
+    public string ShareCode { get; set; } = string.Empty;
+    /// <summary>
+    /// 是否启用
+    /// </summary>
+    public bool IsEnabled { get; set; }
+    /// <summary>
+    /// 是否有密码
+    /// </summary>
+    public bool HasPassword { get; set; }
+    /// <summary>
+    /// 创建时间
+    /// </summary>
+    public DateTime? CreateTime { get; set; }
+    /// <summary>
+    /// 到期时间
+    /// </summary>
+    public DateTime? ExpiresAt { get; set; }
+    /// <summary>
+    /// 分享状态
+    /// </summary>
+    public ShareListStatus Status { get; set; }
+    /// <summary>
+    /// 目标是否可用
+    /// </summary>
+    public bool TargetAvailable { get; set; }
+}
+
+/// <summary>
 /// 分享目标请求
 /// </summary>
 public class ShareTargetRequestDto

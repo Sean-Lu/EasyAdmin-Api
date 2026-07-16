@@ -1,5 +1,6 @@
 using EasyAdmin.Application.Dtos;
 using EasyAdmin.Infrastructure.Enums;
+using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
@@ -8,6 +9,10 @@ namespace EasyAdmin.Application.Contracts;
 /// </summary>
 public interface IShareService
 {
+    /// <summary>
+    /// 获取我的分享
+    /// </summary>
+    Task<PageQueryResult<ShareListItemDto>> ListAsync(ShareListReqDto request);
     Task<ShareConfigDto> GetConfigAsync(ShareTargetType targetType, long targetId);
     Task<ShareConfigDto> SaveAsync(ShareSaveDto request);
     Task<ShareConfigDto> SetEnabledAsync(ShareToggleDto request);
