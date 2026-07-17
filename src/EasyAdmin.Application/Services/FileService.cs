@@ -44,7 +44,7 @@ public class FileService(
     public async Task<bool> DeleteByIdFromFileManagerAsync(long id)
     {
         var entity = await fileRepository.GetByIdAsync(id);
-        if (entity == null || entity.Id < 1)
+        if (!FileManagerAccessPolicy.CanAccess(entity, TenantContextHolder.TenantId, TenantContextHolder.UserId))
         {
             return false;
         }
@@ -79,7 +79,7 @@ public class FileService(
     {
         var orderBy = OrderByConditionBuilder<FileEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);
         orderBy.Next = OrderByConditionBuilder<FileEntity>.Build(OrderByType.Desc, entity => entity.Id);
-        return await fileRepository.PageQueryAsync(WhereExpressionUtil.Create<FileEntity>(entity => entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete)
+        return await fileRepository.PageQueryAsync(WhereExpressionUtil.Create(FileManagerAccessPolicy.BuildCurrentUserScope(TenantContextHolder.TenantId, TenantContextHolder.UserId))
             .AndAlsoIF(!string.IsNullOrWhiteSpace(request.Name), entity => entity.Name.Contains(request.Name))
             .AndAlsoIF(!string.IsNullOrWhiteSpace(request.Description), entity => entity.Description.Contains(request.Description))
             .AndAlsoIF(request.BizType.HasValue, entity => entity.BizType == request.BizType.Value), orderBy, request.PageNumber, request.PageSize);

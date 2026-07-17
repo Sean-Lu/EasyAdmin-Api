@@ -110,6 +110,63 @@ public enum ShareTargetType
 }
 
 /// <summary>
+/// 收藏目标类型
+/// </summary>
+public enum FavoriteTargetType
+{
+    /// <summary>
+    /// 菜单
+    /// </summary>
+    Menu = 0,
+    /// <summary>
+    /// 文件
+    /// </summary>
+    File = 1,
+    /// <summary>
+    /// 笔记
+    /// </summary>
+    Note = 2
+}
+
+/// <summary>
+/// 收藏来源类型
+/// </summary>
+public enum FavoriteSourceType
+{
+    /// <summary>
+    /// 直接收藏
+    /// </summary>
+    Direct = 0,
+    /// <summary>
+    /// 分享收藏
+    /// </summary>
+    Share = 1
+}
+
+/// <summary>
+/// 收藏可用状态
+/// </summary>
+public enum FavoriteAvailabilityStatus
+{
+    /// <summary>
+    /// 正常
+    /// </summary>
+    Normal = 0,
+    /// <summary>
+    /// 分享已停用
+    /// </summary>
+    ShareDisabled = 1,
+    /// <summary>
+    /// 分享已过期
+    /// </summary>
+    ShareExpired = 2,
+    /// <summary>
+    /// 分享内容已删除
+    /// </summary>
+    ShareTargetDeleted = 3
+}
+
+/// <summary>
 /// 定时任务调度类型
 /// </summary>
 public enum ScheduleType

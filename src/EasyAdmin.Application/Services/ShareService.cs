@@ -175,6 +175,47 @@ public class ShareService(
         };
     }
 
+    public async Task<ShareFavoriteTargetDto> GetFavoriteTargetAsync(string shareCode, string? accessToken)
+    {
+        var share = await GetAvailableShareAsync(shareCode);
+        if (HasPassword(share) &&
+            !await ShareSecurity.ValidateAccessTokenAsync(accessToken, share.ShareCode, share.AccessVersion, DateTime.UtcNow))
+        {
+            throw new ExplicitException("需要分享密码");
+        }
+
+        var title = string.Empty;
+        switch (share.TargetType)
+        {
+            case ShareTargetType.File:
+                var file = await fileService.GetByIdAsync(share.TargetId);
+                if (!ShareTargetPolicy.CanShareFile(file, share.TenantId, share.CreateUserId))
+                {
+                    throw ShareUnavailable();
+                }
+                title = file.Name;
+                break;
+            case ShareTargetType.Note:
+                var note = await noteService.GetSharedDetailAsync(share.TargetId, share.TenantId, share.CreateUserId);
+                if (note == null)
+                {
+                    throw ShareUnavailable();
+                }
+                title = note.Title;
+                break;
+            default:
+                throw ShareUnavailable();
+        }
+
+        return new ShareFavoriteTargetDto
+        {
+            ShareId = share.Id,
+            TargetType = FavoriteRules.MapShareTargetType(share.TargetType),
+            Title = title,
+            OwnerName = await GetOwnerNameAsync(share)
+        };
+    }
+
     public async Task<PublicShareVerifyResultDto> VerifyPasswordAsync(PublicShareVerifyDto request, string ipAddress)
     {
         var share = await GetAvailableShareAsync(request.ShareCode);

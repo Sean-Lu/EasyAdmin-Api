@@ -81,7 +81,7 @@ public class FileController(
     public async Task<IActionResult> DownloadFile(long id)
     {
         var fileEntity = await fileService.GetByIdAsync(id);
-        if (!IsCurrentTenantFile(fileEntity))
+        if (!IsCurrentUserFile(fileEntity))
         {
             return NotFound("文件不存在");
         }
@@ -112,7 +112,7 @@ public class FileController(
     public async Task<ApiResult<bool>> DeleteFile(long id)
     {
         var fileEntity = await fileService.GetByIdAsync(id);
-        if (!IsCurrentTenantFile(fileEntity))
+        if (!IsCurrentUserFile(fileEntity))
         {
             return Fail<bool>("文件不存在");
         }
@@ -158,15 +158,15 @@ public class FileController(
     public async Task<ApiResult<FileDto>> Detail(long id)
     {
         var fileEntity = await fileService.GetByIdAsync(id);
-        if (!IsCurrentTenantFile(fileEntity))
+        if (!IsCurrentUserFile(fileEntity))
         {
             return Fail<FileDto>("文件不存在");
         }
         return Success(mapper.Map<FileDto>(fileEntity));
     }
 
-    private bool IsCurrentTenantFile(FileEntity? fileEntity)
+    private bool IsCurrentUserFile(FileEntity? fileEntity)
     {
-        return fileEntity != null && fileEntity.Id > 0 && fileEntity.TenantId == TenantId;
+        return FileManagerAccessPolicy.CanAccess(fileEntity, TenantId, UserId);
     }
 }

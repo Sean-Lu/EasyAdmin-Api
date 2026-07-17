@@ -177,6 +177,29 @@ public class PublicShareStatusDto
 }
 
 /// <summary>
+/// 分享收藏目标
+/// </summary>
+public class ShareFavoriteTargetDto
+{
+    /// <summary>
+    /// 分享ID
+    /// </summary>
+    public long ShareId { get; set; }
+    /// <summary>
+    /// 收藏目标类型
+    /// </summary>
+    public FavoriteTargetType TargetType { get; set; }
+    /// <summary>
+    /// 标题
+    /// </summary>
+    public string Title { get; set; } = string.Empty;
+    /// <summary>
+    /// 分享者
+    /// </summary>
+    public string OwnerName { get; set; } = string.Empty;
+}
+
+/// <summary>
 /// 分享密码验证
 /// </summary>
 public class PublicShareVerifyDto
