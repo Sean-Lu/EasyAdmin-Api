@@ -7,9 +7,13 @@ public class MenuUpdateDto : DtoIdBase, ITreeIdBase
 {
     public long PId { get; set; }
     public int Sort { get; set; }
+    /// <summary>
+    /// 菜单类型
+    /// </summary>
+    public MenuType Type { get; set; }
     public string? Icon { get; set; }
     public string Title { get; set; }
-    public string Path { get; set; }
+    public string? Path { get; set; }
     public string? OutLink { get; set; }
     public OutLinkOpenType? OutLinkOpenType { get; set; }
     public CommonState State { get; set; }

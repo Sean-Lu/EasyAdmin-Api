@@ -67,8 +67,9 @@ public static class FavoriteRules
     public static bool IsCollectibleMenu(MenuEntity? menu)
     {
         return menu is { Id: > 0, IsDelete: false, State: CommonState.Enable }
-               && (!string.IsNullOrWhiteSpace(menu.OutLink) ||
-                   ((!menu.Children?.Any()) ?? true) && !string.IsNullOrWhiteSpace(menu.Path));
+               && menu.Type != MenuType.Directory
+               && !string.IsNullOrWhiteSpace(menu.Path)
+               && (menu.Type != MenuType.External || !string.IsNullOrWhiteSpace(menu.OutLink));
     }
 
     /// <summary>

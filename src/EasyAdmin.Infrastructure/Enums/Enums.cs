@@ -167,6 +167,25 @@ public enum FavoriteAvailabilityStatus
 }
 
 /// <summary>
+/// 菜单类型
+/// </summary>
+public enum MenuType
+{
+    /// <summary>
+    /// 目录
+    /// </summary>
+    Directory = 0,
+    /// <summary>
+    /// 内部菜单
+    /// </summary>
+    Internal = 1,
+    /// <summary>
+    /// 外链菜单
+    /// </summary>
+    External = 2
+}
+
+/// <summary>
 /// 定时任务调度类型
 /// </summary>
 public enum ScheduleType

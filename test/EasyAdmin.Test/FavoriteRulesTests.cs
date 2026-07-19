@@ -15,6 +15,7 @@ public class FavoriteRulesTests
         Assert.IsTrue(FavoriteRules.IsCollectibleMenu(new MenuEntity
         {
             Id = 1,
+            Type = MenuType.Internal,
             State = CommonState.Enable,
             Path = "/user/note",
             Children = new List<MenuEntity>()
@@ -22,6 +23,7 @@ public class FavoriteRulesTests
         Assert.IsTrue(FavoriteRules.IsCollectibleMenu(new MenuEntity
         {
             Id = 2,
+            Type = MenuType.External,
             State = CommonState.Enable,
             Path = "/link",
             OutLink = "https://example.com",
@@ -30,6 +32,7 @@ public class FavoriteRulesTests
         Assert.IsFalse(FavoriteRules.IsCollectibleMenu(new MenuEntity
         {
             Id = 4,
+            Type = MenuType.Directory,
             State = CommonState.Enable,
             Path = "/user",
             Children = new List<MenuEntity> { new() { Id = 5 } }
@@ -37,6 +40,7 @@ public class FavoriteRulesTests
         Assert.IsFalse(FavoriteRules.IsCollectibleMenu(new MenuEntity
         {
             Id = 6,
+            Type = MenuType.Internal,
             State = CommonState.Disable,
             Path = "/disabled",
             Children = new List<MenuEntity>()
@@ -44,7 +48,16 @@ public class FavoriteRulesTests
         Assert.IsFalse(FavoriteRules.IsCollectibleMenu(new MenuEntity
         {
             Id = 7,
+            Type = MenuType.Internal,
             State = CommonState.Enable,
+            Children = new List<MenuEntity>()
+        }));
+        Assert.IsFalse(FavoriteRules.IsCollectibleMenu(new MenuEntity
+        {
+            Id = 8,
+            Type = MenuType.Directory,
+            State = CommonState.Enable,
+            Path = "/not-a-page",
             Children = new List<MenuEntity>()
         }));
     }

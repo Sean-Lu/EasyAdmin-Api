@@ -11,8 +11,17 @@ namespace EasyAdmin.Domain.Entities;
 /// </summary>
 //[Table("Menu")]
 [CodeFirst]
+[Index(new[] { nameof(TenantId), nameof(Path) }, "UX_Menu_TenantPath", DbIndexType.Unique)]
 public class MenuEntity : TreeEntityBase<MenuEntity>
 {
+    /// <summary>
+    /// 所属租户ID，空值表示全局菜单
+    /// </summary>
+    public virtual long? TenantId { get; set; }
+    /// <summary>
+    /// 菜单类型
+    /// </summary>
+    public virtual MenuType Type { get; set; }
     /// <summary>
     /// 图标
     /// </summary>
@@ -27,7 +36,7 @@ public class MenuEntity : TreeEntityBase<MenuEntity>
     /// 路由路径
     /// </summary>
     [MaxLength(200)]
-    public virtual string Path { get; set; }
+    public virtual string? Path { get; set; }
     /// <summary>
     /// 外部链接地址
     /// </summary>

@@ -8,6 +8,14 @@ namespace EasyAdmin.Application.Dtos;
 public class MenuDto : TreeDtoBase<MenuDto>
 {
     /// <summary>
+    /// 所属租户ID，空值表示全局菜单
+    /// </summary>
+    public virtual long? TenantId { get; set; }
+    /// <summary>
+    /// 菜单类型
+    /// </summary>
+    public virtual MenuType Type { get; set; }
+    /// <summary>
     /// 图标
     /// </summary>
     public virtual string? Icon { get; set; }
@@ -18,7 +26,7 @@ public class MenuDto : TreeDtoBase<MenuDto>
     /// <summary>
     /// 路由路径
     /// </summary>
-    public virtual string Path { get; set; }
+    public virtual string? Path { get; set; }
     /// <summary>
     /// 外部链接地址
     /// </summary>
