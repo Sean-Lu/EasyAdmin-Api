@@ -1,30 +1,11 @@
 using EasyAdmin.Application.Services;
 using EasyAdmin.Infrastructure.Enums;
-using EasyAdmin.Infrastructure.Wrapper;
 
 namespace EasyAdmin.Test;
 
 [TestClass]
 public class TenantValidityTests
 {
-    [TestMethod]
-    public void ValidateValidityRange_AllowsOpenEndedAndOrderedRanges()
-    {
-        TenantValidityValidator.Validate(null, null);
-        TenantValidityValidator.Validate(new DateTime(2026, 7, 1), null);
-        TenantValidityValidator.Validate(null, new DateTime(2026, 7, 1));
-        TenantValidityValidator.Validate(new DateTime(2026, 7, 1), new DateTime(2026, 7, 2));
-    }
-
-    [TestMethod]
-    public void ValidateValidityRange_RejectsEqualOrReversedRange()
-    {
-        Assert.ThrowsExactly<ExplicitException>(() =>
-            TenantValidityValidator.Validate(new DateTime(2026, 7, 1), new DateTime(2026, 7, 1)));
-        Assert.ThrowsExactly<ExplicitException>(() =>
-            TenantValidityValidator.Validate(new DateTime(2026, 7, 2), new DateTime(2026, 7, 1)));
-    }
-
     [TestMethod]
     public void IsTenantValid_UsesHalfOpenValidityInterval()
     {

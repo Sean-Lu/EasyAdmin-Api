@@ -26,7 +26,7 @@ public class TenantService(
 {
     public async Task<bool> AddAsync(TenantDto dto)
     {
-        TenantValidityValidator.Validate(dto.StartTime, dto.ExpireTime);
+        ValidateValidity(dto.StartTime, dto.ExpireTime);
         dto.Code = dto.Code?.Trim();
         if (string.IsNullOrEmpty(dto.Code) || dto.Code.Length > TenantLoginPolicy.MaxTenantCodeLength)
         {
@@ -114,7 +114,7 @@ public class TenantService(
 
     public async Task<bool> UpdateAsync(TenantUpdateDto dto)
     {
-        TenantValidityValidator.Validate(dto.StartTime, dto.ExpireTime);
+        ValidateValidity(dto.StartTime, dto.ExpireTime);
         return await tenantRepository.UpdateByDtoAsync(dto, mapper.Map<TenantEntity>) > 0;
     }
     public async Task<bool> UpdateStateAsync(long id, CommonState state)
@@ -148,5 +148,13 @@ public class TenantService(
     {
         var candidates = (await tenantRepository.QueryAsync(entity => entity.Code == code && entity.State == CommonState.Enable && !entity.IsDelete))?.ToList() ?? [];
         return candidates.FirstOrDefault(entity => string.Equals(entity.Code, code, StringComparison.Ordinal));
+    }
+
+    private static void ValidateValidity(DateTime? startTime, DateTime? expireTime)
+    {
+        if (startTime.HasValue && expireTime.HasValue && startTime.Value >= expireTime.Value)
+        {
+            throw new ExplicitException("生效时间必须早于到期时间");
+        }
     }
 }

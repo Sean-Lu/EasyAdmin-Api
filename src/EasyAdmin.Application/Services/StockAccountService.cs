@@ -21,7 +21,7 @@ public class StockAccountService(
 {
     public async Task<bool> AddAsync(StockAccountDto dto)
     {
-        var normalized = StockAccountValidator.Normalize(dto.BrokerName, dto.InitialAsset, dto.CurrentAsset);
+        var normalized = Normalize(dto.BrokerName, dto.InitialAsset, dto.CurrentAsset);
         var entity = mapper.Map<StockAccountEntity>(dto);
         entity.UserId = TenantContextHolder.UserId;
         entity.BrokerName = normalized.BrokerName;
@@ -53,7 +53,7 @@ public class StockAccountService(
 
     public async Task<bool> UpdateAsync(StockAccountUpdateDto dto)
     {
-        var normalized = StockAccountValidator.Normalize(dto.BrokerName, dto.InitialAsset, dto.CurrentAsset);
+        var normalized = Normalize(dto.BrokerName, dto.InitialAsset, dto.CurrentAsset);
         return await stockAccountRepository.UpdateAsync(new StockAccountEntity
         {
             Id = dto.Id,
@@ -103,5 +103,30 @@ public class StockAccountService(
             ? 0
             : Math.Round(dto.AssetProfitAmount / initialAsset * 100, 2);
         return dto;
+    }
+
+    private static (string BrokerName, decimal InitialAsset, decimal CurrentAsset) Normalize(
+        string? brokerName,
+        decimal? initialAsset,
+        decimal? currentAsset)
+    {
+        if (string.IsNullOrWhiteSpace(brokerName))
+        {
+            throw new ExplicitException("券商名称不能为空");
+        }
+
+        var normalizedInitialAsset = initialAsset ?? 0;
+        if (normalizedInitialAsset < 0)
+        {
+            throw new ExplicitException("初始资产不能小于0");
+        }
+
+        var normalizedCurrentAsset = currentAsset ?? 0;
+        if (normalizedCurrentAsset < 0)
+        {
+            throw new ExplicitException("现资产不能小于0");
+        }
+
+        return (brokerName.Trim(), normalizedInitialAsset, normalizedCurrentAsset);
     }
 }

@@ -59,10 +59,10 @@ public class RedisCacheService(IConfiguration configuration) : IRedisCacheServic
         };
     }
 
-    internal static List<string> SortKeys(IEnumerable<string> keys) =>
+    private static List<string> SortKeys(IEnumerable<string> keys) =>
         keys.Order(StringComparer.Ordinal).ToList();
 
-    internal static int NormalizeDatabase(int database, int databaseCount)
+    private static int NormalizeDatabase(int database, int databaseCount)
     {
         if (database < 0 || database >= databaseCount) throw new ArgumentOutOfRangeException(nameof(database));
         return database;

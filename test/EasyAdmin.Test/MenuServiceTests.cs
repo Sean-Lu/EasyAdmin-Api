@@ -101,8 +101,9 @@ public class MenuServiceTests
     }
 
     [TestMethod]
-    public async Task AddAsync_AllowsSameRouteInDifferentTenant()
+    public async Task AddAsync_AllowsSameRouteInDifferentTenantAndNormalizesExternalFields()
     {
+        MenuEntity? added = null;
         ConfigureExistingMenus(new MenuEntity
         {
             Id = 8,
@@ -110,19 +111,31 @@ public class MenuServiceTests
             Type = MenuType.External,
             Path = "/link/GitHub"
         });
+        _menuRepository
+            .Setup(repository => repository.AddAsync(
+                It.IsAny<MenuEntity>(),
+                It.IsAny<bool>(),
+                It.IsAny<Expression<Func<MenuEntity, object>>>(),
+                It.IsAny<IDbTransaction>()))
+            .Callback<MenuEntity, bool, Expression<Func<MenuEntity, object>>, IDbTransaction>(
+                (entity, _, _, _) => added = entity)
+            .ReturnsAsync(true);
 
         var result = await CreateService().AddAsync(new MenuDto
         {
             PId = 0,
             Title = "GitHub",
             Type = MenuType.External,
-            Path = "/link/github",
-            OutLink = "https://github.com",
+            Path = " /link/github ",
+            OutLink = " https://github.com ",
             OutLinkOpenType = OutLinkOpenType.Blank,
             State = CommonState.Enable
         });
 
         Assert.IsTrue(result);
+        Assert.IsNotNull(added);
+        Assert.AreEqual("/link/github", added.Path);
+        Assert.AreEqual("https://github.com", added.OutLink);
     }
 
     [TestMethod]

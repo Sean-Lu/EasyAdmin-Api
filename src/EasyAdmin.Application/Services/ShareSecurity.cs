@@ -6,10 +6,7 @@ using System.Text;
 
 namespace EasyAdmin.Application.Services;
 
-/// <summary>
-/// 分享访问令牌
-/// </summary>
-public sealed record ShareAccessTokenPayload(string ShareCode, int AccessVersion, DateTime ExpiresAt);
+internal sealed record ShareAccessTokenPayload(string ShareCode, int AccessVersion, DateTime ExpiresAt);
 
 /// <summary>
 /// 分享安全工具
@@ -25,13 +22,13 @@ public static class ShareSecurity
         return Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
     }
 
-    public static DateTime CalculateTokenExpiry(DateTime now, DateTime? shareExpiry)
+    private static DateTime CalculateTokenExpiry(DateTime now, DateTime? shareExpiry)
     {
         var tokenExpiry = now.AddMinutes(AccessTokenExpireMinutes);
         return shareExpiry.HasValue && shareExpiry.Value < tokenExpiry ? shareExpiry.Value : tokenExpiry;
     }
 
-    public static bool IsTokenPayloadValid(
+    private static bool IsTokenPayloadValid(
         ShareAccessTokenPayload? payload,
         string shareCode,
         int accessVersion,
@@ -43,7 +40,7 @@ public static class ShareSecurity
                && payload.ExpiresAt > now;
     }
 
-    public static string GetFailureKey(string shareCode, string ipAddress)
+    private static string GetFailureKey(string shareCode, string ipAddress)
     {
         var ipHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(ipAddress ?? string.Empty)))
             .ToLowerInvariant();
