@@ -219,11 +219,7 @@ public class AuthController(
         }
         else
         {
-            var token = JwtHelper.GetToken(this.Request);
-            if (!string.IsNullOrEmpty(token))
-            {
-                await tokenService.AddTokenToBlacklistAsync(token, "用户主动登出");
-            }
+            await tokenService.RevokeUserSessionsAsync(userInfo.UserId, "用户主动登出");
         }
 
         return Success<object>("登出成功！");
