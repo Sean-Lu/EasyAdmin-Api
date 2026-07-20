@@ -210,10 +210,10 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         }
 
         var tokenKey = SlidingExpirationJwtMiddleware.GetTokenKey(userId);
-        var token = await RedisHelper.StringGetAsync<string>(tokenKey);
-        if (!string.IsNullOrWhiteSpace(token))
+        var session = await GetSingleTokenSessionAsync(userId);
+        if (!string.IsNullOrWhiteSpace(session?.Token))
         {
-            await AddTokenToBlacklistAsync(token, reason);
+            await AddTokenToBlacklistAsync(session.Token, reason);
         }
 
         await RedisHelper.KeyDeleteAsync(tokenKey);
