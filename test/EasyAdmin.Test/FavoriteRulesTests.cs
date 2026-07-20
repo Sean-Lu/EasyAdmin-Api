@@ -127,4 +127,52 @@ public class FavoriteRulesTests
         Assert.AreEqual("快照标题", invalid.Title);
         Assert.AreEqual("快照分享者", invalid.OwnerName);
     }
+
+    [TestMethod]
+    public void ToolboxToolCatalog_UsesUniqueStableIdsAndKeys()
+    {
+        Assert.AreEqual(ToolboxToolCatalog.All.Count, ToolboxToolCatalog.All.Select(item => item.Id).Distinct().Count());
+        Assert.AreEqual(ToolboxToolCatalog.All.Count, ToolboxToolCatalog.All.Select(item => item.Key).Distinct().Count());
+        Assert.AreEqual("/tool/commonTools?tool=jsonParser", ToolboxToolCatalog.Find(3)?.Path);
+        Assert.IsNull(ToolboxToolCatalog.Find(999));
+    }
+
+    [TestMethod]
+    public void IsCollectibleTool_RequiresCatalogEntryAndToolboxMenuAccess()
+    {
+        var accessibleMenus = new[]
+        {
+            new MenuEntity
+            {
+                Id = 11000003,
+                Type = MenuType.Internal,
+                State = CommonState.Enable,
+                Path = ToolboxToolCatalog.ToolboxPath
+            }
+        };
+
+        Assert.IsTrue(FavoriteRules.IsCollectibleTool(3, accessibleMenus));
+        Assert.IsFalse(FavoriteRules.IsCollectibleTool(999, accessibleMenus));
+        Assert.IsFalse(FavoriteRules.IsCollectibleTool(3, Array.Empty<MenuEntity>()));
+        Assert.IsFalse(FavoriteRules.IsCollectibleTool(3, new[]
+        {
+            new MenuEntity
+            {
+                Id = 11000003,
+                Type = MenuType.Internal,
+                State = CommonState.Disable,
+                Path = ToolboxToolCatalog.ToolboxPath
+            }
+        }));
+        Assert.IsFalse(FavoriteRules.IsCollectibleTool(3, new[]
+        {
+            new MenuEntity
+            {
+                Id = 11000003,
+                Type = MenuType.Directory,
+                State = CommonState.Enable,
+                Path = ToolboxToolCatalog.ToolboxPath
+            }
+        }));
+    }
 }

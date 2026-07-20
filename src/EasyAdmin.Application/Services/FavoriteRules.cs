@@ -73,6 +73,15 @@ public static class FavoriteRules
     }
 
     /// <summary>
+    /// 判断工具是否可收藏
+    /// </summary>
+    public static bool IsCollectibleTool(long toolId, IEnumerable<MenuEntity> menus)
+    {
+        return ToolboxToolCatalog.Find(toolId) != null &&
+               menus.Any(menu => menu.Path == ToolboxToolCatalog.ToolboxPath && IsCollectibleMenu(menu));
+    }
+
+    /// <summary>
     /// 获取分享收藏状态
     /// </summary>
     public static FavoriteAvailabilityStatus GetShareStatus(ShareEntity share, bool targetAvailable, DateTime now)

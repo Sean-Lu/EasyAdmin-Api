@@ -41,9 +41,12 @@ public class FavoriteService(
             !entity.IsDelete))?.ToList() ?? new List<FavoriteEntity>();
 
         var menuTree = await menuService.GetMenuTreeAsync(userId, new MenuListReqDto());
-        var accessibleMenus = FlattenMenus(menuTree)
+        var flattenedMenus = FlattenMenus(menuTree).ToList();
+        var accessibleMenus = flattenedMenus
             .Where(FavoriteRules.IsCollectibleMenu)
             .ToDictionary(entity => entity.Id);
+        var canAccessToolbox = flattenedMenus.Any(menu =>
+            menu.Path == ToolboxToolCatalog.ToolboxPath && FavoriteRules.IsCollectibleMenu(menu));
         var directIds = favorites.Where(entity => entity.SourceType == FavoriteSourceType.Direct)
             .Select(entity => entity.TargetId).Distinct().ToList();
         var directFiles = request.TargetType == FavoriteTargetType.File && directIds.Count > 0
@@ -92,7 +95,8 @@ public class FavoriteService(
                     directFileMap,
                     directNoteMap,
                     tenantId,
-                    userId);
+                    userId,
+                    canAccessToolbox);
                 if (directItem == null)
                 {
                     invalidDirectIds.Add(favorite.Id);
@@ -253,6 +257,7 @@ public class FavoriteService(
             FavoriteTargetType.File => menus.Any(menu => menu.Path == "/system/file") &&
                                        IsCollectibleFile(await fileRepository.GetByIdAsync(request.TargetId)),
             FavoriteTargetType.Note => IsCollectibleNote(await noteRepository.GetByIdAsync(request.TargetId)),
+            FavoriteTargetType.Tool => FavoriteRules.IsCollectibleTool(request.TargetId, menus),
             _ => false
         };
         if (!allowed)
@@ -267,7 +272,8 @@ public class FavoriteService(
         IReadOnlyDictionary<long, FileEntity> fileMap,
         IReadOnlyDictionary<long, NoteEntity> noteMap,
         long tenantId,
-        long userId)
+        long userId,
+        bool canAccessToolbox)
     {
         if (favorite.TargetType == FavoriteTargetType.Menu && menuMap.TryGetValue(favorite.TargetId, out var menu))
         {
@@ -284,6 +290,14 @@ public class FavoriteService(
             note.TenantId == tenantId && note.UserId == userId && !note.IsDelete)
         {
             return CreateBaseItem(favorite, note.Title, null, null, null, null, null);
+        }
+        if (favorite.TargetType == FavoriteTargetType.Tool && canAccessToolbox)
+        {
+            var tool = ToolboxToolCatalog.Find(favorite.TargetId);
+            if (tool != null)
+            {
+                return CreateBaseItem(favorite, tool.Title, tool.Icon, null, tool.Path, null, null);
+            }
         }
         return null;
     }

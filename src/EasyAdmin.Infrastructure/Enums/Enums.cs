@@ -125,7 +125,11 @@ public enum FavoriteTargetType
     /// <summary>
     /// 笔记
     /// </summary>
-    Note = 2
+    Note = 2,
+    /// <summary>
+    /// 工具
+    /// </summary>
+    Tool = 3
 }
 
 /// <summary>
