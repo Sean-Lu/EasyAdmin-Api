@@ -32,6 +32,12 @@ public class StockHoldingDto : TenantDtoBase
     public string Code { get; set; }
 
     /// <summary>
+    /// 备注
+    /// </summary>
+    [MaxLength(500)]
+    public string? Remark { get; set; }
+
+    /// <summary>
     /// 持仓成本
     /// </summary>
     public decimal CostPrice { get; set; }
@@ -100,6 +106,12 @@ public class StockHoldingUpdateDto : DtoIdBase
     [Required]
     [MaxLength(30)]
     public string Code { get; set; }
+
+    /// <summary>
+    /// 备注
+    /// </summary>
+    [MaxLength(500)]
+    public string? Remark { get; set; }
 
     /// <summary>
     /// 持仓成本

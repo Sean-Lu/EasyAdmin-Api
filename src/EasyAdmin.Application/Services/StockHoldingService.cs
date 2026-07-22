@@ -30,6 +30,7 @@ public class StockHoldingService(
         entity.UserId = TenantContextHolder.UserId;
         entity.Name = dto.Name.Trim();
         entity.Code = dto.Code.Trim();
+        entity.Remark = dto.Remark?.Trim();
         entity.AccountId = dto.AccountId;
         return await stockHoldingRepository.AddAsync(entity);
     }
@@ -58,12 +59,13 @@ public class StockHoldingService(
             AccountId = dto.AccountId,
             Name = dto.Name.Trim(),
             Code = dto.Code.Trim(),
+            Remark = dto.Remark?.Trim(),
             CostPrice = dto.CostPrice,
             Quantity = dto.Quantity,
             CurrentPrice = dto.CurrentPrice,
             IsEnabled = dto.IsEnabled,
             SortOrder = dto.SortOrder
-          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.CostPrice, entity.Quantity, entity.CurrentPrice, entity.IsEnabled, entity.SortOrder },
+          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.Remark, entity.CostPrice, entity.Quantity, entity.CurrentPrice, entity.IsEnabled, entity.SortOrder },
               entity => entity.Id == dto.Id &&
                         entity.AccountId == dto.AccountId &&
                         entity.UserId == TenantContextHolder.UserId &&
@@ -148,6 +150,7 @@ public class StockHoldingService(
             AccountId = entity.AccountId,
             Name = entity.Name,
             Code = entity.Code,
+            Remark = entity.Remark,
             CostPrice = entity.CostPrice,
             Quantity = entity.Quantity,
             CurrentPrice = entity.CurrentPrice,

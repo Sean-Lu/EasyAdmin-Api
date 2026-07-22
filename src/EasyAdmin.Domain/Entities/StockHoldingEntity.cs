@@ -33,6 +33,12 @@ public class StockHoldingEntity : TenantEntityBase
     public virtual string Code { get; set; }
 
     /// <summary>
+    /// 备注
+    /// </summary>
+    [MaxLength(500)]
+    public virtual string? Remark { get; set; }
+
+    /// <summary>
     /// 持仓成本
     /// </summary>
     public virtual decimal CostPrice { get; set; }
