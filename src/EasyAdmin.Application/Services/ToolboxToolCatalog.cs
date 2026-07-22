@@ -40,7 +40,10 @@ public static class ToolboxToolCatalog
         new(12, "timestamp", "时间戳转换", "ClockCircleOutlined"),
         new(13, "crypto", "加解密工具", "LockOutlined"),
         new(14, "regexTester", "正则表达式测试", "CodeOutlined"),
-        new(15, "cronTester", "Cron 表达式测试", "ClockCircleOutlined")
+        new(15, "cronTester", "Cron 表达式测试", "ClockCircleOutlined"),
+        new(16, "timer", "计时器", "ClockCircleOutlined"),
+        new(17, "countdown", "倒计时", "HourglassOutlined"),
+        new(18, "flipClock", "翻页时钟", "FieldTimeOutlined")
     };
 
     /// <summary>
