@@ -80,6 +80,7 @@ public static class ServiceCollectionExtensions
             var db = new DbFactory(configuration);
 
             var assembly = Assembly.GetExecutingAssembly();
+            var includeTestData = configuration.GetValue("DatabaseSettings:IncludeTestData", false);
             var seedDataTypes = assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntitySeedData<>))).ToList();
             var seedDataMap = new Dictionary<Type, bool>();
             if (seedDataTypes.Any())
@@ -108,6 +109,10 @@ public static class ServiceCollectionExtensions
                 foreach (var kv in seedDataMap)
                 {
                     var seedDataType = kv.Key;
+                    if (!includeTestData && typeof(ITestSeedData).IsAssignableFrom(seedDataType))
+                    {
+                        continue;
+                    }
                     var instance = Activator.CreateInstance(seedDataType);
                     var interfaceType = seedDataType.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEntitySeedData<>));
                     var entityType = interfaceType.GenericTypeArguments[0];

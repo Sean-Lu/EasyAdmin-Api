@@ -28,6 +28,10 @@ public class SysConst
     /// </summary>
     public const long SuperAdminRoleId = 1000000;
     /// <summary>
+    /// 超级管理员角色编码
+    /// </summary>
+    public const string SuperAdminRoleCode = "SUPER_ADMIN";
+    /// <summary>
     /// 系统管理员角色编码
     /// </summary>
     public const string SystemAdminRoleCode = "SYSTEM_ADMIN";

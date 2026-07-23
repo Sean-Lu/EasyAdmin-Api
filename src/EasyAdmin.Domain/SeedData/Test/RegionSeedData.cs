@@ -4,12 +4,12 @@ using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
-namespace EasyAdmin.Domain.SeedData;
+namespace EasyAdmin.Domain.SeedData.Test;
 
 /// <summary>
-/// 行政区划种子数据
+/// 测试 - 行政区划种子数据
 /// </summary>
-public class RegionSeedData : IEntitySeedData<RegionEntity>
+public class RegionSeedData : IEntitySeedData<RegionEntity>, ITestSeedData
 {
     public IEnumerable<RegionEntity> SeedData()
     {

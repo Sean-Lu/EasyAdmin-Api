@@ -3,9 +3,12 @@ using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
 
-namespace EasyAdmin.Domain.SeedData;
+namespace EasyAdmin.Domain.SeedData.Test;
 
-public class SysDictTypeSeedData : IEntitySeedData<SysDictTypeEntity>
+/// <summary>
+/// 测试 - 字典类型种子数据
+/// </summary>
+public class SysDictTypeSeedData : IEntitySeedData<SysDictTypeEntity>, ITestSeedData
 {
     public IEnumerable<SysDictTypeEntity> SeedData()
     {

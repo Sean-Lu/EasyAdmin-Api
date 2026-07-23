@@ -3,16 +3,21 @@ using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
 
-namespace EasyAdmin.Domain.SeedData;
+namespace EasyAdmin.Domain.SeedData.Test;
 
-public class SysDictDataSeedData : IEntitySeedData<SysDictDataEntity>
+/// <summary>
+/// 测试 - 字典数据种子数据
+/// </summary>
+public class SysDictDataSeedData : IEntitySeedData<SysDictDataEntity>, ITestSeedData
 {
     public IEnumerable<SysDictDataEntity> SeedData()
     {
         return new[]
         {
+            // 性别
             new SysDictDataEntity { Id = 1, TenantId = SysConst.DefaultTenantId, DictTypeId = 1, DictKey = 1, DictValue = "男", Sort = 1, State = CommonState.Enable },
             new SysDictDataEntity { Id = 2, TenantId = SysConst.DefaultTenantId, DictTypeId = 1, DictKey = 2, DictValue = "女", Sort = 2, State = CommonState.Enable },
+            // 政治面貌
             new SysDictDataEntity { Id = 3, TenantId = SysConst.DefaultTenantId, DictTypeId = 2, DictKey = 1, DictValue = "中共党员", Sort = 1, State = CommonState.Enable },
             new SysDictDataEntity { Id = 4, TenantId = SysConst.DefaultTenantId, DictTypeId = 2, DictKey = 2, DictValue = "中共预备党员", Sort = 2, State = CommonState.Enable },
             new SysDictDataEntity { Id = 5, TenantId = SysConst.DefaultTenantId, DictTypeId = 2, DictKey = 3, DictValue = "共青团员", Sort = 3, State = CommonState.Enable },

@@ -2,12 +2,12 @@ using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
-namespace EasyAdmin.Domain.SeedData;
+namespace EasyAdmin.Domain.SeedData.Test;
 
 /// <summary>
-/// 代码生成分类种子数据
+/// 测试 - 代码生成分类种子数据
 /// </summary>
-public class CodeGenCategorySeedData : IEntitySeedData<CodeGenCategoryEntity>
+public class CodeGenCategorySeedData : IEntitySeedData<CodeGenCategoryEntity>, ITestSeedData
 {
     public IEnumerable<CodeGenCategoryEntity> SeedData()
     {

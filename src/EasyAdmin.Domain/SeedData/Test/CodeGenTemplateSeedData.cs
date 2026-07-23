@@ -2,12 +2,12 @@ using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Enums;
 
-namespace EasyAdmin.Domain.SeedData;
+namespace EasyAdmin.Domain.SeedData.Test;
 
 /// <summary>
-/// 代码生成内置模板种子数据
+/// 测试 - 代码生成内置模板种子数据
 /// </summary>
-public class CodeGenTemplateSeedData : IEntitySeedData<CodeGenTemplateEntity>
+public class CodeGenTemplateSeedData : IEntitySeedData<CodeGenTemplateEntity>, ITestSeedData
 {
     public IEnumerable<CodeGenTemplateEntity> SeedData()
     {

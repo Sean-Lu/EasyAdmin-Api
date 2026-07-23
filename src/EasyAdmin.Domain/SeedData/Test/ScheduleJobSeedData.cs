@@ -3,12 +3,12 @@ using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Const;
 using EasyAdmin.Infrastructure.Enums;
 
-namespace EasyAdmin.Domain.SeedData;
+namespace EasyAdmin.Domain.SeedData.Test;
 
 /// <summary>
-/// 定时任务种子数据
+/// 测试 - 定时任务种子数据
 /// </summary>
-public class ScheduleJobSeedData : IEntitySeedData<ScheduleJobEntity>
+public class ScheduleJobSeedData : IEntitySeedData<ScheduleJobEntity>, ITestSeedData
 {
     public IEnumerable<ScheduleJobEntity> SeedData()
     {
