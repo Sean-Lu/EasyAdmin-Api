@@ -7,6 +7,7 @@ public class ParamUpdateDto : DtoIdBase
     public string ParamName { get; set; }
     public string ParamKey { get; set; }
     public string ParamValue { get; set; }
+    public ParamValueType ValueType { get; set; }
     public string? Remark { get; set; }
     public CommonState State { get; set; }
 }

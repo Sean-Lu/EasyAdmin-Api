@@ -21,9 +21,114 @@ public class UserService(
     ILogger<UserService> logger,
     IMapper mapper,
     IUserRepository userRepository,
-    IParamRepository paramRepository
+    IParamRepository paramRepository,
+    IRoleRepository roleRepository,
+    IUserRoleRepository userRoleRepository
     ) : IUserService
 {
+    public async Task<UserEntity> RegisterAsync(RegisterUserDto dto, long tenantId)
+    {
+        var userName = dto.UserName?.Trim();
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            throw new ExplicitException("用户名不能为空");
+        }
+        if (userName.Length > 50)
+        {
+            throw new ExplicitException("用户名不能超过50个字符");
+        }
+        if (string.IsNullOrWhiteSpace(dto.Password) || dto.Password.Length > 50)
+        {
+            throw new ExplicitException("密码不能为空且不能超过50个字符");
+        }
+
+        var phoneNumber = string.IsNullOrWhiteSpace(dto.PhoneNumber) ? null : dto.PhoneNumber.Trim();
+        if (phoneNumber != null && !Regex.IsMatch(phoneNumber, @"^1\d{10}$"))
+        {
+            throw new ExplicitException("手机号码格式不正确");
+        }
+
+        var email = string.IsNullOrWhiteSpace(dto.Email) ? null : dto.Email.Trim();
+        if (email != null && !Regex.IsMatch(email, @"^[^\s@]+@[^\s@]+\.[^\s@]+$"))
+        {
+            throw new ExplicitException("邮箱格式不正确");
+        }
+
+        if (await userRepository.ExistsAsync(entity => entity.UserName == userName && !entity.IsDelete && entity.TenantId == tenantId, false))
+        {
+            throw new ExplicitException("用户名已存在");
+        }
+        if (phoneNumber != null && await userRepository.ExistsAsync(entity => entity.PhoneNumber == phoneNumber && !entity.IsDelete && entity.TenantId == tenantId, false))
+        {
+            throw new ExplicitException("手机号已存在");
+        }
+        if (email != null && await userRepository.ExistsAsync(entity => entity.Email == email && !entity.IsDelete && entity.TenantId == tenantId, false))
+        {
+            throw new ExplicitException("邮箱已存在");
+        }
+
+        var normalUserRole = await roleRepository.GetAsync(entity =>
+            entity.TenantId == tenantId &&
+            entity.Code == SysConst.NormalUserRoleCode &&
+            entity.State == CommonState.Enable &&
+            !entity.IsDelete);
+        if (normalUserRole == null || normalUserRole.Id < 1)
+        {
+            throw new ExplicitException("普通用户角色不存在，请联系管理员");
+        }
+
+        var user = new UserEntity
+        {
+            TenantId = tenantId,
+            UserName = userName,
+            NickName = userName,
+            Password = dto.Password.ToLower(),
+            PhoneNumber = phoneNumber,
+            Email = email,
+            State = CommonState.Enable,
+            ApprovalState = await IsRegistrationApprovalRequiredAsync() ? UserApprovalState.Pending : UserApprovalState.NotRequired
+        };
+
+        await userRepository.ExecuteAutoTransactionAsync(async transaction =>
+        {
+            if (!await userRepository.AddAsync(user, transaction: transaction))
+            {
+                throw new ExplicitException("注册用户失败");
+            }
+
+            if (!await userRoleRepository.AddAsync(new UserRoleEntity
+            {
+                TenantId = tenantId,
+                UserId = user.Id,
+                RoleId = normalUserRole.Id
+            }, transaction: transaction))
+            {
+                throw new ExplicitException("分配普通用户角色失败");
+            }
+
+            return true;
+        });
+
+        return user;
+    }
+
+    private async Task<bool> IsRegistrationApprovalRequiredAsync()
+    {
+        var parameter = await paramRepository.GetAsync(entity =>
+            entity.ParamKey == ConfigConst.UserRegisterNeedApproval &&
+            entity.State == CommonState.Enable &&
+            !entity.IsDelete);
+        return bool.TryParse(parameter?.ParamValue, out var required) && required;
+    }
+
+    public async Task<bool> ApproveAsync(long id)
+    {
+        return await userRepository.UpdateAsync(
+            new UserEntity { ApprovalState = UserApprovalState.Approved },
+            entity => new { entity.ApprovalState },
+            entity => entity.Id == id && entity.TenantId == TenantContextHolder.TenantId && !entity.IsDelete && entity.ApprovalState == UserApprovalState.Pending) > 0;
+    }
+
     public async Task<bool> AddAsync(UserDto dto)
     {
         if (!string.IsNullOrWhiteSpace(dto.UserName) && await userRepository.ExistsAsync(entity => entity.UserName == dto.UserName && !entity.IsDelete && entity.TenantId == TenantContextHolder.TenantId))
@@ -40,6 +145,7 @@ public class UserService(
         }
 
         var entity = mapper.Map<UserEntity>(dto);
+        entity.ApprovalState = UserApprovalState.NotRequired;
         if (string.IsNullOrWhiteSpace(entity.NickName))
         {
             entity.NickName = entity.UserName;

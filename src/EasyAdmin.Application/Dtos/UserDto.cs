@@ -59,4 +59,8 @@ public class UserDto : TenantDtoBase
     /// 状态（0-禁用，1-启用）
     /// </summary>
     public virtual CommonState State { get; set; }
+    /// <summary>
+    /// 审核状态
+    /// </summary>
+    public virtual UserApprovalState ApprovalState { get; set; }
 }

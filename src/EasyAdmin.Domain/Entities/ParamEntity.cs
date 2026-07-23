@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Sean.Core.DbRepository;
 using System.ComponentModel.DataAnnotations.Schema;
 using EasyAdmin.Infrastructure.Enums;
@@ -28,6 +28,11 @@ public class ParamEntity : EntityBase
     /// </summary>
     [MaxLength(200)]
     public virtual string ParamValue { get; set; }
+    /// <summary>
+    /// 参数值类型
+    /// </summary>
+    [DefaultValue(ParamValueType.String)]
+    public virtual ParamValueType ValueType { get; set; }
     /// <summary>
     /// 备注
     /// </summary>

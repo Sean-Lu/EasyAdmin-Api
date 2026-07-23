@@ -37,6 +37,26 @@ public class SysConst
     public const string SystemAdminRoleCode = "SYSTEM_ADMIN";
 
     /// <summary>
+    /// 普通用户角色ID
+    /// </summary>
+    public const long NormalUserRoleId = 1000006;
+    /// <summary>
+    /// 普通用户角色编码
+    /// </summary>
+    public const string NormalUserRoleCode = "NORMAL_USER";
+    /// <summary>
+    /// 普通用户基础菜单ID
+    /// </summary>
+    public static readonly long[] NormalUserMenuIds =
+    {
+        1000000,// 首页
+        2000000,// 数据大屏
+        8100001, 8100002, 8100003, 8100004, 8100005, 8100006, 8100007, 8100008, 8100009,// 个人中心
+        10000001, 10000002, 10000003,// 外部链接
+        11000002, 11000003// 工具
+    };
+
+    /// <summary>
     /// 顶级菜单ID
     /// </summary>
     public const long TopMenuId = 0;

@@ -40,7 +40,63 @@ public class AuthController(
     {
         return Success(new LoginConfigResponse
         {
-            TenantEnabled = await paramService.GetBooleanValueAsync(ConfigConst.TenantEnable)
+            TenantEnabled = await paramService.GetBooleanValueAsync(ConfigConst.TenantEnable),
+            RegisterEnabled = await paramService.GetBooleanValueAsync(ConfigConst.UserEnableRegister)
+        });
+    }
+
+    /// <summary>
+    /// 用户注册
+    /// </summary>
+    [AllowAnonymous]
+    [HttpPost]
+    public async Task<ApiResult<RegisterUserResponse>> Register(RegisterRequest data)
+    {
+        if (!await paramService.GetBooleanValueAsync(ConfigConst.UserEnableRegister))
+        {
+            return Fail<RegisterUserResponse>("注册功能未开启");
+        }
+
+        if (!await captchaService.ValidateAsync(data.CaptchaKey, data.CaptchaCode))
+        {
+            return Fail<RegisterUserResponse>("验证码错误或已过期");
+        }
+
+        if (string.IsNullOrWhiteSpace(data.UserName) || string.IsNullOrWhiteSpace(data.Password))
+        {
+            return Fail<RegisterUserResponse>("用户名和密码不能为空");
+        }
+
+        var tenantEnabled = await paramService.GetBooleanValueAsync(ConfigConst.TenantEnable);
+        var tenantSelection = TenantLoginPolicy.ResolveTenantCode(tenantEnabled, data.TenantCode);
+        if (tenantSelection.TenantCode == null)
+        {
+            return Fail<RegisterUserResponse>("租户编码不能为空");
+        }
+
+        var tenant = tenantEnabled
+            ? await tenantService.GetEnabledByCodeAsync(tenantSelection.TenantCode)
+            : await tenantService.GetByIdAsync(SysConst.DefaultTenantId);
+        if (tenant == null || tenant.Id < 1 || !TenantAccessPolicy.IsTenantValid(tenant.State, tenant.StartTime, tenant.ExpireTime, DateTime.UtcNow))
+        {
+            return Fail<RegisterUserResponse>("租户不存在或不可用");
+        }
+
+        var user = await userService.RegisterAsync(new RegisterUserDto
+        {
+            UserName = data.UserName,
+            Password = data.Password,
+            PhoneNumber = data.PhoneNumber,
+            Email = data.Email
+        }, tenant.Id);
+
+        return Success(new RegisterUserResponse
+        {
+            RequiresApproval = user.ApprovalState == UserApprovalState.Pending,
+            UserName = user.UserName,
+            PhoneNumber = user.PhoneNumber,
+            Email = user.Email,
+            TenantCode = tenant.Code
         });
     }
 
@@ -99,6 +155,11 @@ public class AuthController(
         if (user == null || user.Id < 1)
         {
             return Fail<LoginResponse>("租户、账号或密码错误！");
+        }
+
+        if (user.ApprovalState == UserApprovalState.Pending)
+        {
+            return Fail<LoginResponse>("账号待管理员审核，请联系管理员");
         }
 
         if (user.State == CommonState.Disable)

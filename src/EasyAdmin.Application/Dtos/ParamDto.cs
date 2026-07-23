@@ -20,6 +20,10 @@ public class ParamDto : DtoBase
     /// </summary>
     public virtual string ParamValue { get; set; }
     /// <summary>
+    /// 参数值类型
+    /// </summary>
+    public virtual ParamValueType ValueType { get; set; }
+    /// <summary>
     /// 备注
     /// </summary>
     public virtual string? Remark { get; set; }

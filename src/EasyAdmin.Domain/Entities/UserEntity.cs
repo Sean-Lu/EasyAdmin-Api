@@ -74,4 +74,9 @@ public class UserEntity : TenantEntityBase
     /// </summary>
     [DefaultValue(CommonState.Enable)]
     public virtual CommonState State { get; set; }
+    /// <summary>
+    /// 审核状态
+    /// </summary>
+    [DefaultValue(UserApprovalState.NotRequired)]
+    public virtual UserApprovalState ApprovalState { get; set; }
 }

@@ -7,6 +7,8 @@ namespace EasyAdmin.Application.Contracts;
 
 public interface IUserService
 {
+    Task<UserEntity> RegisterAsync(RegisterUserDto dto, long tenantId);
+    Task<bool> ApproveAsync(long id);
     Task<bool> AddAsync(UserDto dto);
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> DeleteByIdsAsync(List<long> ids);

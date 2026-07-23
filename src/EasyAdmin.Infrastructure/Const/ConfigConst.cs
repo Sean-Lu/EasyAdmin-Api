@@ -1,4 +1,4 @@
-﻿namespace EasyAdmin.Infrastructure.Const;
+namespace EasyAdmin.Infrastructure.Const;
 
 /// <summary>
 /// 配置常量
@@ -18,6 +18,10 @@ public class ConfigConst
     /// 是否开启注册功能
     /// </summary>
     public const string UserEnableRegister = "user.enableRegister";
+    /// <summary>
+    /// 新注册用户是否需要审核
+    /// </summary>
+    public const string UserRegisterNeedApproval = "user.registerNeedApproval";
     /// <summary>
     /// 账号初始密码
     /// </summary>

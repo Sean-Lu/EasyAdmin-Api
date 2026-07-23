@@ -9,4 +9,8 @@ public class LoginConfigResponse
     /// 是否启用多租户
     /// </summary>
     public bool TenantEnabled { get; set; }
+    /// <summary>
+    /// 是否开启注册
+    /// </summary>
+    public bool RegisterEnabled { get; set; }
 }

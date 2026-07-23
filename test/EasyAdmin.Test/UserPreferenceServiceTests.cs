@@ -25,7 +25,7 @@ public class UserPreferenceServiceTests
         var result = await new UserPreferenceService(repository.Object).GetToolboxToolOrderAsync();
 
         CollectionAssert.AreEqual(
-            new long[] { 3, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            new long[] { 3, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 },
             result.ToolIds);
     }
 
@@ -60,7 +60,7 @@ public class UserPreferenceServiceTests
             new ToolboxToolOrderDto { ToolIds = new long[] { 3, 1 }.ToList() });
 
         CollectionAssert.AreEqual(
-            new long[] { 3, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+            new long[] { 3, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 },
             result.ToolIds);
     }
 }

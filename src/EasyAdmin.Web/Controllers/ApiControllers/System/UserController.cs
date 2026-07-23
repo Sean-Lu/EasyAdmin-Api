@@ -110,6 +110,21 @@ public class UserController(
     }
 
     /// <summary>
+    /// 审核通过用户
+    /// </summary>
+    [HttpPost]
+    public async Task<ApiResult<bool>> Approve([FromBody] JObject? data)
+    {
+        var id = data?["id"]?.Value<long>() ?? default;
+        var result = await userService.ApproveAsync(id);
+        if (result)
+        {
+            await accountAccessService.InvalidateUserAsync(TenantId, id);
+        }
+        return Success(result);
+    }
+
+    /// <summary>
     /// 分页查询用户列表
     /// </summary>
     /// <param name="request"></param>

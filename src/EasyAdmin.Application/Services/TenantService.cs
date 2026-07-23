@@ -21,7 +21,8 @@ public class TenantService(
     IUserRepository userRepository,
     IParamRepository paramRepository,
     IRoleRepository roleRepository,
-    IUserRoleRepository userRoleRepository
+    IUserRoleRepository userRoleRepository,
+    IRoleMenuRepository roleMenuRepository
     ) : ITenantService
 {
     public async Task<bool> AddAsync(TenantDto dto)
@@ -65,6 +66,14 @@ public class TenantService(
             Sort = 0,
             State = CommonState.Enable
         };
+        var normalUserRole = new RoleEntity
+        {
+            Name = "普通用户",
+            Code = SysConst.NormalUserRoleCode,
+            Description = "普通用户角色，拥有基础菜单权限",
+            Sort = 1,
+            State = CommonState.Enable
+        };
         return await tenantRepository.ExecuteAutoTransactionAsync(async transaction =>
         {
             if (!await tenantRepository.AddAsync(tenantEntity, transaction: transaction))
@@ -81,6 +90,19 @@ public class TenantService(
             adminRole.TenantId = tenantEntity.Id;
             if (!await roleRepository.AddAsync(adminRole, transaction: transaction))
                 throw new ExplicitException("创建系统管理员角色失败");
+
+            normalUserRole.TenantId = tenantEntity.Id;
+            if (!await roleRepository.AddAsync(normalUserRole, transaction: transaction))
+                throw new ExplicitException("创建普通用户角色失败");
+
+            var normalUserRoleMenus = SysConst.NormalUserMenuIds.Select(menuId => new RoleMenuEntity
+            {
+                TenantId = tenantEntity.Id,
+                RoleId = normalUserRole.Id,
+                MenuId = menuId
+            }).ToList();
+            if (!await roleMenuRepository.AddAsync(normalUserRoleMenus, transaction: transaction))
+                throw new ExplicitException("创建普通用户菜单权限失败");
 
             var userRole = new UserRoleEntity
             {

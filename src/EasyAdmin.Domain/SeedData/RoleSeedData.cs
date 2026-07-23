@@ -15,7 +15,8 @@ public class RoleSeedData : IEntitySeedData<RoleEntity>
         return new[]
         {
             new RoleEntity { Id = SysConst.SuperAdminRoleId, TenantId = SysConst.DefaultTenantId, Name = "超级管理员", Code = SysConst.SuperAdminRoleCode, Description = "超级管理员角色，拥有所有系统权限，包括租户配置", Sort = 0, State = CommonState.Enable },
-            new RoleEntity { Id = 1000001, TenantId = SysConst.DefaultTenantId, Name = "系统管理员", Code = SysConst.SystemAdminRoleCode, Description = "系统管理员角色，拥有租户内所有系统权限", Sort = 1, State = CommonState.Enable }
+            new RoleEntity { Id = 1000001, TenantId = SysConst.DefaultTenantId, Name = "系统管理员", Code = SysConst.SystemAdminRoleCode, Description = "系统管理员角色，拥有租户内所有系统权限", Sort = 1, State = CommonState.Enable },
+            new RoleEntity { Id = SysConst.NormalUserRoleId, TenantId = SysConst.DefaultTenantId, Name = "普通用户", Code = SysConst.NormalUserRoleCode, Description = "普通用户角色，拥有基础菜单权限", Sort = 2, State = CommonState.Enable }
         };
     }
 }

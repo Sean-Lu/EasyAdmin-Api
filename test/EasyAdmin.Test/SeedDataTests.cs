@@ -54,7 +54,6 @@ public class SeedDataTests
         Assert.IsInstanceOfType(new TestSeedData.DepartmentSeedData(), typeof(EasyAdmin.Domain.Contracts.ITestSeedData));
         Assert.IsInstanceOfType(new TestSeedData.PositionSeedData(), typeof(EasyAdmin.Domain.Contracts.ITestSeedData));
         Assert.IsInstanceOfType(new TestSeedData.RoleSeedData(), typeof(EasyAdmin.Domain.Contracts.ITestSeedData));
-        Assert.IsInstanceOfType(new TestSeedData.RoleMenuSeedData(), typeof(EasyAdmin.Domain.Contracts.ITestSeedData));
         Assert.IsInstanceOfType(new TestSeedData.ScheduleJobSeedData(), typeof(EasyAdmin.Domain.Contracts.ITestSeedData));
     }
 
@@ -63,7 +62,8 @@ public class SeedDataTests
     {
         var roles = new RoleSeedData().SeedData().ToList();
 
-        CollectionAssert.AreEquivalent(new long[] { SysConst.SuperAdminRoleId, 1000001 }, roles.Select(role => role.Id).ToArray());
+        CollectionAssert.AreEquivalent(new long[] { SysConst.SuperAdminRoleId, 1000001, SysConst.NormalUserRoleId }, roles.Select(role => role.Id).ToArray());
+        Assert.AreEqual(SysConst.NormalUserRoleCode, roles.Single(role => role.Id == SysConst.NormalUserRoleId).Code);
     }
 
     [TestMethod]
@@ -71,14 +71,15 @@ public class SeedDataTests
     {
         var roles = new TestSeedData.RoleSeedData().SeedData().ToList();
 
-        CollectionAssert.AreEquivalent(new long[] { 1000002, 1000003, 1000004, 1000005 }, roles.Select(role => role.Id).ToArray());
+        CollectionAssert.AreEquivalent(new long[] { 1000002, 1000003, 1000005 }, roles.Select(role => role.Id).ToArray());
+        CollectionAssert.DoesNotContain(roles.Select(role => role.Code).ToArray(), "NORMAL_EMPLOYEE");
     }
 
     [TestMethod]
-    public void RoleMenuSeedData_AssignsMinimalNormalEmployeeMenus()
+    public void RoleMenuSeedData_AssignsMinimalNormalUserMenus()
     {
-        var roleMenus = new TestSeedData.RoleMenuSeedData().SeedData()
-            .Where(roleMenu => roleMenu.RoleId == 1000004)
+        var roleMenus = new RoleMenuSeedData().SeedData()
+            .Where(roleMenu => roleMenu.RoleId == SysConst.NormalUserRoleId)
             .Select(roleMenu => roleMenu.MenuId)
             .ToHashSet();
 

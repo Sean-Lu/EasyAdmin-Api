@@ -340,3 +340,41 @@ public enum NoteContentType
     /// </summary>
     Markdown = 1
 }
+
+/// <summary>
+/// 用户审核状态
+/// </summary>
+public enum UserApprovalState
+{
+    /// <summary>
+    /// 无需审核
+    /// </summary>
+    NotRequired = 0,
+    /// <summary>
+    /// 待审核
+    /// </summary>
+    Pending = 1,
+    /// <summary>
+    /// 已通过
+    /// </summary>
+    Approved = 2
+}
+
+/// <summary>
+/// 参数值类型
+/// </summary>
+public enum ParamValueType
+{
+    /// <summary>
+    /// 字符串
+    /// </summary>
+    String = 0,
+    /// <summary>
+    /// 布尔值
+    /// </summary>
+    Boolean = 1,
+    /// <summary>
+    /// 数字
+    /// </summary>
+    Number = 2
+}
