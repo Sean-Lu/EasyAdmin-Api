@@ -212,7 +212,7 @@ http | | 8080 | * | 前端：通过IP+端口访问
 docker run -d --name easyadmin-api `
     -p 9001:9001 `
     --network easyadmin-net `
-    -e ConnectionStrings__master="DataSource=192.168.6.151;Database=EasyAdmin;uid=root;pwd=12345!a;SslMode=none" `
+    -e ConnectionStrings__master="DataSource=192.168.6.151;Database=EasyAdmin;uid=root;pwd=12345!a" `
     -e DatabaseSettings__DatabaseType="MySQL" `
     --privileged=true easyadmin-api
 

@@ -33,14 +33,17 @@ public class NoteEntity : TenantEntityBase
     /// <summary>
     /// Markdown正文
     /// </summary>
+    [MaxLength(5000)]
     public virtual string? ContentMarkdown { get; set; }
     /// <summary>
     /// 富文本内容
     /// </summary>
+    [MaxLength(5000)]
     public virtual string? ContentHtml { get; set; }
     /// <summary>
     /// 纯文本内容
     /// </summary>
+    [MaxLength(5000)]
     public virtual string? ContentText { get; set; }
     /// <summary>
     /// 摘要

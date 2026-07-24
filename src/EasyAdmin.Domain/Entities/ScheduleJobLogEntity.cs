@@ -51,5 +51,6 @@ public class ScheduleJobLogEntity : TenantEntityBase
     /// 执行结果信息
     /// </summary>
     [Description("执行结果信息")]
+    [MaxLength(2000)]
     public virtual string? ExecuteMessage { get; set; }
 }
