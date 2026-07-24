@@ -30,4 +30,8 @@ public class ConfigConst
     /// 账号密码错误锁定次数
     /// </summary>
     public const string UserPasswordMismatchLockCount = "user.passwordMismatchLockCount";
+    /// <summary>
+    /// 账号密码错误锁定时间（分钟）
+    /// </summary>
+    public const string UserPasswordMismatchLockMinutes = "user.passwordMismatchLockMinutes";
 }

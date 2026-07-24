@@ -31,11 +31,10 @@ public interface IUserService
     /// 按账号（用户名/手机号/邮箱） + 密码 查询用户
     /// </summary>
     /// <param name="account">账号</param>
-    /// <param name="password">MD5加密后的密码</param>
     /// <param name="loginType">登录方式</param>
     /// <param name="tenantId">租户ID</param>
     /// <returns></returns>
-    Task<UserEntity?> GetByAccountAsync(string account, string password, LoginType loginType, long tenantId);
+    Task<UserEntity?> GetByAccountAsync(string account, LoginType loginType, long tenantId);
     /// <summary>
     /// 校验密码
     /// </summary>

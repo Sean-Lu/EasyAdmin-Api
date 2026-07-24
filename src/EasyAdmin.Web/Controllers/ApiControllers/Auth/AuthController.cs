@@ -68,18 +68,22 @@ public class AuthController(
         }
 
         var tenantEnabled = await paramService.GetBooleanValueAsync(ConfigConst.TenantEnable);
-        var tenantSelection = TenantLoginPolicy.ResolveTenantCode(tenantEnabled, data.TenantCode);
-        if (tenantSelection.TenantCode == null)
+        var tenantCode = tenantEnabled ? data.TenantCode?.Trim() : SysConst.DefaultTenantCode;
+        if (string.IsNullOrWhiteSpace(tenantCode))
         {
             return Fail<RegisterUserResponse>("租户编码不能为空");
         }
 
         var tenant = tenantEnabled
-            ? await tenantService.GetEnabledByCodeAsync(tenantSelection.TenantCode)
+            ? await tenantService.GetByCodeAsync(tenantCode)
             : await tenantService.GetByIdAsync(SysConst.DefaultTenantId);
-        if (tenant == null || tenant.Id < 1 || !TenantAccessPolicy.IsTenantValid(tenant.State, tenant.StartTime, tenant.ExpireTime, DateTime.UtcNow))
+        if (tenant == null || tenant.Id < 1)
         {
-            return Fail<RegisterUserResponse>("租户不存在或不可用");
+            return Fail<RegisterUserResponse>("租户不存在");
+        }
+        if (!TenantAccessPolicy.IsTenantValid(tenant.State, tenant.StartTime, tenant.ExpireTime, DateTime.UtcNow))
+        {
+            return Fail<RegisterUserResponse>("租户不可用");
         }
 
         var user = await userService.RegisterAsync(new RegisterUserDto
@@ -135,26 +139,28 @@ public class AuthController(
         }
 
         var tenantEnabled = await paramService.GetBooleanValueAsync(ConfigConst.TenantEnable);
-        var tenantSelection = TenantLoginPolicy.ResolveTenantCode(tenantEnabled, data.TenantCode);
-        if (tenantSelection.TenantCode == null)
+        var tenantCode = tenantEnabled ? data.TenantCode?.Trim() : SysConst.DefaultTenantCode;
+        if (string.IsNullOrWhiteSpace(tenantCode))
         {
-            return Fail<LoginResponse>("租户、账号或密码错误！");
+            return Fail<LoginResponse>("租户编码不能为空");
         }
 
         var tenant = tenantEnabled
-            ? await tenantService.GetEnabledByCodeAsync(tenantSelection.TenantCode)
+            ? await tenantService.GetByCodeAsync(tenantCode)
             : await tenantService.GetByIdAsync(SysConst.DefaultTenantId);
-        if (tenant == null || tenant.Id < 1 || !TenantAccessPolicy.IsTenantValid(tenant.State, tenant.StartTime, tenant.ExpireTime, DateTime.UtcNow))
+        if (tenant == null || tenant.Id < 1)
         {
-            return Fail<LoginResponse>("租户、账号或密码错误！");
+            return Fail<LoginResponse>("租户不存在");
+        }
+        if (!TenantAccessPolicy.IsTenantValid(tenant.State, tenant.StartTime, tenant.ExpireTime, DateTime.UtcNow))
+        {
+            return Fail<LoginResponse>("租户不可用");
         }
 
-        var password = data.Password ?? string.Empty;
-        var user = await userService.GetByAccountAsync(data.Account, password, data.LoginType, tenant.Id);
-        // 统一错误提示，避免账号枚举
+        var user = await userService.GetByAccountAsync(data.Account, data.LoginType, tenant.Id);
         if (user == null || user.Id < 1)
         {
-            return Fail<LoginResponse>("租户、账号或密码错误！");
+            return Fail<LoginResponse>("账号不存在");
         }
 
         if (user.ApprovalState == UserApprovalState.Pending)
@@ -165,6 +171,11 @@ public class AuthController(
         if (user.State == CommonState.Disable)
         {
             return Fail<LoginResponse>("当前用户已被禁用，请联系管理员！");
+        }
+
+        if (data.LoginType == LoginType.Password)
+        {
+            await authPasswordVerifier.VerifyAsync(user, data.Password, HttpContext.GetClientIp());
         }
 
         var lastLoginTime = DateTime.Now;

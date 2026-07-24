@@ -24,6 +24,10 @@ public class ParamDto : DtoBase
     /// </summary>
     public virtual ParamValueType ValueType { get; set; }
     /// <summary>
+    /// 排序
+    /// </summary>
+    public virtual int Sort { get; set; }
+    /// <summary>
     /// 备注
     /// </summary>
     public virtual string? Remark { get; set; }

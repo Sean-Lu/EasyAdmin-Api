@@ -15,5 +15,5 @@ public interface ITenantService
     Task<PageQueryResult<TenantEntity>> PageAsync(TenantPageReqDto request);
     Task<TenantEntity> GetByIdAsync(long id);
     Task<TenantEntity> GetByNameAsync(string name);
-    Task<TenantEntity?> GetEnabledByCodeAsync(string code);
+    Task<TenantEntity?> GetByCodeAsync(string code);
 }

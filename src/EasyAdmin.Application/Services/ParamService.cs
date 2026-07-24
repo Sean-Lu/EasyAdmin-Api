@@ -43,8 +43,8 @@ public class ParamService(
 
     public async Task<PageQueryResult<ParamEntity>> PageAsync(ParamPageReqDto request)
     {
-        var orderBy = OrderByConditionBuilder<ParamEntity>.Build(OrderByType.Desc, entity => entity.CreateTime);
-        orderBy.Next = OrderByConditionBuilder<ParamEntity>.Build(OrderByType.Desc, entity => entity.Id);
+        var orderBy = OrderByConditionBuilder<ParamEntity>.Build(OrderByType.Asc, entity => entity.Sort);
+        orderBy.Next = OrderByConditionBuilder<ParamEntity>.Build(OrderByType.Asc, entity => entity.Id);
         return await paramRepository.PageQueryAsync(WhereExpressionUtil.Create<ParamEntity>(entity => !entity.IsDelete)
             .AndAlsoIF(!string.IsNullOrWhiteSpace(request.ParamName), entity => entity.ParamName.Contains(request.ParamName))
             .AndAlsoIF(!string.IsNullOrWhiteSpace(request.ParamKey), entity => entity.ParamKey.Contains(request.ParamKey))

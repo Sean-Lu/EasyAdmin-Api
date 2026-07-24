@@ -274,7 +274,7 @@ public class UserService(
         return await userRepository.GetAsync(entity => entity.UserName == username && entity.Password == password && !entity.IsDelete && entity.TenantId == TenantContextHolder.TenantId);
     }
 
-    public async Task<UserEntity?> GetByAccountAsync(string account, string password, LoginType loginType, long tenantId)
+    public async Task<UserEntity?> GetByAccountAsync(string account, LoginType loginType, long tenantId)
     {
         if (string.IsNullOrWhiteSpace(account))
         {
@@ -287,7 +287,6 @@ public class UserService(
         {
             return await userRepository.GetAsync(entity =>
                 entity.PhoneNumber == trimmedAccount
-                && entity.Password == password
                 && !entity.IsDelete
                 && entity.TenantId == tenantId);
         }
@@ -295,13 +294,11 @@ public class UserService(
         {
             return await userRepository.GetAsync(entity =>
                 entity.Email == trimmedAccount
-                && entity.Password == password
                 && !entity.IsDelete
                 && entity.TenantId == tenantId);
         }
         return await userRepository.GetAsync(entity =>
             entity.UserName == trimmedAccount
-            && entity.Password == password
             && !entity.IsDelete
             && entity.TenantId == tenantId);
     }

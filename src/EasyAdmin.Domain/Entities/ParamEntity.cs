@@ -34,6 +34,11 @@ public class ParamEntity : EntityBase
     [DefaultValue(ParamValueType.String)]
     public virtual ParamValueType ValueType { get; set; }
     /// <summary>
+    /// 排序
+    /// </summary>
+    [DefaultValue(0)]
+    public virtual int Sort { get; set; }
+    /// <summary>
     /// 备注
     /// </summary>
     [MaxLength(200)]

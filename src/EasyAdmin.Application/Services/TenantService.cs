@@ -29,9 +29,9 @@ public class TenantService(
     {
         ValidateValidity(dto.StartTime, dto.ExpireTime);
         dto.Code = dto.Code?.Trim();
-        if (string.IsNullOrEmpty(dto.Code) || dto.Code.Length > TenantLoginPolicy.MaxTenantCodeLength)
+        if (string.IsNullOrEmpty(dto.Code))
         {
-            throw new ExplicitException("租户编码长度必须为1到50个字符");
+            throw new ExplicitException("租户编码不能为空");
         }
         if (string.IsNullOrEmpty(dto.AdminUserName))
         {
@@ -166,10 +166,9 @@ public class TenantService(
         return await tenantRepository.GetAsync(entity => entity.Name == name);
     }
 
-    public async Task<TenantEntity?> GetEnabledByCodeAsync(string code)
+    public async Task<TenantEntity?> GetByCodeAsync(string code)
     {
-        var candidates = (await tenantRepository.QueryAsync(entity => entity.Code == code && entity.State == CommonState.Enable && !entity.IsDelete))?.ToList() ?? [];
-        return candidates.FirstOrDefault(entity => string.Equals(entity.Code, code, StringComparison.Ordinal));
+        return await tenantRepository.GetAsync(entity => entity.Code == code && !entity.IsDelete);
     }
 
     private static void ValidateValidity(DateTime? startTime, DateTime? expireTime)

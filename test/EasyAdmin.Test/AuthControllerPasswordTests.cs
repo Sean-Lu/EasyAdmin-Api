@@ -35,15 +35,15 @@ public class AuthControllerPasswordTests
     {
         TenantContextHolder.UserInfo = new JwtUserModel { UserId = 7 };
         var users = new Mock<IUserService>();
-        users.Setup(x => x.CheckPasswordAsync(7, "md5-password")).ReturnsAsync(true);
-        var verifier = new AuthPasswordVerifier(Mock.Of<ILogger<AuthPasswordVerifier>>(), users.Object);
+        users.Setup(x => x.GetByIdAsync(7)).ReturnsAsync(new EasyAdmin.Domain.Entities.UserEntity { Id = 7, Password = "md5-password" });
+        var verifier = new AuthPasswordVerifier(users.Object, Mock.Of<IParamService>());
         var controller = CreateController(verifier);
 
         var result = await controller.VerifyPassword(new VerifyPasswordRequest { Password = "md5-password" });
 
         Assert.IsTrue(result.Success);
         Assert.IsTrue(result.Data);
-        users.Verify(x => x.CheckPasswordAsync(7, "md5-password"), Times.Once);
+        users.Verify(x => x.GetByIdAsync(7), Times.Once);
     }
 
     [TestMethod]
@@ -61,7 +61,7 @@ public class AuthControllerPasswordTests
                 Expired = 30
             };
             var tokenService = new Mock<ITokenService>();
-            var verifier = new AuthPasswordVerifier(Mock.Of<ILogger<AuthPasswordVerifier>>(), Mock.Of<IUserService>());
+            var verifier = new AuthPasswordVerifier(Mock.Of<IUserService>(), Mock.Of<IParamService>());
             var controller = CreateController(verifier, tokenService.Object);
             controller.ControllerContext = new ControllerContext
             {
