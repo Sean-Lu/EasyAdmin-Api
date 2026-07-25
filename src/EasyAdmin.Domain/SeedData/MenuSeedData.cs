@@ -18,25 +18,6 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
 
             new MenuEntity{ Type = MenuType.Internal, Id = 2000000, PId = 0, Sort = 2, Icon = "AreaChartOutlined", Title = "数据大屏", Path = "/dataScreen/index", State = CommonState.Enable },
 
-            new MenuEntity{ Type = MenuType.Directory, Id = 3000000, PId = 0, Sort = 3, Icon = "TableOutlined", Title = "超级表格", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 3000001, PId = 3000000, Sort = 1, Icon = "AppstoreOutlined", Title = "使用 Hooks", Path = "/proTable/useHooks", State = CommonState.Disable },
-
-            new MenuEntity{ Type = MenuType.Directory, Id = 4000000, PId = 0, Sort = 4, Icon = "FundOutlined", Title = "Dashboard", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 4000001, PId = 4000000, Sort = 1, Icon = "AppstoreOutlined", Title = "数据可视化", Path = "/dashboard/dataVisualize", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 4000002, PId = 4000000, Sort = 2, Icon = "AppstoreOutlined", Title = "内嵌页面", Path = "/dashboard/embedded", State = CommonState.Disable },
-
-            new MenuEntity{ Type = MenuType.Directory, Id = 6000000, PId = 0, Sort = 6, Icon = "PieChartOutlined", Title = "Echarts图表", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 6000001, PId = 6000000, Sort = 1, Icon = "AppstoreOutlined", Title = "水型图", Path = "/echarts/waterChart", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 6000002, PId = 6000000, Sort = 2, Icon = "AppstoreOutlined", Title = "柱状图", Path = "/echarts/columnChart", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 6000003, PId = 6000000, Sort = 3, Icon = "AppstoreOutlined", Title = "折线图", Path = "/echarts/lineChart", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 6000004, PId = 6000000, Sort = 4, Icon = "AppstoreOutlined", Title = "饼图", Path = "/echarts/pieChart", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 6000005, PId = 6000000, Sort = 5, Icon = "AppstoreOutlined", Title = "雷达图", Path = "/echarts/radarChart", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 6000006, PId = 6000000, Sort = 6, Icon = "AppstoreOutlined", Title = "嵌套环形图", Path = "/echarts/nestedChart", State = CommonState.Disable },
-
-            new MenuEntity{ Type = MenuType.Directory, Id = 7000000, PId = 0, Sort = 7, Icon = "ShoppingOutlined", Title = "常用组件", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 7000001, PId = 7000000, Sort = 1, Icon = "AppstoreOutlined", Title = "引导页", Path = "/assembly/guide", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 7000002, PId = 7000000, Sort = 2, Icon = "AppstoreOutlined", Title = "Svg 图标", Path = "/assembly/svgIcon", State = CommonState.Disable },
-
             new MenuEntity{ Type = MenuType.Directory, Id = 8000000, PId = 0, Sort = 8, Icon = "SettingOutlined", Title = "系统管理", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = SysConst.TenantMenuId, PId = 8000000, Sort = 1, Icon = "ShopOutlined", Title = "租户管理", Path = "/system/tenant", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = 8000002, PId = 8000000, Sort = 2, Icon = "UserOutlined", Title = "用户管理", Path = "/system/user", State = CommonState.Enable },
@@ -64,11 +45,6 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Type = MenuType.Internal, Id = 8100007, PId = 8100000, Sort = 7, Icon = "FormOutlined", Title = "日报", Path = "/user/dayWorkReport", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = 8100008, PId = 8100000, Sort = 8, Icon = "FormOutlined", Title = "周报", Path = "/user/weekWorkReport", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = 8100009, PId = 8100000, Sort = 9, Icon = "FormOutlined", Title = "月报", Path = "/user/monthWorkReport", State = CommonState.Enable },
-
-            new MenuEntity{ Type = MenuType.Directory, Id = 9000000, PId = 0, Sort = 10, Icon = "ExclamationCircleOutlined", Title = "错误页面", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 9000001, PId = 9000000, Sort = 1, Icon = "AppstoreOutlined", Title = "404页面", Path = "/404", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 9000002, PId = 9000000, Sort = 2, Icon = "AppstoreOutlined", Title = "403页面", Path = "/403", State = CommonState.Disable },
-            new MenuEntity{ Type = MenuType.Internal, Id = 9000003, PId = 9000000, Sort = 3, Icon = "AppstoreOutlined", Title = "500页面", Path = "/500", State = CommonState.Disable },
 
             new MenuEntity{ Type = MenuType.Directory, Id = 10000000, PId = 0, Sort = 11, Icon = "LinkOutlined", Title = "外部链接", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.External, Id = 10000001, PId = 10000000, Sort = 1, Icon = "LinkOutlined", Title = "Gitee 仓库", Path = "/link/gitee", OutLink = "https://gitee.com/Sean-Lu", OutLinkOpenType = OutLinkOpenType.Blank, State = CommonState.Enable },
