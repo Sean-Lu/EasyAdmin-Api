@@ -7,7 +7,7 @@ public class TodoItemUpdateDto : DtoIdBase
     public long CategoryId { get; set; }
 
     [Required]
-    [MaxLength(100)]
+    [MaxLength(500)]
     public string Name { get; set; }
 
     public bool Done { get; set; }

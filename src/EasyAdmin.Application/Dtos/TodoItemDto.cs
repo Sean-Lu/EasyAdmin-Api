@@ -15,7 +15,7 @@ public class TodoItemDto : TenantDtoBase
     /// 待办事项名称
     /// </summary>
     [Required]
-    [MaxLength(100)]
+    [MaxLength(500)]
     public string Name { get; set; }
     /// <summary>
     /// 是否完成

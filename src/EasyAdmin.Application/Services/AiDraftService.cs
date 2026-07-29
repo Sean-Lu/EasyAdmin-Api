@@ -370,7 +370,7 @@ public sealed class AiDraftService(
 
     private static string ValidateTodo(AiTodoDraft value)
     {
-        RequireLength(value.Name, 1, 100, "待办名称");
+        RequireLength(value.Name, 1, 500, "待办名称");
         if (value.CategoryId < 1 || value.Priority is < 1 or > 3)
         {
             throw new ExplicitException("待办分类或优先级无效");

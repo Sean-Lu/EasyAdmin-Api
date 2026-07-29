@@ -21,7 +21,7 @@ public class TodoItemEntity : TenantEntityBase
     /// <summary>
     /// 待办事项名称
     /// </summary>
-    [MaxLength(100)]
+    [MaxLength(500)]
     public virtual string Name { get; set; }
     /// <summary>
     /// 是否完成
