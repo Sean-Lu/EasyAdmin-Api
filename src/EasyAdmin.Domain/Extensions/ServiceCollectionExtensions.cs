@@ -15,6 +15,9 @@ using Sean.Utility.Extensions;
 
 namespace EasyAdmin.Domain.Extensions;
 
+/// <summary>
+/// 领域层服务注册扩展
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
@@ -25,6 +28,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddServiceByInterfaceSuffix(Assembly.GetExecutingAssembly(), "Repository", ServiceLifetime.Transient);
         services.AddFileStorage();// 添加文件存储服务
+        services.AddAiModelClient();
 
         IConfiguration configuration = services.GetConfiguration();
 

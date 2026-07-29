@@ -9,6 +9,7 @@ namespace EasyAdmin.Domain.SeedData.Test;
 /// </summary>
 public class UserRoleSeedData : IEntitySeedData<UserRoleEntity>, ITestSeedData
 {
+    /// <inheritdoc />
     public IEnumerable<UserRoleEntity> SeedData()
     {
         return new[]

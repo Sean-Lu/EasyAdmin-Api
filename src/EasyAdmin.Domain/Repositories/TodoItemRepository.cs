@@ -6,9 +6,10 @@ using Microsoft.Extensions.Logging;
 namespace EasyAdmin.Domain.Repositories;
 
 /// <summary>
-/// 待办事项仓库实现
+/// 待办事项仓储实现
 /// </summary>
 public class TodoItemRepository(IConfiguration configuration, ILogger<TodoItemRepository> logger) : BaseRepositoryExt<TodoItemEntity>(configuration, logger), ITodoItemRepository
 {
+    /// <inheritdoc />
     protected override bool IsLogicallyDelete => false;
 }

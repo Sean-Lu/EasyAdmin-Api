@@ -1,4 +1,4 @@
-﻿using EasyAdmin.Infrastructure.Tenant;
+using EasyAdmin.Infrastructure.Tenant;
 using EasyAdmin.Web.Helper;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -9,6 +9,7 @@ namespace EasyAdmin.Web.Filter;
 /// </summary>
 public class TenantFilter : IAsyncActionFilter
 {
+    /// <inheritdoc />
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         // 从请求头中获取当前用户信息

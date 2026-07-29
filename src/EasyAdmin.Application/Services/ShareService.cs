@@ -11,7 +11,7 @@ using Sean.Core.DbRepository;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 分享服务
+/// 分享服务实现
 /// </summary>
 public class ShareService(
     IShareRepository shareRepository,
@@ -23,9 +23,7 @@ public class ShareService(
     IFileStorageFactory fileStorageFactory,
     SharePasswordProtector passwordProtector) : IShareService
 {
-    /// <summary>
-    /// 获取我的分享
-    /// </summary>
+    /// <inheritdoc />
     public async Task<PageQueryResult<ShareListItemDto>> ListAsync(ShareListReqDto request)
     {
         var tenantId = TenantContextHolder.TenantId;

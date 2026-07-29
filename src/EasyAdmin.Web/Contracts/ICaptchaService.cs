@@ -3,7 +3,7 @@ using EasyAdmin.Web.Models;
 namespace EasyAdmin.Web.Contracts;
 
 /// <summary>
-/// 验证码服务
+/// 验证码服务接口
 /// </summary>
 public interface ICaptchaService
 {

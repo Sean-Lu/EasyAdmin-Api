@@ -11,6 +11,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 定时任务日志服务实现
+/// </summary>
 public class ScheduleJobLogService(
     ILogger<ScheduleJobLogService> logger,
     IMapper mapper,

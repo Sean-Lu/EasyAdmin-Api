@@ -9,6 +9,7 @@ namespace EasyAdmin.Domain.SeedData.Test;
 /// </summary>
 public class CodeGenTemplateSeedData : IEntitySeedData<CodeGenTemplateEntity>, ITestSeedData
 {
+    /// <inheritdoc />
     public IEnumerable<CodeGenTemplateEntity> SeedData()
     {
         return new[]

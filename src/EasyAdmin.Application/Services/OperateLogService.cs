@@ -11,6 +11,9 @@ using Sean.Core.DbRepository.Extensions;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 操作日志服务实现
+/// </summary>
 public class OperateLogService(
     ILogger<OperateLogService> logger,
     IMapper mapper,

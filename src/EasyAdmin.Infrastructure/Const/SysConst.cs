@@ -51,7 +51,7 @@ public class SysConst
     {
         1000000,// 首页
         2000000,// 数据大屏
-        8100001, 8100002, 8100003, 8100004, 8100005, 8100006, 8100007, 8100008, 8100009,// 个人中心
+        8100001, 8100002, 8100003, 8100004, 8100005, 8100006, 8100007, 8100008, 8100009, AiAssistantMenuId,// 个人中心
         10000001, 10000002, 10000003,// 外部链接
         11000002, 11000003// 工具
     };
@@ -78,4 +78,17 @@ public class SysConst
     /// 租户管理菜单ID
     /// </summary>
     public const long TenantMenuId = 8000001;
+
+    /// <summary>
+    /// AI助手菜单ID
+    /// </summary>
+    public const long AiAssistantMenuId = 8100010;
+    /// <summary>
+    /// AI模型配置菜单ID
+    /// </summary>
+    public const long AiConfigMenuId = 8000016;
+    /// <summary>
+    /// AI用量记录菜单ID
+    /// </summary>
+    public const long AiUsageMenuId = 8000017;
 }

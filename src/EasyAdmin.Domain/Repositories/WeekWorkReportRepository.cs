@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Domain.Repositories;
 
+/// <summary>
+/// 周报仓储实现
+/// </summary>
 public class WeekWorkReportRepository(IConfiguration configuration, ILogger<WeekWorkReportRepository> logger) : BaseRepositoryExt<WeekWorkReportEntity>(configuration, logger), IWeekWorkReportRepository
 {
 

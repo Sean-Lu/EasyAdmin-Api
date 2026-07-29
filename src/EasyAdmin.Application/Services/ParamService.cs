@@ -11,6 +11,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 参数服务实现
+/// </summary>
 public class ParamService(
     ILogger<ParamService> logger,
     IMapper mapper,

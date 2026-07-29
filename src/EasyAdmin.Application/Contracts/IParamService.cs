@@ -5,6 +5,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 参数服务接口
+/// </summary>
 public interface IParamService
 {
     Task<bool> AddAsync(ParamDto dto);

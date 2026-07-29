@@ -31,26 +31,44 @@ public class UserNotificationEntity : TenantEntityBase
     /// </summary>
     public virtual DateTime? ReadTime { get; set; }
 
+    /// <summary>
+    /// 通知标题
+    /// </summary>
     [NotMapped]
     [LeftJoinField("n", nameof(NotificationEntity.Title))]
     public virtual string? Title { get; set; }
 
+    /// <summary>
+    /// 通知内容
+    /// </summary>
     [NotMapped]
     [LeftJoinField("n", nameof(NotificationEntity.Content))]
     public virtual string? Content { get; set; }
 
+    /// <summary>
+    /// 通知类型
+    /// </summary>
     [NotMapped]
     [LeftJoinField("n", nameof(NotificationEntity.NoticeType))]
     public virtual NotificationNoticeType NoticeType { get; set; }
 
+    /// <summary>
+    /// 目标摘要
+    /// </summary>
     [NotMapped]
     [LeftJoinField("n", nameof(NotificationEntity.TargetSummary))]
     public virtual string? TargetSummary { get; set; }
 
+    /// <summary>
+    /// 发送时间
+    /// </summary>
     [NotMapped]
     [LeftJoinField("n", nameof(NotificationEntity.SendTime))]
     public virtual DateTime? SendTime { get; set; }
 
+    /// <summary>
+    /// 通知状态
+    /// </summary>
     [NotMapped]
     [LeftJoinField("n", nameof(NotificationEntity.State))]
     public virtual CommonState NoticeState { get; set; }

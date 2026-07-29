@@ -9,6 +9,7 @@ namespace EasyAdmin.Web.Filter;
 /// </summary>
 public class ApiModelValidationFilter(ILogger<ApiModelValidationFilter> logger) : ActionFilterAttribute
 {
+    /// <inheritdoc />
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         if (!context.ModelState.IsValid)

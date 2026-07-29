@@ -9,7 +9,7 @@ using EasyAdmin.Infrastructure.Wrapper;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 用户偏好服务
+/// 用户偏好服务实现
 /// </summary>
 public class UserPreferenceService(IUserPreferenceRepository userPreferenceRepository) : IUserPreferenceService
 {

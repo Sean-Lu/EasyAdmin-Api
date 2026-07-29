@@ -40,6 +40,7 @@ public class RedisCacheController(
     /// 获取Redis缓存键详情
     /// </summary>
     /// <param name="key"></param>
+    /// <param name="database"></param>
     /// <returns></returns>
     [HttpGet]
     public async Task<ApiResult<RedisCacheDetailDto>> Detail(string key, [FromQuery] int database = 0)

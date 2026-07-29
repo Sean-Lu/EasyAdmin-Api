@@ -17,6 +17,9 @@ public class SlidingExpirationJwtMiddleware
     private readonly JwtConfig _jwtConfig;
     private readonly ITokenService _tokenService;
 
+    /// <summary>
+    /// 初始化JWT滑动过期中间件
+    /// </summary>
     public SlidingExpirationJwtMiddleware(RequestDelegate next, JwtConfig jwtConfig, ITokenService tokenService)
     {
         _next = next;
@@ -24,6 +27,9 @@ public class SlidingExpirationJwtMiddleware
         _tokenService = tokenService;
     }
 
+    /// <summary>
+    /// 执行令牌续期
+    /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
         var token = JwtHelper.GetToken(context.Request);
@@ -105,6 +111,9 @@ public class SlidingExpirationJwtMiddleware
         await _next(context);
     }
 
+    /// <summary>
+    /// 获取单令牌缓存键
+    /// </summary>
     public static string GetTokenKey(long userId)
     {
         return $"{CacheKeyConst.TokenPrefix}{userId}";

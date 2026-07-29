@@ -9,6 +9,7 @@ namespace EasyAdmin.Domain.SeedData.Test;
 /// </summary>
 public class CodeGenCategorySeedData : IEntitySeedData<CodeGenCategoryEntity>, ITestSeedData
 {
+    /// <inheritdoc />
     public IEnumerable<CodeGenCategoryEntity> SeedData()
     {
         var now = DateTime.Now;

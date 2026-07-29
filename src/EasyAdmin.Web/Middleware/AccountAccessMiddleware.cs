@@ -3,8 +3,14 @@ using EasyAdmin.Web.Contracts;
 
 namespace EasyAdmin.Web.Middleware;
 
+/// <summary>
+/// 账户访问校验中间件
+/// </summary>
 public class AccountAccessMiddleware(RequestDelegate next)
 {
+    /// <summary>
+    /// 执行账户访问校验
+    /// </summary>
     public async Task InvokeAsync(HttpContext context, IAccountAccessService accountAccessService)
     {
         if (context.User.Identity?.IsAuthenticated == true)

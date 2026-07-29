@@ -15,9 +15,7 @@ public class SvgCaptchaCodeGenerator : ICaptchaCodeGenerator
     /// </summary>
     public const string AllowedCharacters = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
 
-    /// <summary>
-    /// 生成验证码
-    /// </summary>
+    /// <inheritdoc />
     public CaptchaCode Generate(int codeLength)
     {
         var code = new string(Enumerable.Range(0, codeLength)

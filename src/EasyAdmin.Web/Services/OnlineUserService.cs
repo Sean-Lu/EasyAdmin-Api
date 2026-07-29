@@ -7,10 +7,11 @@ using EasyAdmin.Web.Models;
 namespace EasyAdmin.Web.Services;
 
 /// <summary>
-/// 在线用户服务
+/// 在线用户服务实现
 /// </summary>
 public sealed class OnlineUserService(IUserService userService, ITokenService tokenService) : IOnlineUserService
 {
+    /// <inheritdoc />
     public async Task<ApiResultPageData<OnlineUserSummary>> PageAsync(OnlineUserPageRequest request, long tenantId)
     {
         var records = OnlineUserSessionAggregator.Aggregate(
@@ -47,6 +48,7 @@ public sealed class OnlineUserService(IUserService userService, ITokenService to
         };
     }
 
+    /// <inheritdoc />
     public async Task KickAsync(long userId, long tenantId)
     {
         var user = await userService.GetByIdAsync(userId);

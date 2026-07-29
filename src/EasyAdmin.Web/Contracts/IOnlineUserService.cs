@@ -4,7 +4,7 @@ using EasyAdmin.Web.Models;
 namespace EasyAdmin.Web.Contracts;
 
 /// <summary>
-/// 在线用户服务
+/// 在线用户服务接口
 /// </summary>
 public interface IOnlineUserService
 {

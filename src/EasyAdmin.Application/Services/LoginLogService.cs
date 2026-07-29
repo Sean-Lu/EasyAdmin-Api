@@ -11,6 +11,9 @@ using Sean.Core.DbRepository.Extensions;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 登录日志服务实现
+/// </summary>
 public class LoginLogService(
     ILogger<LoginLogService> logger,
     IMapper mapper,

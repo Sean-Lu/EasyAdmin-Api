@@ -3,6 +3,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 笔记服务接口
+/// </summary>
 public interface INoteService
 {
     Task<PageQueryResult<NoteDto>> PageAsync(NotePageReqDto request);

@@ -21,7 +21,7 @@ using Sean.Core.DbRepository.Util;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 代码生成服务
+/// 代码生成服务实现
 /// </summary>
 public class CodeGenService(
     ILogger<CodeGenService> logger,

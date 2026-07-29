@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 笔记Markdown服务
+/// 笔记Markdown服务实现
 /// </summary>
 public partial class NoteMarkdownService : INoteMarkdownService
 {

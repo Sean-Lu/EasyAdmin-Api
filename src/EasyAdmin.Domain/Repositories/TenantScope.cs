@@ -4,8 +4,14 @@ using EasyAdmin.Infrastructure.Tenant;
 
 namespace EasyAdmin.Domain.Repositories;
 
+/// <summary>
+/// 租户查询范围
+/// </summary>
 public static class TenantScope
 {
+    /// <summary>
+    /// 应用租户过滤条件
+    /// </summary>
     public static Expression<Func<TEntity, bool>> Apply<TEntity>(Expression<Func<TEntity, bool>> predicate)
     {
         var tenantId = TenantContextHolder.TenantId;

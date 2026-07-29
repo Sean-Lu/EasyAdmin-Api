@@ -9,6 +9,7 @@ namespace EasyAdmin.Domain.SeedData;
 /// </summary>
 public class RoleMenuSeedData : IEntitySeedData<RoleMenuEntity>
 {
+    /// <inheritdoc />
     public IEnumerable<RoleMenuEntity> SeedData()
     {
         return SysConst.NormalUserMenuIds.Select((menuId, index) => new RoleMenuEntity

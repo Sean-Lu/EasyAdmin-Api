@@ -10,6 +10,7 @@ namespace EasyAdmin.Domain.SeedData.Test;
 /// </summary>
 public class PositionSeedData : IEntitySeedData<PositionEntity>, ITestSeedData
 {
+    /// <inheritdoc />
     public IEnumerable<PositionEntity> SeedData()
     {
         return new[]

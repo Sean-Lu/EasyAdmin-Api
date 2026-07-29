@@ -22,4 +22,19 @@ public class CacheKeyConst
 
     public const string TenantAccessStatusPrefix = $"{TopPrefix}TenantAccessStatus:";
     public const string UserAccessStatusPrefix = $"{TopPrefix}UserAccessStatus:";
+
+    /// <summary>
+    /// AI租户每日配额缓存前缀
+    /// </summary>
+    public const string AiTenantDailyQuotaPrefix = $"{TopPrefix}AiTenantDailyQuota:";
+
+    /// <summary>
+    /// AI会话生成锁缓存前缀
+    /// </summary>
+    public const string AiConversationGenerationLockPrefix = $"{TopPrefix}AiConversationGenerationLock:";
+
+    /// <summary>
+    /// AI会话取消请求缓存前缀
+    /// </summary>
+    public const string AiConversationCancellationPrefix = $"{TopPrefix}AiConversationCancellation:";
 }

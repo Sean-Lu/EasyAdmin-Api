@@ -8,7 +8,7 @@ using EasyAdmin.Application.Dtos;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 服务器监控服务
+/// 服务器监控服务实现
 /// </summary>
 public class ServerMonitorService : IServerMonitorService
 {

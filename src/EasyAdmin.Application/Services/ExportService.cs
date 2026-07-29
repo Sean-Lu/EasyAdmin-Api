@@ -8,6 +8,9 @@ using OfficeOpenXml;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 导出服务实现
+/// </summary>
 public class ExportService : IExportService
 {
     public async Task<byte[]> ExportToExcelAsync<T>(IEnumerable<T> data)

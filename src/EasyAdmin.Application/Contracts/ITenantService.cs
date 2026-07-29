@@ -5,6 +5,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 租户服务接口
+/// </summary>
 public interface ITenantService
 {
     Task<bool> AddAsync(TenantDto dto);

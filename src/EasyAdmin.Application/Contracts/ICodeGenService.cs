@@ -2,6 +2,9 @@ using EasyAdmin.Application.Dtos;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 代码生成服务接口
+/// </summary>
 public interface ICodeGenService
 {
     Task<List<CodeGenTemplateDto>> GetTemplateListAsync(CodeGenTemplateListReqDto request);

@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Domain.Repositories;
 
+/// <summary>
+/// 日报仓储实现
+/// </summary>
 public class DayWorkReportRepository(IConfiguration configuration, ILogger<DayWorkReportRepository> logger) : BaseRepositoryExt<DayWorkReportEntity>(configuration, logger), IDayWorkReportRepository
 {
 

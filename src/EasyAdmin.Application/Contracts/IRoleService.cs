@@ -5,6 +5,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 角色服务接口
+/// </summary>
 public interface IRoleService
 {
     Task<bool> AddAsync(RoleDto dto);

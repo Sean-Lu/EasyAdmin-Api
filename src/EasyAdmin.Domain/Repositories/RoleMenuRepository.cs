@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Domain.Repositories;
 
+/// <summary>
+/// 角色菜单仓储实现
+/// </summary>
 public class RoleMenuRepository(IConfiguration configuration, ILogger<RoleMenuRepository> logger) : BaseRepositoryExt<RoleMenuEntity>(configuration, logger), IRoleMenuRepository
 {
 

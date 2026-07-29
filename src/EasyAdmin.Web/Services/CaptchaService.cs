@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace EasyAdmin.Web.Services;
 
 /// <summary>
-/// 验证码服务
+/// 验证码服务实现
 /// </summary>
 public class CaptchaService(
     IOptions<CaptchaOptions> options,
@@ -17,14 +17,10 @@ public class CaptchaService(
 {
     private readonly CaptchaOptions _options = options.Value;
 
-    /// <summary>
-    /// 是否启用
-    /// </summary>
+    /// <inheritdoc />
     public bool Enabled => _options.Enable;
 
-    /// <summary>
-    /// 生成验证码
-    /// </summary>
+    /// <inheritdoc />
     public async Task<CaptchaResponse> GenerateAsync()
     {
         if (!Enabled)
@@ -55,9 +51,7 @@ public class CaptchaService(
         };
     }
 
-    /// <summary>
-    /// 校验验证码
-    /// </summary>
+    /// <inheritdoc />
     public async Task<bool> ValidateAsync(string? captchaKey, string? captchaCode)
     {
         if (!Enabled)

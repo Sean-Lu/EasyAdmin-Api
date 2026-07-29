@@ -12,6 +12,9 @@ using Sean.Core.DbRepository.Extensions;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 字典类型服务实现
+/// </summary>
 public class SysDictTypeService(
     ILogger<SysDictTypeService> logger,
     IMapper mapper,

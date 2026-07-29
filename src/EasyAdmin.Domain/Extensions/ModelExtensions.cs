@@ -1,10 +1,16 @@
-﻿using EasyAdmin.Domain.Contracts;
+using EasyAdmin.Domain.Contracts;
 
 namespace EasyAdmin.Domain.Extensions;
 
+/// <summary>
+/// 模型扩展
+/// </summary>
 public static class ModelExtensions
 {
-    public static List<T>? ToTreeList<T>(this List<T>? list, long rootPId = 0) where T : ITreeEntityBase<T>
+    /// <summary>
+    /// 转换为树形列表
+    /// </summary>
+    public static List<T> ToTreeList<T>(this List<T> list, long rootPId = 0) where T : ITreeEntityBase<T>
     {
         if (list == null || !list.Any())
         {

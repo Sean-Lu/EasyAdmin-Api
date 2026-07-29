@@ -12,6 +12,7 @@ namespace EasyAdmin.Web.Filter;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
 public class ApiExceptionFilterAttribute(ILogger<ApiExceptionFilterAttribute> logger) : ExceptionFilterAttribute
 {
+    /// <inheritdoc />
     public override void OnException(ExceptionContext context)
     {
         var requestPath = context.HttpContext.Request.Path;

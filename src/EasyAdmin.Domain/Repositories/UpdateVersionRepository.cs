@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Domain.Repositories;
 
+/// <summary>
+/// 更新版本仓储实现
+/// </summary>
 public class UpdateVersionRepository(
     IConfiguration configuration,
     ILogger<UpdateVersionRepository> logger

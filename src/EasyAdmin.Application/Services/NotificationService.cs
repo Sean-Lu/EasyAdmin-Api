@@ -13,6 +13,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 通知服务实现
+/// </summary>
 public class NotificationService(
     ILogger<NotificationService> logger,
     IMapper mapper,

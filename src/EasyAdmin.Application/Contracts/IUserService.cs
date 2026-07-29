@@ -5,6 +5,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 用户服务接口
+/// </summary>
 public interface IUserService
 {
     Task<UserEntity> RegisterAsync(RegisterUserDto dto, long tenantId);

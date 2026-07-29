@@ -2,6 +2,9 @@
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 导出服务接口
+/// </summary>
 public interface IExportService
 {
     /// <summary>

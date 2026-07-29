@@ -9,6 +9,7 @@ namespace EasyAdmin.Domain.SeedData.Test;
 /// </summary>
 public class MenuSeedData : IEntitySeedData<MenuEntity>, ITestSeedData
 {
+    /// <inheritdoc />
     public IEnumerable<MenuEntity> SeedData()
     {
         return new[]

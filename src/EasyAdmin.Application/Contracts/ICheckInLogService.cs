@@ -4,6 +4,9 @@ using EasyAdmin.Infrastructure.Enums;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 签到记录服务接口
+/// </summary>
 public interface ICheckInLogService
 {
     Task<bool> AddAsync(CheckInLogDto dto);

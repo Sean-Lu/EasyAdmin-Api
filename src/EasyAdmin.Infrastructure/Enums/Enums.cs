@@ -378,3 +378,179 @@ public enum ParamValueType
     /// </summary>
     Number = 2
 }
+
+/// <summary>
+/// AI消息角色
+/// </summary>
+public enum AiMessageRole
+{
+    /// <summary>
+    /// 用户
+    /// </summary>
+    User = 0,
+
+    /// <summary>
+    /// 助手
+    /// </summary>
+    Assistant = 1,
+
+    /// <summary>
+    /// 工具
+    /// </summary>
+    Tool = 2
+}
+
+/// <summary>
+/// AI消息状态
+/// </summary>
+public enum AiMessageStatus
+{
+    /// <summary>
+    /// 生成中
+    /// </summary>
+    Pending = 0,
+
+    /// <summary>
+    /// 已完成
+    /// </summary>
+    Completed = 1,
+
+    /// <summary>
+    /// 失败
+    /// </summary>
+    Failed = 2,
+
+    /// <summary>
+    /// 已取消
+    /// </summary>
+    Cancelled = 3
+}
+
+/// <summary>
+/// AI来源类型
+/// </summary>
+public enum AiSourceType
+{
+    /// <summary>
+    /// 笔记
+    /// </summary>
+    Note = 0,
+
+    /// <summary>
+    /// 待办
+    /// </summary>
+    Todo = 1,
+
+    /// <summary>
+    /// 日报
+    /// </summary>
+    DayReport = 2,
+
+    /// <summary>
+    /// 周报
+    /// </summary>
+    WeekReport = 3,
+
+    /// <summary>
+    /// 月报
+    /// </summary>
+    MonthReport = 4,
+
+    /// <summary>
+    /// 通知
+    /// </summary>
+    Notification = 5,
+
+    /// <summary>
+    /// 菜单
+    /// </summary>
+    Menu = 6
+}
+
+/// <summary>
+/// AI草稿类型
+/// </summary>
+public enum AiDraftType
+{
+    /// <summary>
+    /// 笔记
+    /// </summary>
+    Note = 0,
+
+    /// <summary>
+    /// 待办
+    /// </summary>
+    Todo = 1,
+
+    /// <summary>
+    /// 日报
+    /// </summary>
+    DayReport = 2,
+
+    /// <summary>
+    /// 周报
+    /// </summary>
+    WeekReport = 3,
+
+    /// <summary>
+    /// 月报
+    /// </summary>
+    MonthReport = 4
+}
+
+/// <summary>
+/// AI草稿状态
+/// </summary>
+public enum AiDraftStatus
+{
+    /// <summary>
+    /// 待确认
+    /// </summary>
+    Pending = 0,
+
+    /// <summary>
+    /// 确认中
+    /// </summary>
+    Confirming = 1,
+
+    /// <summary>
+    /// 已确认
+    /// </summary>
+    Confirmed = 2,
+
+    /// <summary>
+    /// 已过期
+    /// </summary>
+    Expired = 3,
+
+    /// <summary>
+    /// 已删除
+    /// </summary>
+    Deleted = 4
+}
+
+/// <summary>
+/// AI用量状态
+/// </summary>
+public enum AiUsageStatus
+{
+    /// <summary>
+    /// 进行中
+    /// </summary>
+    Running = 0,
+
+    /// <summary>
+    /// 成功
+    /// </summary>
+    Succeeded = 1,
+
+    /// <summary>
+    /// 失败
+    /// </summary>
+    Failed = 2,
+
+    /// <summary>
+    /// 已取消
+    /// </summary>
+    Cancelled = 3
+}

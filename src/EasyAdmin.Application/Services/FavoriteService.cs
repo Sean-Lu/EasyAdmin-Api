@@ -10,7 +10,7 @@ using Sean.Core.DbRepository;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 收藏服务
+/// 收藏服务实现
 /// </summary>
 public class FavoriteService(
     IFavoriteRepository favoriteRepository,

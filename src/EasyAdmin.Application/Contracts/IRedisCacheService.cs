@@ -3,7 +3,7 @@ using EasyAdmin.Application.Dtos;
 namespace EasyAdmin.Application.Contracts;
 
 /// <summary>
-/// Redis缓存管理服务
+/// Redis缓存管理服务接口
 /// </summary>
 public interface IRedisCacheService
 {

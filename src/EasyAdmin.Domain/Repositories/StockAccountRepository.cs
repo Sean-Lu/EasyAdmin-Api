@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Domain.Repositories;
 
+/// <summary>
+/// 股票账户仓储实现
+/// </summary>
 public class StockAccountRepository(IConfiguration configuration, ILogger<StockAccountRepository> logger)
     : BaseRepositoryExt<StockAccountEntity>(configuration, logger), IStockAccountRepository
 {

@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EasyAdmin.Web.Controllers;
 
+/// <summary>
+/// API控制器基类
+/// </summary>
 [Route("api/[controller]/[action]")]
 [ApiController]
 [UserAuth]
@@ -29,27 +32,45 @@ public abstract class BaseApiController : ControllerBase
     protected long UserId => TenantContextHolder.UserId;//UserInfo?.UserId ?? 0;
 
     #region ApiResult
+    /// <summary>
+    /// 返回成功结果
+    /// </summary>
     protected ApiResult Success()
     {
         return ApiResult.Ok();
     }
+    /// <summary>
+    /// 返回带数据的成功结果
+    /// </summary>
     protected ApiResult<T> Success<T>(T data)
     {
         return ApiResult.Ok<T>(data);
     }
 
+    /// <summary>
+    /// 返回失败结果
+    /// </summary>
     protected ApiResult Fail()
     {
         return ApiResult.Fail();
     }
+    /// <summary>
+    /// 返回带消息的失败结果
+    /// </summary>
     protected ApiResult Fail(string msg)
     {
         return ApiResult.Fail(msg);
     }
+    /// <summary>
+    /// 返回泛型失败结果
+    /// </summary>
     protected ApiResult<T> Fail<T>()
     {
         return ApiResult.Fail<T>();
     }
+    /// <summary>
+    /// 返回带消息的泛型失败结果
+    /// </summary>
     protected ApiResult<T> Fail<T>(string msg)
     {
         return ApiResult.Fail<T>(msg);

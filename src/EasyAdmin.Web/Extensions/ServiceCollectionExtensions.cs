@@ -5,6 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace EasyAdmin.Web.Extensions;
 
+/// <summary>
+/// Web层服务注册扩展
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>

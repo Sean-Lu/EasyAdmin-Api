@@ -11,12 +11,18 @@ public class GlobalExceptionMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// 初始化全局异常中间件
+    /// </summary>
     public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
     {
         _next = next;
         _logger = logger;
     }
 
+    /// <summary>
+    /// 执行异常处理
+    /// </summary>
     public async Task Invoke(HttpContext context)
     {
         try

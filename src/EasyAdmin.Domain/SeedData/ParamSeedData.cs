@@ -10,6 +10,7 @@ namespace EasyAdmin.Domain.SeedData;
 /// </summary>
 public class ParamSeedData : IEntitySeedData<ParamEntity>
 {
+    /// <inheritdoc />
     public IEnumerable<ParamEntity> SeedData()
     {
         return new[]

@@ -5,7 +5,7 @@ using Sean.Core.DbRepository;
 namespace EasyAdmin.Application.Contracts;
 
 /// <summary>
-/// 分享服务
+/// 分享服务接口
 /// </summary>
 public interface IShareService
 {

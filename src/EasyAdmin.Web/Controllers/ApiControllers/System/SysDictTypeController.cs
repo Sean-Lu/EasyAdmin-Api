@@ -18,6 +18,9 @@ public class SysDictTypeController(
     ISysDictTypeService sysDictTypeService
     ) : BaseApiController
 {
+    /// <summary>
+    /// 新增字典类型
+    /// </summary>
     [HttpPost]
     [ApiRepeatRequestFilter]
     public async Task<ApiResult<bool>> Add(SysDictTypeDto data)
@@ -34,6 +37,9 @@ public class SysDictTypeController(
         return Success(await sysDictTypeService.AddAsync(data));
     }
 
+    /// <summary>
+    /// 删除字典类型
+    /// </summary>
     [HttpPost]
     public async Task<ApiResult<bool>> Delete([FromBody] JObject? data)
     {
@@ -47,6 +53,9 @@ public class SysDictTypeController(
         return Success(await sysDictTypeService.DeleteByIdAsync(id));
     }
 
+    /// <summary>
+    /// 更新字典类型
+    /// </summary>
     [HttpPost]
     public async Task<ApiResult<bool>> Update(SysDictTypeUpdateDto data)
     {
@@ -62,6 +71,9 @@ public class SysDictTypeController(
         return Success(await sysDictTypeService.UpdateAsync(data));
     }
 
+    /// <summary>
+    /// 更新字典类型状态
+    /// </summary>
     [HttpPost]
     public async Task<ApiResult<bool>> UpdateState([FromBody] JObject? data)
     {
@@ -70,6 +82,9 @@ public class SysDictTypeController(
         return Success(await sysDictTypeService.UpdateStateAsync(id, state));
     }
 
+    /// <summary>
+    /// 分页查询字典类型
+    /// </summary>
     [HttpGet]
     public async Task<ApiResult<ApiResultPageData<SysDictTypeDto>>> Page([FromQuery] SysDictTypePageReqDto request)
     {
@@ -77,12 +92,18 @@ public class SysDictTypeController(
         return Success(mapper.Map<ApiResultPageData<SysDictTypeDto>>(pageResult));
     }
 
+    /// <summary>
+    /// 查询字典类型列表
+    /// </summary>
     [HttpGet]
     public async Task<ApiResult<List<SysDictTypeDto>>> List()
     {
         return Success(mapper.Map<List<SysDictTypeDto>>(await sysDictTypeService.GetAllAsync()));
     }
 
+    /// <summary>
+    /// 查询字典类型详情
+    /// </summary>
     [HttpGet]
     public async Task<ApiResult<SysDictTypeDto>> Detail(long id)
     {

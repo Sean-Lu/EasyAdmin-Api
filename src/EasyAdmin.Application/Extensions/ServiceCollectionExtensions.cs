@@ -27,6 +27,10 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IExportService, ExportService>();
         services.AddTransient<SharePasswordProtector>();
+        services.AddTransient<AiApiKeyProtector>();
+        services.AddTransient<IAiGenerationCoordinator, AiGenerationCoordinator>();
+        services.AddTransient<IAiQuotaCounter, AiQuotaCounter>();
+        services.AddTransient<IAiUsageRecorder, AiUsageRecorder>();
         services.AddSingleton<INotePdfRenderer, WkHtmlNotePdfRenderer>();
         services.Configure<EmailOptions>(services.GetConfiguration().GetSection("Email"));
         services.Configure<SmsOptions>(services.GetConfiguration().GetSection("Sms"));

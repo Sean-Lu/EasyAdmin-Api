@@ -13,6 +13,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 岗位服务实现
+/// </summary>
 public class PositionService(
     ILogger<PositionService> logger,
     IMapper mapper,

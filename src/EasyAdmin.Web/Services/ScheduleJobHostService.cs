@@ -10,6 +10,7 @@ public class ScheduleJobHostService(
         ILogger<ScheduleJobHostService> logger,
         IServiceProvider serviceProvider) : BackgroundService
 {
+    /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("定时任务管理服务启动中...");
@@ -33,6 +34,7 @@ public class ScheduleJobHostService(
         await quartzSchedulerService.LoadEnabledJobsAsync(jobs);
     }
 
+    /// <inheritdoc />
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("定时任务管理服务已停止");

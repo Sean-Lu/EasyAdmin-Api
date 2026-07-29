@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 签到统计服务实现
+/// </summary>
 public class CheckInCountService(
     ILogger<CheckInCountService> logger,
     IMapper mapper,

@@ -7,12 +7,16 @@ using Sean.Core.Redis;
 
 namespace EasyAdmin.Web.Services;
 
+/// <summary>
+/// 账户访问服务实现
+/// </summary>
 public class AccountAccessService(
     ITenantRepository tenantRepository,
     IUserRepository userRepository) : IAccountAccessService
 {
     private static readonly TimeSpan CacheDuration = TimeSpan.FromSeconds(30);
 
+    /// <inheritdoc />
     public async Task<bool> IsAllowedAsync(long tenantId, long userId)
     {
         if (tenantId < 1 || userId < 1 || !await GetTenantAllowedAsync(tenantId))
@@ -21,7 +25,9 @@ public class AccountAccessService(
         return await GetUserAllowedAsync(tenantId, userId);
     }
 
+    /// <inheritdoc />
     public Task InvalidateTenantAsync(long tenantId) => RedisHelper.KeyDeleteAsync(GetTenantKey(tenantId));
+    /// <inheritdoc />
     public Task InvalidateUserAsync(long tenantId, long userId) => RedisHelper.KeyDeleteAsync(GetUserKey(tenantId, userId));
 
     private async Task<bool> GetTenantAllowedAsync(long tenantId)

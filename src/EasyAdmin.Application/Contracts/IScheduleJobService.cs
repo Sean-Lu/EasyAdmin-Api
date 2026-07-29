@@ -5,6 +5,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 定时任务服务接口
+/// </summary>
 public interface IScheduleJobService
 {
     Task<bool> AddAsync(ScheduleJobDto dto);

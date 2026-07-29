@@ -11,6 +11,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 应用代码服务实现
+/// </summary>
 public class AppCodeService(
     IMapper mapper,
     IAppCodeRepository appCodeRepository

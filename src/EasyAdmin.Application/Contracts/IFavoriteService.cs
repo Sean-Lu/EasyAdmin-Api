@@ -4,7 +4,7 @@ using Sean.Core.DbRepository;
 namespace EasyAdmin.Application.Contracts;
 
 /// <summary>
-/// 收藏服务
+/// 收藏服务接口
 /// </summary>
 public interface IFavoriteService
 {

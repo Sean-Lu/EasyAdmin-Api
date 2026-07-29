@@ -18,6 +18,9 @@ public class SysDictDataController(
     ISysDictDataService sysDictDataService
     ) : BaseApiController
 {
+    /// <summary>
+    /// 新增字典数据
+    /// </summary>
     [HttpPost]
     [ApiRepeatRequestFilter]
     public async Task<ApiResult<bool>> Add(SysDictDataDto data)
@@ -34,6 +37,9 @@ public class SysDictDataController(
         return Success(await sysDictDataService.AddAsync(data));
     }
 
+    /// <summary>
+    /// 删除字典数据
+    /// </summary>
     [HttpPost]
     public async Task<ApiResult<bool>> Delete([FromBody] JObject? data)
     {
@@ -47,6 +53,9 @@ public class SysDictDataController(
         return Success(await sysDictDataService.DeleteByIdAsync(id));
     }
 
+    /// <summary>
+    /// 更新字典数据
+    /// </summary>
     [HttpPost]
     public async Task<ApiResult<bool>> Update(SysDictDataUpdateDto data)
     {
@@ -62,6 +71,9 @@ public class SysDictDataController(
         return Success(await sysDictDataService.UpdateAsync(data));
     }
 
+    /// <summary>
+    /// 更新字典数据状态
+    /// </summary>
     [HttpPost]
     public async Task<ApiResult<bool>> UpdateState([FromBody] JObject? data)
     {
@@ -70,6 +82,9 @@ public class SysDictDataController(
         return Success(await sysDictDataService.UpdateStateAsync(id, state));
     }
 
+    /// <summary>
+    /// 分页查询字典数据
+    /// </summary>
     [HttpGet]
     public async Task<ApiResult<ApiResultPageData<SysDictDataDto>>> Page([FromQuery] SysDictDataPageReqDto request)
     {
@@ -77,12 +92,18 @@ public class SysDictDataController(
         return Success(mapper.Map<ApiResultPageData<SysDictDataDto>>(pageResult));
     }
 
+    /// <summary>
+    /// 按类型编码查询字典数据
+    /// </summary>
     [HttpGet]
     public async Task<ApiResult<List<SysDictDataDto>>> GetByTypeCode(string typeCode)
     {
         return Success(mapper.Map<List<SysDictDataDto>>(await sysDictDataService.GetByTypeCodeAsync(typeCode)));
     }
 
+    /// <summary>
+    /// 查询字典数据详情
+    /// </summary>
     [HttpGet]
     public async Task<ApiResult<SysDictDataDto>> Detail(long id)
     {

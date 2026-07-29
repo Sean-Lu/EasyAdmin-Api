@@ -5,8 +5,7 @@ using Sean.Core.DbRepository;
 namespace EasyAdmin.Application.Contracts;
 
 /// <summary>
-/// 版本管理服务接口：定义客户端自动更新的全部业务操作
-/// 包含版本检测、更新清单生成、文件下载、版本注册、发布管理等
+/// 版本管理服务接口
 /// </summary>
 public interface IVersionService
 {

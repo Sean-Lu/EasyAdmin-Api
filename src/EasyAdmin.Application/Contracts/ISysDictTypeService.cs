@@ -5,6 +5,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 字典类型服务接口
+/// </summary>
 public interface ISysDictTypeService
 {
     Task<bool> AddAsync(SysDictTypeDto dto);

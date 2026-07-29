@@ -18,7 +18,7 @@ using System.Text;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 笔记服务
+/// 笔记服务实现
 /// </summary>
 public class NoteService(
     ILogger<NoteService> logger,
@@ -124,6 +124,7 @@ public class NoteService(
             entity.ContentText = NoteContentHelper.ExtractText(content.ContentHtml);
             entity.Summary = NoteContentHelper.CreateSummary(entity.ContentText);
             await noteRepository.AddAsync(entity, transaction: transaction);
+            dto.Id = entity.Id;
             await SaveTagsAsync(entity.Id, dto.Tags, transaction);
             return true;
         });

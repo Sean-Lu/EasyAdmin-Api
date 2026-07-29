@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace EasyAdmin.Web.Filter;
 
+/// <summary>
+/// 超级管理员访问限制
+/// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public class SuperAdminOnlyAttribute : Attribute, IAsyncAuthorizationFilter
 {
+    /// <inheritdoc />
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         var tenantClaim = context.HttpContext.User.FindFirst(nameof(JwtUserModel.TenantId));

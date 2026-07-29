@@ -14,6 +14,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 部门服务实现
+/// </summary>
 public class DepartmentService(
     ILogger<DepartmentService> logger,
     IMapper mapper,

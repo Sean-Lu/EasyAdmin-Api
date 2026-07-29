@@ -9,7 +9,7 @@ using EasyAdmin.Infrastructure.Wrapper;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 笔记密码服务
+/// 笔记密码服务实现
 /// </summary>
 public class NotePasswordService(
     IUserNotePasswordRepository userNotePasswordRepository

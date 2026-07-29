@@ -13,6 +13,9 @@ using EasyAdmin.Infrastructure.Wrapper;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 文件服务实现
+/// </summary>
 public class FileService(
     ILogger<FileService> logger,
     IMapper mapper,

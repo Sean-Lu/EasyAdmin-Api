@@ -4,6 +4,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 操作日志服务接口
+/// </summary>
 public interface IOperateLogService
 {
     Task<bool> AddAsync(OperateLogDto dto);

@@ -6,10 +6,11 @@ using Microsoft.Extensions.Logging;
 namespace EasyAdmin.Domain.Repositories;
 
 /// <summary>
-/// 随机决策候选项仓库实现
+/// 随机决策候选项仓储实现
 /// </summary>
 public class DecisionItemRepository(IConfiguration configuration, ILogger<DecisionItemRepository> logger)
     : BaseRepositoryExt<DecisionItemEntity>(configuration, logger), IDecisionItemRepository
 {
+    /// <inheritdoc />
     protected override bool IsLogicallyDelete => false;
 }

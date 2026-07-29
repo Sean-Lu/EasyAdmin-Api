@@ -5,6 +5,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 岗位服务接口
+/// </summary>
 public interface IPositionService
 {
     Task<bool> AddAsync(PositionDto dto);

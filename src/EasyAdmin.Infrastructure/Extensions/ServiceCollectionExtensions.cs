@@ -1,4 +1,5 @@
 using System.Reflection;
+using EasyAdmin.Infrastructure.Ai;
 using Microsoft.Extensions.DependencyInjection;
 using EasyAdmin.Infrastructure.Storage;
 
@@ -74,6 +75,19 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IFileStorage, LocalFileStorage>();// 添加本地文件存储服务
         services.AddSingleton<IFileStorage, AliyunOssStorage>();// 添加阿里云OSS文件存储服务
         services.AddSingleton<IFileStorageFactory, FileStorageFactory>();// 添加文件存储工厂服务
+        return services;
+    }
+
+    /// <summary>
+    /// 添加AI模型客户端
+    /// </summary>
+    public static IServiceCollection AddAiModelClient(this IServiceCollection services)
+    {
+        services.AddSingleton<IAiModelClient>(_ =>
+            new OpenAiCompatibleClient(new HttpClient
+            {
+                Timeout = Timeout.InfiniteTimeSpan
+            }));
         return services;
     }
 }

@@ -1,7 +1,7 @@
 namespace EasyAdmin.Application.Contracts;
 
 /// <summary>
-/// 笔记Markdown服务
+/// 笔记Markdown服务接口
 /// </summary>
 public interface INoteMarkdownService
 {

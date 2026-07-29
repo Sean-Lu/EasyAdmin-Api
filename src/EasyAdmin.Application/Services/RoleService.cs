@@ -13,6 +13,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 角色服务实现
+/// </summary>
 public class RoleService(
     ILogger<RoleService> logger,
     IMapper mapper,

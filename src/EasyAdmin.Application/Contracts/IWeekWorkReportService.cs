@@ -4,6 +4,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 周报服务接口
+/// </summary>
 public interface IWeekWorkReportService
 {
     Task<bool> AddAsync(WeekWorkReportDto dto);

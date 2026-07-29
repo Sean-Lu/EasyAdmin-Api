@@ -4,6 +4,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 文件服务接口
+/// </summary>
 public interface IFileService
 {
     Task<bool> AddAsync(FileDto dto);

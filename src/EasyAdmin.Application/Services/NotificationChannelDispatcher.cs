@@ -4,9 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Application.Services;
 
-/// <summary>
-/// 通知通道分发器
-/// </summary>
+/// <inheritdoc />
 public class NotificationChannelDispatcher(
     ILogger<NotificationChannelDispatcher> logger,
     IEmailSender emailSender,

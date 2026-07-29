@@ -8,6 +8,7 @@ namespace EasyAdmin.Web.Filter;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = true)]
 public class UserAuthAttribute : Attribute, IAuthorizationFilter
 {
+    /// <inheritdoc />
     public void OnAuthorization(AuthorizationFilterContext context)
     {
 

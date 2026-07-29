@@ -3,6 +3,7 @@ using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Tenant;
+using EasyAdmin.Infrastructure.Wrapper;
 using MapsterMapper;
 using Sean.Core.DbRepository;
 
@@ -13,14 +14,26 @@ namespace EasyAdmin.Application.Services;
 /// </summary>
 public class TodoItemService(
     IMapper mapper,
-    ITodoItemRepository todoItemRepository
+    ITodoItemRepository todoItemRepository,
+    ITodoCategoryRepository todoCategoryRepository
     ) : ITodoItemService
 {
     public async Task<bool> AddAsync(TodoItemDto dto)
     {
+        var category = await todoCategoryRepository.GetAsync(entity =>
+            entity.Id == dto.CategoryId &&
+            entity.UserId == TenantContextHolder.UserId &&
+            entity.TenantId == TenantContextHolder.TenantId &&
+            !entity.IsDelete);
+        if (category == null)
+        {
+            throw new ExplicitException("待办分类不存在或无权访问");
+        }
         var entity = mapper.Map<TodoItemEntity>(dto);
         entity.UserId = TenantContextHolder.UserId;
-        return await todoItemRepository.AddAsync(entity);
+        var result = await todoItemRepository.AddAsync(entity);
+        dto.Id = entity.Id;
+        return result;
     }
 
     public async Task<bool> DeleteByIdAsync(long id)

@@ -2,6 +2,10 @@
 
 namespace EasyAdmin.Domain.Contracts;
 
+/// <summary>
+/// 实体种子数据接口
+/// </summary>
+/// <typeparam name="TEntity">实体类型</typeparam>
 public interface IEntitySeedData<TEntity> where TEntity : EntityBase, new()
 {
     /// <summary>

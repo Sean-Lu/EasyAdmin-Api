@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Domain.Repositories;
 
+/// <summary>
+/// 用户仓储实现
+/// </summary>
 public class UserRepository(IConfiguration configuration, ILogger<UserRepository> logger) : BaseRepositoryExt<UserEntity>(configuration, logger), IUserRepository
 {
 

@@ -16,6 +16,9 @@ using System.Text.RegularExpressions;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 菜单服务实现
+/// </summary>
 public class MenuService(
     ILogger<MenuService> logger,
     IMapper mapper,

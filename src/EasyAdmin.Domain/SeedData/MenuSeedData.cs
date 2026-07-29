@@ -10,6 +10,7 @@ namespace EasyAdmin.Domain.SeedData;
 /// </summary>
 public class MenuSeedData : IEntitySeedData<MenuEntity>
 {
+    /// <inheritdoc />
     public IEnumerable<MenuEntity> SeedData()
     {
         return new[]
@@ -34,6 +35,8 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Type = MenuType.Internal, Id = 8000013, PId = 8000000, Sort = 13, Icon = "FileDoneOutlined", Title = "文件管理", Path = "/system/file", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = 8000014, PId = 8000000, Sort = 14, Icon = "CloudUploadOutlined", Title = "更新管理", Path = "/system/update", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = 8000015, PId = 8000000, Sort = 15, Icon = "BellOutlined", Title = "通知管理", Path = "/system/notification", State = CommonState.Enable },
+            new MenuEntity{ Type = MenuType.Internal, Id = SysConst.AiConfigMenuId, PId = 8000000, Sort = 16, Icon = "RobotOutlined", Title = "AI 模型配置", Path = "/system/ai/config", State = CommonState.Enable },
+            new MenuEntity{ Type = MenuType.Internal, Id = SysConst.AiUsageMenuId, PId = 8000000, Sort = 17, Icon = "BarChartOutlined", Title = "AI 用量记录", Path = "/system/ai/usage", State = CommonState.Enable },
 
             new MenuEntity{ Type = MenuType.Directory, Id = 8100000, PId = 0, Sort = 9, Icon = "UserOutlined", Title = "个人中心", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = 8100001, PId = 8100000, Sort = 1, Icon = "BellOutlined", Title = "我的消息", Path = "/user/message", State = CommonState.Enable },
@@ -45,6 +48,7 @@ public class MenuSeedData : IEntitySeedData<MenuEntity>
             new MenuEntity{ Type = MenuType.Internal, Id = 8100007, PId = 8100000, Sort = 7, Icon = "FormOutlined", Title = "日报", Path = "/user/dayWorkReport", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = 8100008, PId = 8100000, Sort = 8, Icon = "FormOutlined", Title = "周报", Path = "/user/weekWorkReport", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.Internal, Id = 8100009, PId = 8100000, Sort = 9, Icon = "FormOutlined", Title = "月报", Path = "/user/monthWorkReport", State = CommonState.Enable },
+            new MenuEntity{ Type = MenuType.Internal, Id = SysConst.AiAssistantMenuId, PId = 8100000, Sort = 10, Icon = "RobotOutlined", Title = "AI 助手", Path = "/ai/assistant", State = CommonState.Enable },
 
             new MenuEntity{ Type = MenuType.Directory, Id = 10000000, PId = 0, Sort = 11, Icon = "LinkOutlined", Title = "外部链接", State = CommonState.Enable },
             new MenuEntity{ Type = MenuType.External, Id = 10000001, PId = 10000000, Sort = 1, Icon = "LinkOutlined", Title = "Gitee 仓库", Path = "/link/gitee", OutLink = "https://gitee.com/Sean-Lu", OutLinkOpenType = OutLinkOpenType.Blank, State = CommonState.Enable },

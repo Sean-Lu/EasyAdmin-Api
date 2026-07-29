@@ -13,6 +13,9 @@ namespace EasyAdmin.Web.Helper;
 /// </summary>
 public static class JwtHelper
 {
+    /// <summary>
+    /// JWT配置
+    /// </summary>
     public static JwtConfig JwtConfig { get; set; }
 
     /// <summary>

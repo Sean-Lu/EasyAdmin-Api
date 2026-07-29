@@ -13,6 +13,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 行政区划服务实现
+/// </summary>
 public class RegionService(
     ILogger<RegionService> logger,
     IMapper mapper,

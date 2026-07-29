@@ -9,7 +9,7 @@ using Sean.Core.DbRepository;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 笔记分类服务
+/// 笔记分类服务实现
 /// </summary>
 public class NoteCategoryService(
     IMapper mapper,

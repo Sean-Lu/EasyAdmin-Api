@@ -9,7 +9,7 @@ using Sean.Core.DbRepository;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// 笔记标签服务
+/// 笔记标签服务实现
 /// </summary>
 public class NoteTagService(
     IMapper mapper,

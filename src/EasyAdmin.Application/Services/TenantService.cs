@@ -14,6 +14,9 @@ using Sean.Utility.Security.Provider;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 租户服务实现
+/// </summary>
 public class TenantService(
     ILogger<TenantService> logger,
     IMapper mapper,

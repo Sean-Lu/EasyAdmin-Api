@@ -4,6 +4,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 登录日志服务接口
+/// </summary>
 public interface ILoginLogService
 {
     Task<bool> AddAsync(LoginLogDto dto);

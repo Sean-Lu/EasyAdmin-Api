@@ -12,8 +12,10 @@ using Sean.Core.DbRepository.Extensions;
 
 namespace EasyAdmin.Domain.Repositories;
 
+/// <inheritdoc cref="DapperBaseRepository"/>
 public abstract class BaseRepositoryExt(IConfiguration configuration, ILogger logger) : DapperBaseRepository(configuration)
 {
+    /// <inheritdoc />
     protected override void OnSqlExecuting(SqlExecutingContext context)
     {
         base.OnSqlExecuting(context);
@@ -22,6 +24,7 @@ public abstract class BaseRepositoryExt(IConfiguration configuration, ILogger lo
         //context.Handled = true;
     }
 
+    /// <inheritdoc />
     protected override void OnSqlExecuted(SqlExecutedContext context)
     {
         base.OnSqlExecuted(context);
@@ -31,6 +34,7 @@ public abstract class BaseRepositoryExt(IConfiguration configuration, ILogger lo
     }
 }
 
+/// <inheritdoc cref="DapperBaseRepository{TEntity}"/>
 public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, ILogger logger) : DapperBaseRepository<TEntity>(configuration), IBaseRepositoryExt<TEntity> where TEntity : EntityBase, new()
 {
     /// <summary>
@@ -38,6 +42,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
     /// </summary>
     protected virtual bool IsLogicallyDelete => true;
 
+    /// <inheritdoc />
     protected override void OnSqlExecuting(SqlExecutingContext context)
     {
         base.OnSqlExecuting(context);
@@ -46,6 +51,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
         //context.Handled = true;
     }
 
+    /// <inheritdoc />
     protected override void OnSqlExecuted(SqlExecutedContext context)
     {
         base.OnSqlExecuted(context);
@@ -54,6 +60,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
         //context.Handled = true;
     }
 
+    /// <inheritdoc />
     protected override void BeforeEntityAdded(TEntity? entity)
     {
         if (entity == null)
@@ -80,6 +87,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
             tenantEntityBase.TenantId = TenantContextHolder.TenantId;
         }
     }
+    /// <inheritdoc />
     protected override void BeforeEntitiesAdded(IEnumerable<TEntity> entities)
     {
         foreach (var entity in entities)
@@ -88,6 +96,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
         }
     }
 
+    /// <inheritdoc />
     protected override void BeforeEntityUpdated(TEntity? entity, ref Expression<Func<TEntity, object>>? fieldExpression)
     {
         if (entity == null)
@@ -116,6 +125,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
             }
         }
     }
+    /// <inheritdoc />
     protected override void BeforeEntitiesUpdated(IEnumerable<TEntity> entities, ref Expression<Func<TEntity, object>>? fieldExpression)
     {
         foreach (var entity in entities)
@@ -125,6 +135,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
     }
 
     #region 扩展方法
+    /// <inheritdoc />
     public virtual bool DeleteById(long id, IDbTransaction? transaction = null)
     {
         var predicate = TenantScope.Apply<TEntity>(entity => entity.Id == id);
@@ -138,6 +149,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
         }
         return Delete(predicate, transaction) > 0;
     }
+    /// <inheritdoc />
     public virtual bool DeleteByIds(IEnumerable<long> ids, IDbTransaction? transaction = null)
     {
         var predicate = TenantScope.Apply<TEntity>(entity => ids.Contains(entity.Id));
@@ -151,15 +163,18 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
         return Delete(predicate, transaction) > 0;
     }
 
+    /// <inheritdoc />
     public virtual TEntity GetById(long id)
     {
         return Get(TenantScope.Apply<TEntity>(entity => entity.Id == id));
     }
+    /// <inheritdoc />
     public virtual List<TEntity>? GetByIds(IEnumerable<long> ids)
     {
         return Query(TenantScope.Apply<TEntity>(entity => ids.Contains(entity.Id)))?.ToList();
     }
 
+    /// <inheritdoc />
     public virtual DateTime? GetLastUpdateTime(Expression<Func<TEntity, bool>>? whereExpression = null)
     {
         var sql = this.CreateQueryableBuilder()
@@ -169,6 +184,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
         return Get<DateTime?>(sql);
     }
 
+    /// <inheritdoc />
     public virtual async Task<bool> DeleteByIdAsync(long id, IDbTransaction? transaction = null)
     {
         var predicate = TenantScope.Apply<TEntity>(entity => entity.Id == id);
@@ -182,6 +198,7 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
         }
         return await DeleteAsync(predicate, transaction) > 0;
     }
+    /// <inheritdoc />
     public virtual async Task<bool> DeleteByIdsAsync(IEnumerable<long> ids, IDbTransaction? transaction = null)
     {
         var predicate = TenantScope.Apply<TEntity>(entity => ids.Contains(entity.Id));
@@ -195,15 +212,18 @@ public abstract class BaseRepositoryExt<TEntity>(IConfiguration configuration, I
         return await DeleteAsync(predicate, transaction) > 0;
     }
 
+    /// <inheritdoc />
     public virtual async Task<TEntity> GetByIdAsync(long id)
     {
         return await GetAsync(TenantScope.Apply<TEntity>(entity => entity.Id == id));
     }
+    /// <inheritdoc />
     public virtual async Task<List<TEntity>?> GetByIdsAsync(IEnumerable<long> ids)
     {
         return (await QueryAsync(TenantScope.Apply<TEntity>(entity => ids.Contains(entity.Id))))?.ToList();
     }
 
+    /// <inheritdoc />
     public virtual async Task<DateTime?> GetLastUpdateTimeAsync(Expression<Func<TEntity, bool>>? whereExpression = null)
     {
         var sql = this.CreateQueryableBuilder()

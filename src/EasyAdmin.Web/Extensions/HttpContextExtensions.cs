@@ -1,5 +1,8 @@
 ﻿namespace EasyAdmin.Web.Extensions
 {
+    /// <summary>
+    /// HTTP上下文扩展
+    /// </summary>
     public static class HttpContextExtensions
     {
         /// <summary>

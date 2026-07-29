@@ -15,13 +15,17 @@ namespace EasyAdmin.Web.Filter;
 public class ApiRepeatRequestFilterAttribute : ActionFilterAttribute
 {
     private readonly string[]? _requestKeys;
-    private string _cacheKey;
+    private string? _cacheKey;
 
+    /// <summary>
+    /// 初始化重复请求过滤器
+    /// </summary>
     public ApiRepeatRequestFilterAttribute(params string[]? requestKeys)
     {
         _requestKeys = requestKeys;
     }
 
+    /// <inheritdoc />
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         var requestPath = context.HttpContext.Request.Path;
@@ -55,6 +59,7 @@ public class ApiRepeatRequestFilterAttribute : ActionFilterAttribute
         context.Result = new JsonResult(ApiResult.Fail("请勿重复提交"));
     }
 
+    /// <inheritdoc />
     public override void OnActionExecuted(ActionExecutedContext context)
     {
         RedisHelper.KeyDelete(_cacheKey);

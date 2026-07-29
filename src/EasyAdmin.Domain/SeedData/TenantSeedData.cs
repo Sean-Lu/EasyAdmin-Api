@@ -10,6 +10,7 @@ namespace EasyAdmin.Domain.SeedData;
 /// </summary>
 public class TenantSeedData : IEntitySeedData<TenantEntity>
 {
+    /// <inheritdoc />
     public IEnumerable<TenantEntity> SeedData()
     {
         return new[]

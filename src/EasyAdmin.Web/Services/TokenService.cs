@@ -13,8 +13,12 @@ using Sean.Core.Redis;
 
 namespace EasyAdmin.Web.Services;
 
+/// <summary>
+/// 令牌服务实现
+/// </summary>
 public class TokenService(JwtConfig jwtConfig) : ITokenService
 {
+    /// <inheritdoc />
     public async Task<(string AccessToken, string RefreshToken)> GenerateTokens(JwtUserModel user, string ipAddress, string userAgent)
     {
         var accessToken = GenerateAccessToken(user);
@@ -28,6 +32,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         return (accessToken, refreshToken);
     }
 
+    /// <inheritdoc />
     public string GenerateAccessToken(JwtUserModel user)
     {
         var claims = new List<Claim>
@@ -49,6 +54,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         return "Bearer " + token;
     }
 
+    /// <inheritdoc />
     public string GenerateRefreshToken()
     {
         var randomNumber = new byte[64];
@@ -57,6 +63,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         return Convert.ToBase64String(randomNumber);
     }
 
+    /// <inheritdoc />
     public async Task StoreSingleTokenSessionAsync(JwtUserModel user, string token, string ipAddress, string userAgent)
     {
         var session = new SingleTokenSessionModel
@@ -76,9 +83,11 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
             session.ExpiresAt - DateTime.UtcNow);
     }
 
+    /// <inheritdoc />
     public async Task<SingleTokenSessionModel?> GetSingleTokenSessionAsync(long userId) =>
         await RedisHelper.StringGetAsync<SingleTokenSessionModel>(SlidingExpirationJwtMiddleware.GetTokenKey(userId));
 
+    /// <inheritdoc />
     public async Task RenewSingleTokenSessionAsync(long userId, string token, DateTime expiresAt)
     {
         var session = await GetSingleTokenSessionAsync(userId);
@@ -112,6 +121,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         await RedisHelper.KeyExpireAsync(userTokensKey, TimeSpan.FromMinutes(jwtConfig.RefreshTokenExpired));
     }
 
+    /// <inheritdoc />
     public async Task<(bool Success, string AccessToken, string NewRefreshToken, string Message)> RefreshTokenAsync(string refreshToken, string ipAddress)
     {
         var refreshTokenModel = await GetRefreshTokenAsync(refreshToken);
@@ -157,6 +167,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         return (true, newAccessToken, newRefreshToken, "");
     }
 
+    /// <inheritdoc />
     public async Task RevokeRefreshTokenAsync(string refreshToken)
     {
         var refreshTokenModel = await GetRefreshTokenAsync(refreshToken);
@@ -169,6 +180,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         await RedisHelper.ListRemoveAsync(userTokensKey, refreshToken);
     }
 
+    /// <inheritdoc />
     public async Task RevokeAllUserTokensAsync(long userId)
     {
         var userTokensKey = $"{CacheKeyConst.UserRefreshTokensPrefix}{userId}";
@@ -183,11 +195,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         await RedisHelper.KeyDeleteAsync(userTokensKey);
     }
 
-    /// <summary>
-    /// 读取指定租户的在线会话记录
-    /// </summary>
-    /// <param name="tenantId">租户编号</param>
-    /// <returns>未过期的在线会话记录</returns>
+    /// <inheritdoc />
     public async Task<IReadOnlyList<OnlineUserSessionRecord>> GetOnlineSessionRecordsAsync(long tenantId)
     {
         var now = DateTime.UtcNow;
@@ -196,11 +204,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
             : await GetSingleSessionRecordsAsync(tenantId, now);
     }
 
-    /// <summary>
-    /// 注销用户的全部在线会话
-    /// </summary>
-    /// <param name="userId">用户编号</param>
-    /// <param name="reason">注销原因</param>
+    /// <inheritdoc />
     public async Task RevokeUserSessionsAsync(long userId, string reason)
     {
         if (jwtConfig.TokenMode == TokenMode.Refresh)
@@ -219,6 +223,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         await RedisHelper.KeyDeleteAsync(tokenKey);
     }
 
+    /// <inheritdoc />
     public async Task<bool> IsTokenBlacklistedAsync(string token)
     {
         if (string.IsNullOrEmpty(token))
@@ -229,6 +234,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         return await RedisHelper.KeyExistsAsync(blacklistKey);
     }
 
+    /// <inheritdoc />
     public async Task AddTokenToBlacklistAsync(string token, string reason = "")
     {
         if (string.IsNullOrEmpty(token))
@@ -254,6 +260,7 @@ public class TokenService(JwtConfig jwtConfig) : ITokenService
         }
     }
 
+    /// <inheritdoc />
     public async Task<RefreshTokenModel?> GetRefreshTokenAsync(string refreshToken)
     {
         if (string.IsNullOrEmpty(refreshToken))

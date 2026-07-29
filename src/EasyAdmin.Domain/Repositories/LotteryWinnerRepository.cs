@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace EasyAdmin.Domain.Repositories;
 
 /// <summary>
-/// 抽奖中奖记录仓库实现
+/// 抽奖中奖记录仓储实现
 /// </summary>
 public class LotteryWinnerRepository(IConfiguration configuration, ILogger<LotteryWinnerRepository> logger)
     : BaseRepositoryExt<LotteryWinnerEntity>(configuration, logger), ILotteryWinnerRepository

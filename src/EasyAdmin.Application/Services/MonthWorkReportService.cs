@@ -11,6 +11,9 @@ using Sean.Core.DbRepository.Extensions;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 月报服务实现
+/// </summary>
 public class MonthWorkReportService(
     ILogger<MonthWorkReportService> logger,
     IMapper mapper,
@@ -21,7 +24,9 @@ public class MonthWorkReportService(
     {
         var entity = mapper.Map<MonthWorkReportEntity>(dto);
         entity.UserId = TenantContextHolder.UserId;
-        return await monthWorkReportRepository.AddAsync(entity);
+        var result = await monthWorkReportRepository.AddAsync(entity);
+        dto.Id = entity.Id;
+        return result;
     }
 
     public async Task<bool> DeleteByIdAsync(long id)

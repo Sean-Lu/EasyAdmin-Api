@@ -3,7 +3,7 @@ using EasyAdmin.Application.Dtos;
 namespace EasyAdmin.Application.Contracts;
 
 /// <summary>
-/// 用户偏好服务
+/// 用户偏好服务接口
 /// </summary>
 public interface IUserPreferenceService
 {

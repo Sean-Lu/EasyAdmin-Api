@@ -12,6 +12,9 @@ using Sean.Core.DbRepository.Util;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 代码生成分类服务实现
+/// </summary>
 public class CodeGenCategoryService(
     ILogger<CodeGenCategoryService> logger,
     ICodeGenCategoryRepository categoryRepository,

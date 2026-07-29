@@ -17,6 +17,9 @@ using MapsterMapper;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 用户服务实现
+/// </summary>
 public class UserService(
     ILogger<UserService> logger,
     IMapper mapper,

@@ -5,6 +5,9 @@ using Sean.Core.DbRepository;
 
 namespace EasyAdmin.Application.Contracts;
 
+/// <summary>
+/// 应用代码服务接口
+/// </summary>
 public interface IAppCodeService
 {
     Task<bool> AddAsync(AppCodeAddDto dto);

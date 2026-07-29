@@ -11,9 +11,7 @@ public class RedisCaptchaStore : ICaptchaStore
 {
     private static readonly TimeSpan LockExpiration = TimeSpan.FromSeconds(5);
 
-    /// <summary>
-    /// 保存验证码
-    /// </summary>
+    /// <inheritdoc />
     public async Task StoreAsync(string captchaKey, string value, TimeSpan expiration)
     {
         var stored = await RedisHelper.StringSetAsync(GetCacheKey(captchaKey), value, expiration);
@@ -23,9 +21,7 @@ public class RedisCaptchaStore : ICaptchaStore
         }
     }
 
-    /// <summary>
-    /// 消费验证码
-    /// </summary>
+    /// <inheritdoc />
     public async Task<string?> ConsumeAsync(string captchaKey)
     {
         var lockKey = $"{CacheKeyConst.CaptchaLockPrefix}{captchaKey}";

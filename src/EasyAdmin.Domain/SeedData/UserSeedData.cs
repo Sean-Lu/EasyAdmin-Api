@@ -11,6 +11,7 @@ namespace EasyAdmin.Domain.SeedData;
 /// </summary>
 public class UserSeedData : IEntitySeedData<UserEntity>
 {
+    /// <inheritdoc />
     public IEnumerable<UserEntity> SeedData()
     {
         var hash = new HashCryptoProvider();

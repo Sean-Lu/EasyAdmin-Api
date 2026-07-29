@@ -3,7 +3,7 @@ using EasyAdmin.Application.Dtos;
 namespace EasyAdmin.Application.Contracts;
 
 /// <summary>
-/// 服务器监控服务
+/// 服务器监控服务接口
 /// </summary>
 public interface IServerMonitorService
 {

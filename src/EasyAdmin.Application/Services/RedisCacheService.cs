@@ -9,7 +9,7 @@ using StackExchange.Redis;
 namespace EasyAdmin.Application.Services;
 
 /// <summary>
-/// Redis缓存管理服务
+/// Redis缓存管理服务实现
 /// </summary>
 public class RedisCacheService(IConfiguration configuration) : IRedisCacheService
 {

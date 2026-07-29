@@ -7,6 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace EasyAdmin.Application.Services;
 
+/// <summary>
+/// 用户角色服务实现
+/// </summary>
 public class UserRoleService(
     ILogger<UserRoleService> logger,
     IUserRoleRepository userRoleRepository,

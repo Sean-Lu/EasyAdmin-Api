@@ -11,6 +11,7 @@ namespace EasyAdmin.Domain.SeedData.Test;
 /// </summary>
 public class RegionSeedData : IEntitySeedData<RegionEntity>, ITestSeedData
 {
+    /// <inheritdoc />
     public IEnumerable<RegionEntity> SeedData()
     {
         var assembly = Assembly.GetExecutingAssembly();
