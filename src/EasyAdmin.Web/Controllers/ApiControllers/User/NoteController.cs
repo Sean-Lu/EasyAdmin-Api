@@ -39,13 +39,14 @@ public class NoteController(
     /// </summary>
     [HttpPost]
     [ApiRepeatRequestFilter]
-    public async Task<ApiResult<bool>> Add(NoteUpdateDto data)
+    public async Task<ApiResult<long>> Add(NoteUpdateDto data)
     {
         if (string.IsNullOrWhiteSpace(data.Title))
         {
-            return Fail<bool>("笔记标题不能为空");
+            return Fail<long>("笔记标题不能为空");
         }
-        return Success(await noteService.AddAsync(data));
+        var result = await noteService.AddAsync(data);
+        return result ? Success(data.Id) : Fail<long>("笔记创建失败");
     }
 
     /// <summary>
