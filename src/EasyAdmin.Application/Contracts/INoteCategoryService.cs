@@ -11,5 +11,6 @@ public interface INoteCategoryService
     Task<bool> DeleteByIdAsync(long id);
     Task<bool> UpdateAsync(NoteCategoryUpdateDto dto);
     Task<bool> UpdateSortOrderAsync(long id, int sortOrder);
+    Task<bool> ReorderAsync(List<long> ids);
     Task<List<NoteCategoryDto>> GetByUserIdAsync();
 }

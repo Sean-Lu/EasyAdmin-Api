@@ -3,6 +3,7 @@ using EasyAdmin.Application.Dtos;
 using EasyAdmin.Domain.Contracts;
 using EasyAdmin.Domain.Entities;
 using EasyAdmin.Infrastructure.Tenant;
+using EasyAdmin.Infrastructure.Wrapper;
 using MapsterMapper;
 using Sean.Core.DbRepository;
 
@@ -44,6 +45,49 @@ public class NoteCategoryService(
     {
         return await noteCategoryRepository.UpdateAsync(new NoteCategoryEntity { SortOrder = sortOrder }, entity => entity.SortOrder,
             entity => entity.Id == id && entity.UserId == TenantContextHolder.UserId && entity.TenantId == TenantContextHolder.TenantId) > 0;
+    }
+
+    public async Task<bool> ReorderAsync(List<long> ids)
+    {
+        if (ids.Count == 0 || ids.Count != ids.Distinct().Count())
+        {
+            throw new ExplicitException("分类排序数据无效");
+        }
+
+        var categories = (await noteCategoryRepository.QueryAsync(entity =>
+            entity.UserId == TenantContextHolder.UserId &&
+            entity.TenantId == TenantContextHolder.TenantId &&
+            !entity.IsDelete))?.ToList() ?? new List<NoteCategoryEntity>();
+        if (categories.Count != ids.Count || categories.Any(category => !ids.Contains(category.Id)))
+        {
+            throw new ExplicitException("分类已发生变化，请刷新后重试");
+        }
+
+        var categoryDict = categories.ToDictionary(category => category.Id);
+        return await noteCategoryRepository.ExecuteAutoTransactionAsync(async transaction =>
+        {
+            for (var index = 0; index < ids.Count; index++)
+            {
+                var id = ids[index];
+                if (categoryDict[id].SortOrder == index)
+                {
+                    continue;
+                }
+                var affectedRows = await noteCategoryRepository.UpdateAsync(
+                    new NoteCategoryEntity { SortOrder = index },
+                    entity => entity.SortOrder,
+                    entity => entity.Id == id &&
+                              entity.UserId == TenantContextHolder.UserId &&
+                              entity.TenantId == TenantContextHolder.TenantId &&
+                              !entity.IsDelete,
+                    transaction);
+                if (affectedRows <= 0)
+                {
+                    throw new ExplicitException("分类排序保存失败");
+                }
+            }
+            return true;
+        });
     }
 
     public async Task<List<NoteCategoryDto>> GetByUserIdAsync()

@@ -59,6 +59,16 @@ public class NoteCategoryController(
     }
 
     /// <summary>
+    /// 重新排序
+    /// </summary>
+    [HttpPost]
+    public async Task<ApiResult<bool>> Reorder([FromBody] JObject? data)
+    {
+        var ids = data?["ids"]?.Values<long>().ToList() ?? new List<long>();
+        return Success(await noteCategoryService.ReorderAsync(ids));
+    }
+
+    /// <summary>
     /// 列表
     /// </summary>
     [HttpGet]
