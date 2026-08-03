@@ -17,6 +17,7 @@ public interface IShareService
     Task<ShareConfigDto> SaveAsync(ShareSaveDto request);
     Task<ShareConfigDto> SetEnabledAsync(ShareToggleDto request);
     Task<ShareConfigDto> RegenerateAsync(ShareTargetRequestDto request);
+    Task DeleteAsync(ShareTargetRequestDto request);
     Task<PublicShareStatusDto> GetPublicStatusAsync(string shareCode);
     Task<ShareFavoriteTargetDto> GetFavoriteTargetAsync(string shareCode, string? accessToken);
     Task<PublicShareVerifyResultDto> VerifyPasswordAsync(PublicShareVerifyDto request, string ipAddress);

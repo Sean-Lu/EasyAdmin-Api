@@ -163,6 +163,15 @@ public class ShareService(
         return ToConfig(share);
     }
 
+    public async Task DeleteAsync(ShareTargetRequestDto request)
+    {
+        var share = await GetRequiredOwnedShareAsync(request.TargetType, request.TargetId);
+        share.IsDelete = true;
+        share.IsEnabled = false;
+        share.AccessVersion++;
+        await PersistAsync(share);
+    }
+
     public async Task<PublicShareStatusDto> GetPublicStatusAsync(string shareCode)
     {
         var share = await GetAvailableShareAsync(shareCode);

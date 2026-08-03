@@ -56,4 +56,14 @@ public class ShareController(IShareService shareService) : BaseApiController
     {
         return Success(await shareService.RegenerateAsync(request));
     }
+
+    /// <summary>
+    /// 删除分享
+    /// </summary>
+    [HttpPost]
+    public async Task<ApiResult> Delete(ShareTargetRequestDto request)
+    {
+        await shareService.DeleteAsync(request);
+        return Success();
+    }
 }
