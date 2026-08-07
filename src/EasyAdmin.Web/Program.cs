@@ -11,6 +11,7 @@ using Quartz;
 using Serilog;
 using Sean.Core.Redis.Extensions;
 using System.Reflection;
+using System.Text;
 using EasyAdmin.Infrastructure.Converter;
 using EasyAdmin.Web.Contracts;
 using EasyAdmin.Web.Filter;
@@ -21,6 +22,9 @@ using OfficeOpenXml;
 Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);// 设置当前工作目录：@".\"
 
 ThreadPool.SetMinThreads(30, 30);
+
+// 注册 GBK/GB18030 等传统代码页编码支持
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 ExcelPackage.License.SetNonCommercialPersonal("Sean");// EPPlus
 

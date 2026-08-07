@@ -28,6 +28,16 @@ public interface IStockHoldingService
     Task<bool> UpdateCurrentPriceAsync(long accountId, long id, decimal currentPrice);
 
     /// <summary>
+    /// 刷新账户持仓价格
+    /// </summary>
+    Task<StockHoldingPriceRefreshResultDto> RefreshCurrentPricesAsync(long accountId);
+
+    /// <summary>
+    /// 刷新单个持仓价格
+    /// </summary>
+    Task<bool> RefreshCurrentPriceAsync(long accountId, long id);
+
+    /// <summary>
     /// 更新启用状态
     /// </summary>
     Task<bool> UpdateIsEnabledAsync(long accountId, long id, bool isEnabled);

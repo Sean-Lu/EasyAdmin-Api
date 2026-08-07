@@ -17,7 +17,8 @@ namespace EasyAdmin.Application.Services;
 public class StockHoldingService(
     IMapper mapper,
     IStockHoldingRepository stockHoldingRepository,
-    IStockAccountService stockAccountService
+    IStockAccountService stockAccountService,
+    IStockQuoteProvider stockQuoteProvider
     ) : IStockHoldingService
 {
     public async Task<bool> AddAsync(StockHoldingDto dto)
@@ -89,6 +90,84 @@ public class StockHoldingService(
                       entity.UserId == TenantContextHolder.UserId &&
                       entity.TenantId == TenantContextHolder.TenantId &&
                       !entity.IsDelete) > 0;
+    }
+
+    public async Task<StockHoldingPriceRefreshResultDto> RefreshCurrentPricesAsync(long accountId)
+    {
+        await EnsureAccountAsync(accountId);
+
+        var entities = (await stockHoldingRepository.QueryAsync(entity =>
+            entity.UserId == TenantContextHolder.UserId &&
+            entity.AccountId == accountId &&
+            entity.TenantId == TenantContextHolder.TenantId &&
+            entity.IsEnabled &&
+            !entity.IsDelete))?.ToList() ?? new List<StockHoldingEntity>();
+        if (entities.Count == 0)
+        {
+            return new StockHoldingPriceRefreshResultDto();
+        }
+
+        var quotes = (await stockQuoteProvider.GetCurrentPricesAsync(entities.Select(entity => entity.Code)))
+            .ToDictionary(quote => quote.StockCode, StringComparer.OrdinalIgnoreCase);
+        var result = new StockHoldingPriceRefreshResultDto();
+
+        foreach (var entity in entities)
+        {
+            if (!quotes.TryGetValue(entity.Code.Trim(), out var quote))
+            {
+                result.FailedNames.Add(entity.Name);
+                continue;
+            }
+
+            var updated = await stockHoldingRepository.UpdateAsync(
+                new StockHoldingEntity { Id = entity.Id, CurrentPrice = quote.CurrentPrice },
+                item => item.CurrentPrice,
+                item => item.Id == entity.Id &&
+                        item.AccountId == accountId &&
+                        item.UserId == TenantContextHolder.UserId &&
+                        item.TenantId == TenantContextHolder.TenantId &&
+                        !item.IsDelete) > 0;
+            if (updated) result.UpdatedCount++;
+            else result.FailedNames.Add(entity.Name);
+        }
+
+        if (result.UpdatedCount == 0)
+        {
+            throw new ExplicitException("未获取到可用的股票行情");
+        }
+
+        return result;
+    }
+
+    public async Task<bool> RefreshCurrentPriceAsync(long accountId, long id)
+    {
+        await EnsureAccountAsync(accountId);
+
+        var entity = (await stockHoldingRepository.QueryAsync(item =>
+            item.Id == id &&
+            item.AccountId == accountId &&
+            item.UserId == TenantContextHolder.UserId &&
+            item.TenantId == TenantContextHolder.TenantId &&
+            !item.IsDelete))?.FirstOrDefault();
+        if (entity == null)
+        {
+            throw new ExplicitException("股票持仓不存在");
+        }
+
+        var quote = (await stockQuoteProvider.GetCurrentPricesAsync(new[] { entity.Code })).FirstOrDefault();
+        if (quote == null)
+        {
+            throw new ExplicitException("未获取到该股票的可用行情");
+        }
+
+        return await stockHoldingRepository.UpdateAsync(
+            new StockHoldingEntity { Id = id, CurrentPrice = quote.CurrentPrice },
+            item => item.CurrentPrice,
+            item => item.Id == id &&
+                    item.AccountId == accountId &&
+                    item.UserId == TenantContextHolder.UserId &&
+                    item.TenantId == TenantContextHolder.TenantId &&
+                    !item.IsDelete) > 0;
     }
 
     public async Task<bool> UpdateIsEnabledAsync(long accountId, long id, bool isEnabled)
@@ -213,4 +292,5 @@ public class StockHoldingService(
             throw new ExplicitException("当前价格不能小于0");
         }
     }
+
 }

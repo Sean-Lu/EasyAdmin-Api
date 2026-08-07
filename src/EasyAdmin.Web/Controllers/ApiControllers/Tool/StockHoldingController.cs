@@ -57,6 +57,27 @@ public class StockHoldingController(
     }
 
     /// <summary>
+    /// 刷新账户持仓价格
+    /// </summary>
+    [HttpPost]
+    public async Task<ApiResult<StockHoldingPriceRefreshResultDto>> RefreshCurrentPrices([FromBody] JObject? data)
+    {
+        var accountId = data?["accountId"]?.Value<long>() ?? default;
+        return Success(await stockHoldingService.RefreshCurrentPricesAsync(accountId));
+    }
+
+    /// <summary>
+    /// 刷新单个持仓价格
+    /// </summary>
+    [HttpPost]
+    public async Task<ApiResult<bool>> RefreshCurrentPrice([FromBody] JObject? data)
+    {
+        var accountId = data?["accountId"]?.Value<long>() ?? default;
+        var id = data?["id"]?.Value<long>() ?? default;
+        return Success(await stockHoldingService.RefreshCurrentPriceAsync(accountId, id));
+    }
+
+    /// <summary>
     /// 修改启用状态
     /// </summary>
     [HttpPost]

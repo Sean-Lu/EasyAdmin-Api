@@ -185,3 +185,19 @@ public class StockHoldingListDto
     /// </summary>
     public StockHoldingSummaryDto Summary { get; set; } = new();
 }
+
+/// <summary>
+/// 股票持仓价格刷新结果
+/// </summary>
+public class StockHoldingPriceRefreshResultDto
+{
+    /// <summary>
+    /// 更新数量
+    /// </summary>
+    public int UpdatedCount { get; set; }
+
+    /// <summary>
+    /// 刷新失败的股票名称
+    /// </summary>
+    public List<string> FailedNames { get; set; } = new();
+}

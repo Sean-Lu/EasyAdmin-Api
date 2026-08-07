@@ -24,6 +24,8 @@ public static class ServiceCollectionExtensions
         services.AddMapster();
 
         services.AddServiceByInterfaceSuffix(Assembly.GetExecutingAssembly(), "Service", ServiceLifetime.Transient);
+        services.AddHttpClient("StockQuote");// 注册命名 HTTP 客户端
+        services.AddTransient<IStockQuoteProvider, TencentStockQuoteProvider>();
 
         services.AddScoped<IExportService, ExportService>();
         services.AddTransient<SharePasswordProtector>();
