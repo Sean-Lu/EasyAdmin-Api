@@ -23,7 +23,7 @@ public class StockHoldingService(
 {
     public async Task<bool> AddAsync(StockHoldingDto dto)
     {
-        Validate(dto.Name, dto.Code, dto.CostPrice, dto.Quantity, dto.CurrentPrice);
+        Validate(dto.Name, dto.Code, dto.CostPrice, dto.Quantity, dto.TargetProfitAmount, dto.CurrentPrice);
         // 校验账户归属，避免跨账户写入
         await EnsureAccountAsync(dto.AccountId);
 
@@ -33,6 +33,7 @@ public class StockHoldingService(
         entity.Code = dto.Code.Trim();
         entity.Remark = dto.Remark?.Trim();
         entity.AccountId = dto.AccountId;
+        entity.TargetProfitAmount = dto.TargetProfitAmount;
         return await stockHoldingRepository.AddAsync(entity);
     }
 
@@ -51,7 +52,7 @@ public class StockHoldingService(
 
     public async Task<bool> UpdateAsync(StockHoldingUpdateDto dto)
     {
-        Validate(dto.Name, dto.Code, dto.CostPrice, dto.Quantity, dto.CurrentPrice);
+        Validate(dto.Name, dto.Code, dto.CostPrice, dto.Quantity, dto.TargetProfitAmount, dto.CurrentPrice);
         await EnsureAccountAsync(dto.AccountId);
 
         return await stockHoldingRepository.UpdateAsync(new StockHoldingEntity
@@ -63,10 +64,11 @@ public class StockHoldingService(
             Remark = dto.Remark?.Trim(),
             CostPrice = dto.CostPrice,
             Quantity = dto.Quantity,
+            TargetProfitAmount = dto.TargetProfitAmount,
             CurrentPrice = dto.CurrentPrice,
             IsEnabled = dto.IsEnabled,
             SortOrder = dto.SortOrder
-          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.Remark, entity.CostPrice, entity.Quantity, entity.CurrentPrice, entity.IsEnabled, entity.SortOrder },
+          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.Remark, entity.CostPrice, entity.Quantity, entity.TargetProfitAmount, entity.CurrentPrice, entity.IsEnabled, entity.SortOrder },
               entity => entity.Id == dto.Id &&
                         entity.AccountId == dto.AccountId &&
                         entity.UserId == TenantContextHolder.UserId &&
@@ -215,6 +217,7 @@ public class StockHoldingService(
         var marketValue = entity.CurrentPrice * entity.Quantity;
         var profitAmount = (entity.CurrentPrice - entity.CostPrice) * entity.Quantity;
         var profitRatio = entity.CostPrice == 0 ? 0 : (entity.CurrentPrice - entity.CostPrice) / entity.CostPrice * 100;
+        var targetPrice = CalculateTargetPrice(entity.CostPrice, entity.Quantity, entity.TargetProfitAmount);
 
         return new StockHoldingDto
         {
@@ -232,13 +235,26 @@ public class StockHoldingService(
             Remark = entity.Remark,
             CostPrice = entity.CostPrice,
             Quantity = entity.Quantity,
+            TargetProfitAmount = entity.TargetProfitAmount,
             CurrentPrice = entity.CurrentPrice,
             CostAmount = Math.Round(costAmount, 2),
             MarketValue = Math.Round(marketValue, 2),
             ProfitAmount = Math.Round(profitAmount, 2),
             ProfitRatio = Math.Round(profitRatio, 2),
+            TargetPrice = targetPrice,
             IsEnabled = entity.IsEnabled
         };
+    }
+
+    private static decimal? CalculateTargetPrice(decimal costPrice, decimal quantity, decimal? targetProfitAmount)
+    {
+        if (!targetProfitAmount.HasValue || quantity <= 0)
+        {
+            return null;
+        }
+
+        var targetPrice = costPrice + targetProfitAmount.Value / quantity;
+        return Math.Ceiling(targetPrice * 1000) / 1000;
     }
 
     private static StockHoldingSummaryDto BuildSummary(IEnumerable<StockHoldingDto> holdings)
@@ -269,7 +285,7 @@ public class StockHoldingService(
     /// <summary>
     /// 校验持仓基础字段
     /// </summary>
-    private static void Validate(string name, string code, decimal costPrice, decimal quantity, decimal currentPrice)
+    private static void Validate(string name, string code, decimal costPrice, decimal quantity, decimal? targetProfitAmount, decimal currentPrice)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -286,6 +302,14 @@ public class StockHoldingService(
         if (quantity < 0)
         {
             throw new ExplicitException("持仓数量不能小于0");
+        }
+        if (targetProfitAmount.HasValue && targetProfitAmount <= 0)
+        {
+            throw new ExplicitException("目标盈利金额必须大于0");
+        }
+        if (targetProfitAmount.HasValue && quantity == 0)
+        {
+            throw new ExplicitException("设置目标盈利金额时持仓数量必须大于0");
         }
         if (currentPrice < 0)
         {

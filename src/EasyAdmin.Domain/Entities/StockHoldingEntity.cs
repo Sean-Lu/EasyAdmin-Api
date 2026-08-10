@@ -49,6 +49,11 @@ public class StockHoldingEntity : TenantEntityBase
     public virtual decimal Quantity { get; set; }
 
     /// <summary>
+    /// 目标盈利金额
+    /// </summary>
+    public virtual decimal? TargetProfitAmount { get; set; }
+
+    /// <summary>
     /// 当前价格
     /// </summary>
     public virtual decimal CurrentPrice { get; set; }

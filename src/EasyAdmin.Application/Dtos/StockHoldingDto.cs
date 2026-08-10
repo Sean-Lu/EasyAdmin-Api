@@ -48,6 +48,11 @@ public class StockHoldingDto : TenantDtoBase
     public decimal Quantity { get; set; }
 
     /// <summary>
+    /// 目标盈利金额
+    /// </summary>
+    public decimal? TargetProfitAmount { get; set; }
+
+    /// <summary>
     /// 当前价格
     /// </summary>
     public decimal CurrentPrice { get; set; }
@@ -81,6 +86,11 @@ public class StockHoldingDto : TenantDtoBase
     /// 盈亏比例
     /// </summary>
     public decimal ProfitRatio { get; set; }
+
+    /// <summary>
+    /// 目标价格
+    /// </summary>
+    public decimal? TargetPrice { get; set; }
 }
 
 /// <summary>
@@ -122,6 +132,11 @@ public class StockHoldingUpdateDto : DtoIdBase
     /// 持仓数量
     /// </summary>
     public decimal Quantity { get; set; }
+
+    /// <summary>
+    /// 目标盈利金额
+    /// </summary>
+    public decimal? TargetProfitAmount { get; set; }
 
     /// <summary>
     /// 当前价格
