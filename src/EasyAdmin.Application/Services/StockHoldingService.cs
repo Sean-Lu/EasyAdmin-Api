@@ -68,7 +68,7 @@ public class StockHoldingService(
             CurrentPrice = dto.CurrentPrice,
             IsEnabled = dto.IsEnabled,
             SortOrder = dto.SortOrder
-          }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.Remark, entity.CostPrice, entity.Quantity, entity.TargetProfitAmount, entity.CurrentPrice, entity.IsEnabled, entity.SortOrder },
+        }, entity => new { entity.AccountId, entity.Name, entity.Code, entity.Remark, entity.CostPrice, entity.Quantity, entity.TargetProfitAmount, entity.CurrentPrice, entity.IsEnabled, entity.SortOrder },
               entity => entity.Id == dto.Id &&
                         entity.AccountId == dto.AccountId &&
                         entity.UserId == TenantContextHolder.UserId &&
@@ -190,7 +190,7 @@ public class StockHoldingService(
         await EnsureAccountAsync(accountId);
 
         var orderBy = OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Asc, entity => entity.SortOrder,
-            OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Asc, entity => entity.CreateTime));
+            OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Desc, entity => entity.CreateTime));
 
         var normalizedKeyword = keyword?.Trim();
         var hasKeyword = !string.IsNullOrEmpty(normalizedKeyword);
@@ -203,46 +203,26 @@ public class StockHoldingService(
                 .AndAlsoIF(hasKeyword, entity => entity.Name.Contains(keywordValue) || entity.Code.Contains(keywordValue)),
             orderBy))?.ToList() ?? new List<StockHoldingEntity>();
 
-        var list = entities.Select(BuildDto).ToList();
+        var list = entities.Select(entity =>
+        {
+            var costAmount = Math.Round(entity.CostPrice * entity.Quantity, 2);
+            var marketValue = Math.Round(entity.CurrentPrice * entity.Quantity, 2);
+            var profitAmount = Math.Round((entity.CurrentPrice - entity.CostPrice) * entity.Quantity, 2);
+            var profitRatio = Math.Round(entity.CostPrice == 0 ? 0 : (entity.CurrentPrice - entity.CostPrice) / entity.CostPrice * 100, 2);
+            var targetPrice = CalculateTargetPrice(entity.CostPrice, entity.Quantity, entity.TargetProfitAmount);
+
+            var dto = mapper.Map<StockHoldingDto>(entity);
+            dto.CostAmount = costAmount;
+            dto.MarketValue = marketValue;
+            dto.ProfitAmount = profitAmount;
+            dto.ProfitRatio = profitRatio;
+            dto.TargetPrice = targetPrice;
+            return dto;
+        }).ToList();
         return new StockHoldingListDto
         {
             List = list,
             Summary = BuildSummary(list)
-        };
-    }
-
-    private static StockHoldingDto BuildDto(StockHoldingEntity entity)
-    {
-        var costAmount = entity.CostPrice * entity.Quantity;
-        var marketValue = entity.CurrentPrice * entity.Quantity;
-        var profitAmount = (entity.CurrentPrice - entity.CostPrice) * entity.Quantity;
-        var profitRatio = entity.CostPrice == 0 ? 0 : (entity.CurrentPrice - entity.CostPrice) / entity.CostPrice * 100;
-        var targetPrice = CalculateTargetPrice(entity.CostPrice, entity.Quantity, entity.TargetProfitAmount);
-
-        return new StockHoldingDto
-        {
-            Id = entity.Id,
-            CreateUserId = entity.CreateUserId,
-            CreateTime = entity.CreateTime,
-            UpdateUserId = entity.UpdateUserId,
-            UpdateTime = entity.UpdateTime,
-            IsDelete = entity.IsDelete,
-            TenantId = entity.TenantId,
-            UserId = entity.UserId,
-            AccountId = entity.AccountId,
-            Name = entity.Name,
-            Code = entity.Code,
-            Remark = entity.Remark,
-            CostPrice = entity.CostPrice,
-            Quantity = entity.Quantity,
-            TargetProfitAmount = entity.TargetProfitAmount,
-            CurrentPrice = entity.CurrentPrice,
-            CostAmount = Math.Round(costAmount, 2),
-            MarketValue = Math.Round(marketValue, 2),
-            ProfitAmount = Math.Round(profitAmount, 2),
-            ProfitRatio = Math.Round(profitRatio, 2),
-            TargetPrice = targetPrice,
-            IsEnabled = entity.IsEnabled
         };
     }
 
