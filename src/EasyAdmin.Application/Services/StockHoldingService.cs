@@ -185,22 +185,20 @@ public class StockHoldingService(
                       !entity.IsDelete) > 0;
     }
 
-    public async Task<StockHoldingListDto> ListAsync(long accountId, string? keyword)
+    public async Task<StockHoldingListDto> ListAsync(long accountId, string? keyword, bool? isEnabled = null)
     {
         await EnsureAccountAsync(accountId);
 
+        var keywordValue = keyword?.Trim() ?? string.Empty;
         var orderBy = OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Asc, entity => entity.SortOrder,
             OrderByConditionBuilder<StockHoldingEntity>.Build(OrderByType.Desc, entity => entity.CreateTime));
-
-        var normalizedKeyword = keyword?.Trim();
-        var hasKeyword = !string.IsNullOrEmpty(normalizedKeyword);
-        var keywordValue = normalizedKeyword ?? string.Empty;
         var entities = (await stockHoldingRepository.QueryAsync(WhereExpressionUtil.Create<StockHoldingEntity>(entity =>
                     entity.UserId == TenantContextHolder.UserId &&
                     entity.AccountId == accountId &&
                     entity.TenantId == TenantContextHolder.TenantId &&
                     !entity.IsDelete)
-                .AndAlsoIF(hasKeyword, entity => entity.Name.Contains(keywordValue) || entity.Code.Contains(keywordValue)),
+                .AndAlsoIF(!string.IsNullOrEmpty(keywordValue), entity => entity.Name.Contains(keywordValue) || entity.Code.Contains(keywordValue))
+                .AndAlsoIF(isEnabled.HasValue, entity => entity.IsEnabled == isEnabled.GetValueOrDefault()),
             orderBy))?.ToList() ?? new List<StockHoldingEntity>();
 
         var list = entities.Select(entity =>

@@ -93,8 +93,8 @@ public class StockHoldingController(
     /// 获取持仓列表
     /// </summary>
     [HttpGet]
-    public async Task<ApiResult<StockHoldingListDto>> List(long accountId, string? keyword)
+    public async Task<ApiResult<StockHoldingListDto>> List(long accountId, string? keyword, bool? isEnabled = null)
     {
-        return Success(await stockHoldingService.ListAsync(accountId, keyword));
+        return Success(await stockHoldingService.ListAsync(accountId, keyword, isEnabled));
     }
 }

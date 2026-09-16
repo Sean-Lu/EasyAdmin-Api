@@ -45,5 +45,5 @@ public interface IStockHoldingService
     /// <summary>
     /// 获取当前用户持仓
     /// </summary>
-    Task<StockHoldingListDto> ListAsync(long accountId, string? keyword);
+    Task<StockHoldingListDto> ListAsync(long accountId, string? keyword, bool? isEnabled = null);
 }
